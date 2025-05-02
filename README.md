@@ -1,4 +1,5 @@
 # Are You Employable?
+
 An interactive, scenario-based assessment tool that evaluates whether someone is employable as a software engineer
 
 ---
@@ -34,29 +35,24 @@ Use [PM2](https://pm2.keymetrics.io/) to manage and keep your Node.js applicatio
 #### 🔧 Commands
 
 ```bash
-# Start the app (replace app.js with your entry file)
-pm2 start app.js
+# Start all apps defined in the config
+pm2 start ecosystem.config.js
 
-# Start with a custom name
-pm2 start app.js --name my-app
+# Start with a specific environment
+pm2 start ecosystem.config.js --env production
 
-# Restart the app
-pm2 restart my-app
+# Restart all apps
+pm2 restart ecosystem.config.js
 
-# Stop the app
-pm2 stop my-app
+# Stop all apps
+pm2 stop ecosystem.config.js
 
-# Delete the app from the PM2 process list
-pm2 delete my-app
+# Delete all apps
+pm2 delete ecosystem.config.js
 
-# View real-time logs
-pm2 logs
-
-# Monitor performance and metrics
-pm2 monit
-
-# Save current process list (for automatic respawn)
+# Save the current process list
 pm2 save
 
-# Generate startup script to resurrect PM2 processes on boot
+# Setup startup script for boot persistence
 pm2 startup
+```
