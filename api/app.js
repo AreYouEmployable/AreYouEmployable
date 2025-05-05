@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import assessmentRoutes from './routes/assessmentRoutes.js';
 
 const app = express();
 dotenv.config();
@@ -7,6 +8,8 @@ dotenv.config();
 app.use('/health', async (req, res) => {
     res.status(200).json({ message: 'API running and healthy' });
 });
+
+app.use('/api/assessments', assessmentRoutes);
 
 const environment = process.env.ENVIRONMENT;
 
