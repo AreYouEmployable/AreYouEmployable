@@ -9,6 +9,8 @@ import swaggerUi from 'swagger-ui-express';
 import routes from './routes/index.js';
 import swaggerOptions from './config/swagger.js';
 
+import authRoutes from './routes/authRoutes.js';
+import { verifyJWT } from './middlewares/authMiddleware.js';
 
 const app = express();
 dotenv.config();
@@ -28,12 +30,14 @@ app.use('/health', async (req, res) => {
 // API routes
 app.use('/api', routes);
 
+app.use('/api/auth', authRoutes);
 
-const environment = process.env.ENVIRONMENT;
+app.get('/protected', verifyJWT, (req, res) => {
+    res.json({ message: 'You are authenticated!', user: req.user });
+});
 
 app.listen(process.env.PORT, async () => { 
-    // connect to database (will do later)
-    if (environment === 'production') {
+    if (process.env.ENVIRONMENT === 'production') {
         console.log(`🚀 Server running on ${process.env.BASE_URL}`)
     } else {
         console.log(`🚀 Server running on http://localhost:${process.env.PORT}`)
