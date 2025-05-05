@@ -57,7 +57,7 @@ CREATE TABLE assessments (
     assessment_status_id INTEGER REFERENCES assessment_status(assessment_status_id)
 );
 
-CREATE TABLE user_answer (
+CREATE TABLE user_answers (
     user_answer_id SERIAL PRIMARY KEY,
     assessment_id INTEGER NOT NULL REFERENCES assessments(assessment_id),
     question_id INTEGER NOT NULL REFERENCES questions(question_id),
