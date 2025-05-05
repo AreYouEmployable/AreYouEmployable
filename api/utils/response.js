@@ -28,7 +28,7 @@ const sendResponse = (res, statusCode, status, message, data = null) => {
  * @param {Object} data - Response data
  * @returns {Object} Response object
  */
-const sendSuccess = (res, statusCode, message, data) => {
+export const sendSuccess = (res, statusCode, message, data) => {
     return sendResponse(res, statusCode, 'success', message, data);
 };
 
@@ -39,9 +39,6 @@ const sendSuccess = (res, statusCode, message, data) => {
  * @param {string} message - Error message
  * @returns {Object} Response object
  */
-const sendError = (res, statusCode, message) => {
+export const sendError = (res, statusCode, message) => {
     return sendResponse(res, statusCode, 'error', message);
 };
-
-
-export default { sendSuccess, sendError };
