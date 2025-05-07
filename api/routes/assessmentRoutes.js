@@ -1,5 +1,5 @@
 import express from 'express';
-import { createAssessment, getAssessment, getAssessments } from '../controllers/assessmentController';
+import { createAssessment, getAssessment, getAssessments } from '../controllers/assessmentController.js';
 
 const router = express.Router();
 
