@@ -1,39 +1,46 @@
-import db from '../database.js'
+import db from '../database.js';
 
-// TODO NOT PROPERLY implemented yet
-// export async function createAssessmentForUser(userId, assessmentData) {
-//     const { title, description } = assessmentData;
-
-//     const result = await db.query(
-//         `INSERT INTO assessments (user_id, title, description, created_at, completed)
-//         VALUES ($1, $2, $3, NOW(), false)
-//         RETURNING *`,
-//         [userId, title, description]
-//     );
-
-//     return result.rows[0];
-// };
-
-export async function getAssessmentById(userId, assessmentId) {
+const createAssessment = async ({ userId, scenarioId, assessmentStatusId }) => {
     const result = await db.query(
         `
-        SELECT 
-            a.*, 
-            s.name AS status_name
-        FROM assessments a
-        LEFT JOIN assessment_status s ON a.assessment_status_id = s.assessment_status_id
-        WHERE a.assessment_id = $1 AND a.user_id = $2
+        INSERT INTO assessments (user_id, scenario_id, started_at, assessment_status_id)
+        VALUES ($1, $2, NOW(), $3)
+        RETURNING *
         `,
-        [assessmentId, userId]
+        [userId, scenarioId, assessmentStatusId]
     );
-    return result.rows[0] || null;
+
+    return result.rows[0];
 };
 
-// TODO NOT PROPERLY implemented yet
-// export async function getAllAssessmentsForUser(userId) {
-//     const result = await db.query(
-//         `SELECT * FROM assessments WHERE user_id = $1 ORDER BY created_at DESC`,
-//         [userId]
-//     );
-//     return result.rows;
-// };
+const getAssessmentById = async (assessmentId) => {
+    const result = await db.query(
+        `
+        SELECT *
+        FROM assessments
+        WHERE assessment_id = $1
+        `,
+        [assessmentId]
+    );
+
+    return result.rows[0];
+};
+
+const completeAssessment = async ({ assessmentId, score, resultSummary }) => {
+    const result = await db.query(
+        `
+        UPDATE assessments
+        SET completed_at = NOW(),
+            score = $2,
+            result_summary = $3,
+            assessment_status_id = 2
+        WHERE assessment_id = $1
+        RETURNING *
+        `,
+        [assessmentId, score, resultSummary]
+    );
+    
+    return result.rows[0];
+};
+
+export { createAssessment, getAssessmentById, completeAssessment };
