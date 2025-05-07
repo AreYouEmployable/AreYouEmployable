@@ -18,10 +18,15 @@ app.use('/health', async (req, res) => {
     res.status(200).json({ message: 'API running and healthy' });
 });
 
+app.get('/', (_req, res) => {
+    res.status(200).send('API running and healthy');
+});
+
+
 // Routes
 app.use('/api', routes);
 
-app.listen(process.env.PORT, async () => { 
+app.listen(process.env.PORT, async () => {
     if (process.env.ENVIRONMENT === 'production') {
         console.log(`🚀 Server running on ${process.env.BASE_URL}`)
     } else {
