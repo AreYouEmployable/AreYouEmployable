@@ -1,0 +1,58 @@
+:root {
+    --font-base: 1rem;
+    --font-scale: 1.25;
+    --font-size-1: calc(var(--font-base) * var(--font-scale));
+    --font-size-2: calc(var(--font-size-1) * var(--font-scale));
+    --font-size-3: calc(var(--font-size-2) * var(--font-scale));
+    
+    --space-unit: 1rem;
+    --space-xs: calc(var(--space-unit) / 2);
+    --space-sm: calc(var(--space-unit));
+    --space-md: calc(var(--space-unit) * 2);
+    --space-lg: calc(var(--space-unit) * 3);
+    --space-xl: calc(var(--space-unit) * 4);
+    
+    --color-primary: #2563eb;
+    --color-secondary: #7c3aed;
+    --color-text: #1e293b;
+    --color-light: #f8fafc;
+    --color-dark: #0f172a;
+
+    --color-primary: #2563eb;
+    --color-secondary: #7c3aed;
+    --color-text: #1e293b;
+    --color-light: #f8fafc;
+    --color-dark: #0f172a;
+    --color-bg: #ffffff;
+    --color-surface: #f1f5f9;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  :root[data-theme="dark"] {
+  --color-primary: #3b82f6;
+  --color-secondary: #8b5cf6;
+  --color-text: #e2e8f0;
+  --color-light: #334155;
+  --color-dark: #f8fafc;
+  --color-bg: #1e293b;
+  --color-surface: #0f172a;
+}
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: var(--font-base);
+    line-height: 1.5;
+    color: var(--color-text);
+  }
+  
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }

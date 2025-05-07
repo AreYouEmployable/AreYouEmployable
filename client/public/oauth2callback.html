@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Auth Callback</title>
+  <script>
+    window.addEventListener('load', () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const error = params.get('error');
+      
+      if (code) {
+        window.opener.postMessage({
+          type: 'google-auth-callback',
+          code
+        }, window.location.origin);
+      } else if (error) {
+        window.opener.postMessage({
+          type: 'google-auth-error',
+          error
+        }, window.location.origin);
+      }
+      
+      window.close();
+    });
+  </script>
+</head>
+<body>
+  <p>Please wait while we authenticate you...</p>
+</body>
+</html>
