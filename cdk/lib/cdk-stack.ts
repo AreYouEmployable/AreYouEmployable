@@ -220,10 +220,5 @@ export class CdkStack extends cdk.Stack {
       value: database.instanceEndpoint.hostname,
       description: 'Database endpoint',
     });
-
-    new cdk.CfnOutput(this, 'DatabaseSecretArn', {
-      value: database.secret?.secretArn || '',
-      description: 'Database secret ARN',
-    });
   }
 }
