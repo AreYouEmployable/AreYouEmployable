@@ -3,8 +3,8 @@ name: Deploy Infrastructure
 on:
   workflow_dispatch:
 jobs:
-  deploy:
-    name: Deploy CDK Stack
+  destroy:
+    name: Destroy CDK Stack
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +16,7 @@ jobs:
       run: |
         npm install -g aws-cdk
         npm install
-    
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -25,11 +25,7 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: 'af-south-1'
 
-    - name: Bootstrap CDK
+    - name: Destroy CDK Stack
       working-directory: ./cdk
       run: |
-        npx cdk bootstrap --require-approval=never        
-    - name: Deploy CDK Stack
-      working-directory: ./cdk
-      run: |
-        npx cdk deploy --require-approval=never
+        npx cdk destroy  --force
