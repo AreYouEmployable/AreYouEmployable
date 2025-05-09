@@ -5,6 +5,8 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as elasticbeanstalk from 'aws-cdk-lib/aws-elasticbeanstalk';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 
 export interface ExtendedStackProps extends cdk.StackProps {
   environmentName: string;
@@ -35,11 +37,31 @@ export class CdkStack extends cdk.Stack {
     const areYouEmployableBucketName = `are-you-employable-${props.environmentName}-bucket`;
     const areYouEmployable = new s3.Bucket(this, areYouEmployableBucketName, {
       bucketName: areYouEmployableBucketName,
+      websiteIndexDocument: 'index.html',
+      websiteErrorDocument: 'index.html',
       accessControl: s3.BucketAccessControl.PRIVATE,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
-      versioned: true,
+      autoDeleteObjects: true
+    });
+
+
+    // Create CloudFront distribution
+    const distribution = new cloudfront.Distribution(this, 'are-you-employable-distribution', {
+      defaultBehavior: {
+        origin: origins.S3BucketOrigin.withOriginAccessControl(areYouEmployable, {
+          originAccessLevels: [cloudfront.AccessLevel.READ], 
+        }),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      },
+      defaultRootObject: 'index.html',
+      errorResponses: [
+        {
+          httpStatus: 404,
+          responseHttpStatus: 404,
+          responsePagePath: '/index.html',
+        },
+      ],
     });
 
     // Create security group for RDS
