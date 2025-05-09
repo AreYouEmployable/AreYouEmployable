@@ -13,9 +13,6 @@ import assessmentRoutes from './routes/assessmentRoutes.js';
 const app = express();
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 app.use(express.json());
 
 // Generate Swagger documentation
@@ -34,10 +31,6 @@ app.use('user', userRoutes);
 app.use('assessment', assessmentRoutes);
 app.use('/', routes);
 
-// Serve static files from client's public directory
-app.use('/public', express.static(path.join(__dirname, '../client/public')));
-
-// Handle OAuth callback route
 app.get('/oauth2callback', (req, res) => {
     res.redirect(`/api/auth/google/callback${req.url}`);
 });
