@@ -13,208 +13,107 @@ INSERT INTO assessment_status (assessment_status_id, name) VALUES
     (1, 'In Progress'),
     (2, 'Completed');
 
-INSERT INTO scenarios (scenario_id, title, description, is_active) VALUES
-    (1, 'Cybersecurity Breach', 'A data breach has occurred, and steps need to be taken to mitigate the damage and protect sensitive information.', true),
-    (2, 'Cloud Migration', 'Migrating applications and infrastructure to the cloud with a focus on scalability and cost efficiency.', true),
-    (3, 'Startup Pitch', 'Pitching a startup idea to investors and dealing with their questions and concerns about the business.', true);
+    -- Insert Scenario
+INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
+VALUES (
+    1,
+    'Debugging Challenge',
+    'You''ve been tasked with fixing a critical bug in production. How do you approach the situation?',
+    1,  -- Technical
+    2   -- Medium
+);
 
-INSERT INTO questions (question_id, scenario_id, question_text, type_id, difficulty_id) VALUES
-    (1, 1, 'What is the first step after detecting a data breach?', 1, 1),
-    (2, 1, 'Explain how you would de-escalate a team conflict under pressure.', 4, 2),
-    (3, 1, 'How would you determine which systems were affected?', 3, 2),
-    (4, 1, 'What are signs of a phishing email?', 1, 1),
-    (5, 1, 'Describe a time you had to deliver bad news to a stakeholder.', 2, 2),
-    (6, 1, 'Which of these is an example of two-factor authentication?', 1, 1),
-    (7, 1, 'How would you prioritize tasks during an emergency?', 3, 3),
-    (8, 1, 'What is your leadership style under stress?', 4, 2),
-    (9, 1, 'Which port does HTTPS use by default?', 1, 1),
-    (10, 1, 'Write a plan for internal communication during a crisis.', 2, 3);
+-- Insert Questions
+INSERT INTO questions (question_id, scenario_id, question_text, explanation) VALUES
+    (1, 1, 'The production website is showing a blank page. What''s your first step?', 'When debugging production issues, collecting data through logs and trying to reproduce the problem are critical first steps.'),
+    (2, 1, 'You found that a third-party API is down. How do you handle this?', NULL);
 
-INSERT INTO questions (question_id, scenario_id, question_text, type_id, difficulty_id) VALUES
-    (11, 2, 'Which AWS service allows scalable object storage?', 1, 1),
-    (12, 2, 'Describe your experience with cross-functional collaboration.', 4, 2),
-    (13, 2, 'How do you reduce cloud vendor lock-in?', 3, 2),
-    (14, 2, 'What’s a common mistake during database migration?', 1, 2),
-    (15, 2, 'What communication strategy would you use for a distributed team?', 2, 3),
-    (16, 2, 'Which AWS service manages containerized applications?', 1, 2),
-    (17, 2, 'Describe a situation where a miscommunication caused delays.', 2, 2),
-    (18, 2, 'What is your approach to resolving unexpected downtime?', 3, 3),
-    (19, 2, 'What motivates you to adopt new technology?', 4, 1),
-    (20, 2, 'How do you handle contradicting opinions in planning meetings?', 4, 3);
+-- Insert Question Options for Question 1
+INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES
+    (1, 1, 'A', 'Immediately roll back to the previous version', false, 'While rollbacks are important, investigating first helps understand the issue.'),
+    (2, 1, 'B', 'Check browser console and server logs', true, 'Excellent! Checking logs helps identify the root cause quickly.'),
+    (3, 1, 'C', 'Ask another developer what changed', false, 'Communication is good, but diagnosis should start with technical investigation.'),
+    (4, 1, 'D', 'Try to reproduce the issue locally', true, 'Good approach! Reproducing locally helps with debugging.');
 
-INSERT INTO questions (question_id, scenario_id, question_text, type_id, difficulty_id) VALUES
-    (21, 3, 'What’s the best way to present a product roadmap?', 2, 2),
-    (22, 3, 'Which metric best represents product-market fit?', 1, 2),
-    (23, 3, 'How would you respond to harsh investor criticism?', 4, 3),
-    (24, 3, 'What is the difference between CAC and LTV?', 1, 2),
-    (25, 3, 'Tell us about a failed project and your takeaway.', 3, 3),
-    (26, 3, 'What’s one thing that differentiates you as a team player?', 4, 1),
-    (27, 3, 'Which option best describes an MVP?', 1, 1),
-    (28, 3, 'How do you keep a team aligned on product goals?', 2, 2),
-    (29, 3, 'What’s your debugging process for production code?', 3, 2),
-    (30, 3, 'How would you simplify a technical idea for non-technical stakeholders?', 2, 3);
+-- Insert Question Options for Question 2
+INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES
+    (5, 2, 'A', 'Implement a fallback mechanism', true, 'Great! Fallbacks ensure your application remains functional.'),
+    (6, 2, 'B', 'Wait for the API to come back online', false, 'Waiting creates extended downtime for your users.'),
+    (7, 2, 'C', 'Add error messaging and graceful degradation', true, 'Excellent approach! Clear communication to users is important.'),
+    (8, 2, 'D', 'Complain to the API provider', false, 'While feedback is important, solving the immediate issue comes first.');
 
-INSERT INTO question_options (question_id, label, value, is_correct) VALUES
-(1, 'A', 'Notify stakeholders', false),
-(1, 'B', 'Contain the breach', true),
-(1, 'C', 'Inform the press', false),
-(1, 'D', 'Delete affected data', false),
-(2, 'A', 'Ask another developer what changed', false),
-(2, 'B', 'Check logs and isolate systems', true),
-(2, 'C', 'Alert users immediately', false),
-(2, 'D', 'Revert to previous backup', false),
-(3, 'A', 'Check firewall logs', false),
-(3, 'B', 'Run antivirus scans on all systems', true),
-(3, 'C', 'Isolate network traffic', false),
-(3, 'D', 'Contact IT support immediately', false),
-(4, 'A', 'Urgent request for payment', false),
-(4, 'B', 'Unknown sender with attachments', true),
-(4, 'C', 'Proper company branding', false),
-(4, 'D', 'Personalized greeting', false),
-(5, 'A', 'Tell them it’s all fine', false),
-(5, 'B', 'Explain the situation calmly', true),
-(5, 'C', 'Ignore their concerns', false),
-(5, 'D', 'Ask for advice from a colleague', false),
-(6, 'A', 'Password only', false),
-(6, 'B', 'Security question', false),
-(6, 'C', 'Password + fingerprint', true),
-(6, 'D', 'PIN code', false),
-(7, 'A', 'Make a quick decision', false),
-(7, 'B', 'Prioritize based on urgency', true),
-(7, 'C', 'Wait for instructions from higher-ups', false),
-(7, 'D', 'Delegate tasks to others', false),
-(8, 'A', 'Lead by example', false),
-(8, 'B', 'Delegate tasks', false),
-(8, 'C', 'Stay calm and focused', true),
-(8, 'D', 'Get team consensus first', false),
-(9, 'A', 'Port 21', false),
-(9, 'B', 'Port 443', true),
-(9, 'C', 'Port 80', false),
-(9, 'D', 'Port 22', false),
-(10, 'A', 'Use email for all updates', false),
-(10, 'B', 'Set up a dedicated communication channel', true),
-(10, 'C', 'Let team handle internal communication', false),
-(10, 'D', 'Post updates on company website', false);
+-- Insert Scenario 2
+INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
+VALUES (
+    2,
+    'Code Review Scenario',
+    'You''re reviewing a colleague''s pull request. How do you provide constructive feedback?',
+    2,  -- Communication
+    2   -- Medium
+);
 
-INSERT INTO question_options (question_id, label, value, is_correct) VALUES
-(11, 'A', 'Amazon EC2', false),
-(11, 'B', 'Amazon RDS', false),
-(11, 'C', 'Amazon S3', true),
-(11, 'D', 'Amazon Lambda', false),
-(12, 'A', 'Frequent check-ins', false),
-(12, 'B', 'Weekly video conferences', false),
-(12, 'C', 'Clear email communication', false),
-(12, 'D', 'Daily stand-up calls', true),
-(13, 'A', 'Use containerization', true),
-(13, 'B', 'Avoid multi-cloud strategies', false),
-(13, 'C', 'Use single cloud services', false),
-(13, 'D', 'Lock-in to specific cloud vendor', false),
-(14, 'A', 'Failing to backup', true),
-(14, 'B', 'Optimizing queries', false),
-(14, 'C', 'Using latest drivers', false),
-(14, 'D', 'Creating new indexes', false),
-(15, 'A', 'Lack of communication', true),
-(15, 'B', 'Ignoring downtime procedures', false),
-(15, 'C', 'Not documenting cloud migration steps', false),
-(15, 'D', 'Failing to test cloud systems', false),
-(16, 'A', 'AWS Lambda', false),
-(16, 'B', 'Amazon S3', false),
-(16, 'C', 'Amazon ECS', true),
-(16, 'D', 'Amazon CloudWatch', false),
-(17, 'A', 'Ask for clarification immediately', false),
-(17, 'B', 'Clarify expectations and goals', true),
-(17, 'C', 'Ignore the miscommunication', false),
-(17, 'D', 'Wait for a better time to address it', false),
-(18, 'A', 'Investigate root causes and resolve', true),
-(18, 'B', 'Wait for the issue to resolve on its own', false),
-(18, 'C', 'Ignore the downtime', false),
-(18, 'D', 'Inform customers immediately', false),
-(19, 'A', 'To enhance company performance', false),
-(19, 'B', 'To stay ahead of the competition', false),
-(19, 'C', 'To improve scalability and availability', true),
-(19, 'D', 'To increase operational costs', false),
-(20, 'A', 'Avoid making decisions', false),
-(20, 'B', 'Get opinions from all stakeholders', false),
-(20, 'C', 'Stick to the original plan', false),
-(20, 'D', 'Find a middle ground and compromise', true);
+-- Insert Question for Scenario 2
+INSERT INTO questions (question_id, scenario_id, question_text, explanation) VALUES
+    (3, 2, 'You notice inefficient code that works but could be improved. What do you do?', NULL);
 
-INSERT INTO question_options (question_id, label, value, is_correct) VALUES
-(21, 'A', 'Charts and graphs', false),
-(21, 'B', 'Detailed feature breakdown', false),
-(21, 'C', 'High-level timeline and goals', true),
-(21, 'D', 'Marketing strategy', false),
-(22, 'A', 'Churn rate', false),
-(22, 'B', 'Net Promoter Score', false),
-(22, 'C', 'Monthly Active Users', false),
-(22, 'D', 'Retention and Growth', true),
-(23, 'A', 'Dismiss their concerns', false),
-(23, 'B', 'Reaffirm your commitment and data', false),
-(23, 'C', 'Respond with evidence and clear strategy', true),
-(23, 'D', 'Agree with all feedback', false),
-(24, 'A', 'CAC measures customer loyalty', false),
-(24, 'B', 'LTV is the cost to acquire a lead', false),
-(24, 'C', 'CAC is customer acquisition cost; LTV is lifetime value', true),
-(24, 'D', 'Both refer to customer churn', false),
-(25, 'A', 'It was a learning experience', false),
-(25, 'B', 'It wasn’t your fault', false),
-(25, 'C', 'It taught you new skills and perspectives', true),
-(25, 'D', 'You plan to forget about it', false),
-(26, 'A', 'You’re a team player', true),
-(26, 'B', 'You lead by example', false),
-(26, 'C', 'You’re highly self-motivated', false),
-(26, 'D', 'You prefer working alone', false),
-(27, 'A', 'Fully-featured product', false),
-(27, 'B', 'Prototype with basic features', true),
-(27, 'C', 'A/B test result', false),
-(27, 'D', 'Marketing campaign', false),
-(28, 'A', 'Hold regular alignment meetings', true),
-(28, 'B', 'Use project management tools', false),
-(28, 'C', 'Send daily email updates', false),
-(28, 'D', 'Wait for the team to manage themselves', false),
-(29, 'A', 'Perform quick fixes', false),
-(29, 'B', 'Analyze root causes before action', true),
-(29, 'C', 'Revert to the last version of the code', false),
-(29, 'D', 'Ignore the issue if it’s not widespread', false),
-(30, 'A', 'Use jargon and technical terms', false),
-(30, 'B', 'Simplify the message without diluting its meaning', true),
-(30, 'C', 'Avoid talking to non-technical people', false),
-(30, 'D', 'Focus only on the technical details', false);
+-- Insert Question Options for Question 3
+INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES
+    (9, 3, 'A', 'Approve it since it works', false, 'Working code isnt always good code. Suggesting improvements helps everyone learn.'),
+    (10, 3, 'B', 'Suggest improvements with explanations and examples', true, 'Perfect approach! Providing context and examples helps the developer learn.'),
+    (11, 3, 'C', 'Reject the PR with comments about efficiency', false, 'Rejecting without constructive feedback can discourage collaboration.'),
+    (12, 3, 'D', 'Fix it yourself and push to their branch', false, 'This doesnt help them learn, and modifying someone elses branch without permission isnt appropriate.');
+
+-- -- Insert Scenario 3
+-- INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
+-- VALUES (
+--     3,
+--     'System Design Challenge',
+--     'You need to design a scalable application. How do you approach the architecture?',
+--     3,  -- Problem Solving
+--     3   -- Hard
+-- );
+
+-- -- Insert Question for Scenario 3
+-- INSERT INTO questions (question_id, scenario_id, question_text) VALUES
+--     (4, 3, 'What''s your first step when designing a new system?');
+
+-- -- Insert Question Options for Question 4
+-- INSERT INTO question_options (question_option_id, question_id, label, value) VALUES
+--     (13, 4, 'A', 'Start coding immediately'),
+--     (14, 4, 'B', 'Gather requirements and constraints'),
+--     (15, 4, 'C', 'Choose the latest trending technologies'),
+--     (16, 4, 'D', 'Create high-level diagrams of components');
+
+-- -- Insert Scenario 4
+-- INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
+-- VALUES (
+--     4,
+--     'Team Conflict Resolution',
+--     'Your team has differing opinions on implementation approach. How do you reach consensus?',
+--     4,  -- Soft Skills
+--     2   -- Medium
+-- );
+
+-- -- Insert Question for Scenario 4
+-- INSERT INTO questions (question_id, scenario_id, question_text) VALUES
+--     (5, 4, 'Two senior developers disagree on architecture. How do you help resolve this?');
+
+-- -- Insert Question Options for Question 5
+-- INSERT INTO question_options (question_option_id, question_id, label, value) VALUES
+--     (17, 5, 'A', 'Let the most experienced developer decide'),
+--     (18, 5, 'B', 'Facilitate a discussion focusing on trade-offs and project needs'),
+--     (19, 5, 'C', 'Implement both approaches and see which works better'),
+--     (20, 5, 'D', 'Ask the manager to make the final decision');
 
 
-INSERT INTO users (google_id, email)
-VALUES ('12412', 'Email@gm.com');
 
+INSERT INTO users (user_id, google_id, email, username, created_at)
+VALUES (1, 'test_user', 'test@example.com', 'testuser', NOW());
 
-INSERT INTO assessments (assessment_id, user_id, scenario_id, assessment_status_id, started_at)
-VALUES (1, 1, 1, 1, NOW());
+INSERT INTO assessments (assessment_id, user_id, score, result_summary, assessment_status_id)
+VALUES (1, 1, NULL, NULL, 1);
 
-INSERT INTO user_answer (assessment_id, question_id, choice_id) VALUES
--- Q1: Correct (B)
-(1, 1, (SELECT question_option_id FROM question_options WHERE question_id = 1 AND label = 'B')),
-
--- Q2: Incorrect (A)
-(1, 2, (SELECT question_option_id FROM question_options WHERE question_id = 2 AND label = 'A')),
-
--- Q3: Correct (B)
-(1, 3, (SELECT question_option_id FROM question_options WHERE question_id = 3 AND label = 'B')),
-
--- Q4: Correct (B)
-(1, 4, (SELECT question_option_id FROM question_options WHERE question_id = 4 AND label = 'B')),
-
--- Q5: Correct (B)
-(1, 5, (SELECT question_option_id FROM question_options WHERE question_id = 5 AND label = 'B')),
-
--- Q6: Correct (C)
-(1, 6, (SELECT question_option_id FROM question_options WHERE question_id = 6 AND label = 'C')),
-
--- Q7: Correct (B)
-(1, 7, (SELECT question_option_id FROM question_options WHERE question_id = 7 AND label = 'B')),
-
--- Q8: Incorrect (A)
-(1, 8, (SELECT question_option_id FROM question_options WHERE question_id = 8 AND label = 'A')),
-
--- Q9: Correct (B)
-(1, 9, (SELECT question_option_id FROM question_options WHERE question_id = 9 AND label = 'B')),
-
--- Q10: Incorrect (A)
-(1, 10, (SELECT question_option_id FROM question_options WHERE question_id = 10 AND label = 'A'));
+INSERT INTO assessment_scenarios (assessment_scenario_id, assessment_id, scenario_id, scenario_index)
+VALUES 
+    (1, 1, 1, 1),
+    (2, 1, 2, 2);
