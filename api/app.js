@@ -4,8 +4,6 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import routes from './routes/index.js';
 import swaggerOptions from './config/swagger.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import assessmentRoutes from './routes/assessmentRoutes.js';
@@ -30,10 +28,6 @@ app.use('auth', authRoutes);
 app.use('user', userRoutes);
 app.use('assessment', assessmentRoutes);
 app.use('/', routes);
-
-app.get('/oauth2callback', (req, res) => {
-    res.redirect(`/api/auth/google/callback${req.url}`);
-});
 
 app.listen(process.env.PORT, async () => { 
     if (process.env.ENVIRONMENT === 'production') {
