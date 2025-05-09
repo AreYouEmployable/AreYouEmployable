@@ -50,4 +50,14 @@ const getAssessments = async (req, res) => {
     }
 };
 
-export { createAssessment, getAssessment, getAssessments };
+const submitAssessmentHandler = async (req, res) => {
+    try {
+        const assessmentId = 1;
+        const result = await assessmentService.submitAssessment(assessmentId);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+export { createAssessment, getAssessment, getAssessments, submitAssessmentHandler };

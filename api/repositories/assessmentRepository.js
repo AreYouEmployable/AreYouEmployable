@@ -43,4 +43,35 @@ const completeAssessment = async ({ assessmentId, score, resultSummary }) => {
     return result.rows[0];
 };
 
-export { createAssessment, getAssessmentById, completeAssessment };
+
+const getUserAnswersWithCorrectness = async (assessmentId) => {
+  const { rows } = await db.query(`
+    SELECT 
+        ua.question_id,
+        qt.name AS question_type,
+        qo.is_correct
+    FROM user_answer ua
+    JOIN questions q ON ua.question_id = q.question_id
+    LEFT JOIN question_type qt ON q.type_id = qt.question_type_id
+    LEFT JOIN question_options qo ON ua.choice_id = qo.question_option_id
+    WHERE ua.assessment_id = $1
+  `, [assessmentId]);
+
+
+  return rows;
+};
+
+const updateAssessmentResult = async (assessmentId, score, resultSummary) => {
+  await db.query(`
+    UPDATE assessments
+    SET score = $1,
+        result_summary = $2,
+        completed_at = NOW(),
+        assessment_status_id = (
+            SELECT assessment_status_id FROM assessment_status WHERE name = 'Completed'
+        )
+    WHERE assessment_id = $3
+  `, [score, resultSummary, assessmentId]);
+};
+
+export { createAssessment, getAssessmentById, completeAssessment, getUserAnswersWithCorrectness, updateAssessmentResult};
