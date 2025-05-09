@@ -179,3 +179,42 @@ INSERT INTO question_options (question_id, label, value, is_correct) VALUES
 (30, 'B', 'Simplify the message without diluting its meaning', true),
 (30, 'C', 'Avoid talking to non-technical people', false),
 (30, 'D', 'Focus only on the technical details', false);
+
+
+INSERT INTO users (google_id, email)
+VALUES ('12412', 'Email@gm.com');
+
+
+INSERT INTO assessments (assessment_id, user_id, scenario_id, assessment_status_id, started_at)
+VALUES (1, 1, 1, 1, NOW());
+
+INSERT INTO user_answer (assessment_id, question_id, choice_id) VALUES
+-- Q1: Correct (B)
+(1, 1, (SELECT question_option_id FROM question_options WHERE question_id = 1 AND label = 'B')),
+
+-- Q2: Incorrect (A)
+(1, 2, (SELECT question_option_id FROM question_options WHERE question_id = 2 AND label = 'A')),
+
+-- Q3: Correct (B)
+(1, 3, (SELECT question_option_id FROM question_options WHERE question_id = 3 AND label = 'B')),
+
+-- Q4: Correct (B)
+(1, 4, (SELECT question_option_id FROM question_options WHERE question_id = 4 AND label = 'B')),
+
+-- Q5: Correct (B)
+(1, 5, (SELECT question_option_id FROM question_options WHERE question_id = 5 AND label = 'B')),
+
+-- Q6: Correct (C)
+(1, 6, (SELECT question_option_id FROM question_options WHERE question_id = 6 AND label = 'C')),
+
+-- Q7: Correct (B)
+(1, 7, (SELECT question_option_id FROM question_options WHERE question_id = 7 AND label = 'B')),
+
+-- Q8: Incorrect (A)
+(1, 8, (SELECT question_option_id FROM question_options WHERE question_id = 8 AND label = 'A')),
+
+-- Q9: Correct (B)
+(1, 9, (SELECT question_option_id FROM question_options WHERE question_id = 9 AND label = 'B')),
+
+-- Q10: Incorrect (A)
+(1, 10, (SELECT question_option_id FROM question_options WHERE question_id = 10 AND label = 'A'));

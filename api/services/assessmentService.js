@@ -16,3 +16,36 @@ export async function getAssessment(userId, assessmentId) {
 
     return assessment;
 };
+  
+export const submitAssessment = async (assessmentId) => {
+    const answers = await assessmentRepository.getUserAnswersWithCorrectness(assessmentId);
+
+    let totalScore = 0;
+    
+    const typeScores = {};
+
+    for (const answer of answers) {
+        const { question_type, is_correct } = answer;
+        if (!question_type) continue;
+
+        if (is_correct) {
+            totalScore += 1;
+            typeScores[question_type] = (typeScores[question_type] || 0) + 1;
+        } else {
+            typeScores[question_type] = typeScores[question_type] || 0;
+        }
+    }
+
+    const summaryParts = Object.entries(typeScores)
+        .map(([type, score]) => `${type}: ${score}`)
+        .join(', ');
+    const resultSummary = `Total: ${totalScore} (${summaryParts})`;
+
+    await assessmentRepository.updateAssessmentResult(assessmentId, totalScore, resultSummary);
+
+    return {
+        totalScore,
+        typeScores,
+        resultSummary
+    };
+};
