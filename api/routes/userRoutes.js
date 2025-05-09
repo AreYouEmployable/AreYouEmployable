@@ -1,6 +1,6 @@
 import express from 'express';
 import getUsers from '../controllers/userController.js';
-
+import { verifyGoogleIdToken } from '../middlewares/authMiddleware.js'; 
 const router = express.Router();
 
 // Add auth middleware and controller
@@ -15,7 +15,7 @@ const router = express.Router();
  *       200:
  *         description: A list of users
  */
-router.get('/', getUsers);
+router.get('/',verifyGoogleIdToken, getUsers);
 
 
 export default router;
