@@ -13,19 +13,22 @@ dotenv.config();
 
 app.use(express.json());
 
+// Generate Swagger documentation
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+// Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use('/health', async (req, res) => {
+    res.status(200).json({ message: 'API running and healthy' });
+});
+
 app.get('/', (_req, res) => {
     res.status(200).send('API running and healthy');
 });
 
-
 // Routes
 app.use('/api', routes);
-
-// API routes
-app.use('auth', authRoutes);
-app.use('user', userRoutes);
-app.use('assessment', assessmentRoutes);
-app.use('/', routes);
 
 app.listen(process.env.PORT, async () => {
 if (process.env.ENVIRONMENT === 'production') {

@@ -5,8 +5,8 @@ import assessmentRoutes from './assessmentRoutes.js';
 
 const router = Router();
 
-router.use('/api/auth', authRoutes);
-router.use('/api/users', usersRoutes);
-router.use('/api/assessment', assessmentRoutes);
+router.use('/auth', authRoutes);
+router.use('/users', usersRoutes);
+router.use('/assessment', assessmentRoutes);
 
 export default router;
