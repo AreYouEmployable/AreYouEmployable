@@ -1,5 +1,3 @@
-import { router } from '../router.js';
-
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/app-main.css">
@@ -26,15 +24,35 @@ class AppMain extends HTMLElement {
 
   loadComponent() {
     const componentName = this.getAttribute('data-component');
-    const props = JSON.parse(this.getAttribute('data-props') || '{}');
-    
-    if (!componentName) return;
+    const dataPropsAttribute = this.getAttribute('data-props');
+    let props = {};
+
+    if (!componentName) {
+        console.warn('AppMain: data-component attribute is missing. Cannot load component.');
+        return;
+    }
+
+    try {
+      if (dataPropsAttribute) {
+        props = JSON.parse(dataPropsAttribute);
+      }
+    } catch (e) {
+      console.error(
+        'AppMain: Error parsing data-props JSON for component', componentName + '.',
+        'Attribute value:', dataPropsAttribute,
+        'Error:', e
+      );
+    }
     
     this.mainElement.innerHTML = '';
     const component = document.createElement(componentName);
     
     Object.entries(props).forEach(([key, value]) => {
-      component.setAttribute(key, value);
+      if (typeof value === 'object' || typeof value === 'boolean') {
+        component.setAttribute(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+      } else {
+        component.setAttribute(key, value);
+      }
     });
     
     this.mainElement.appendChild(component);

@@ -22,8 +22,10 @@ export class ApiService {
                 ...options.headers
             }
         });
-
         if (!response.ok) {
+            if (response.status === 403) {
+                throw new Error('forbidden');
+            }
             throw new Error(`API request failed: ${response.statusText}`);
         }
 
