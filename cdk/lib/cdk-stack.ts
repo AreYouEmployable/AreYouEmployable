@@ -111,6 +111,13 @@ export class CdkStack extends cdk.Stack {
       'Allow Elastic Beanstalk to connect to PostgreSQL'
     );
 
+    // Allow public access to the database for testing purposes
+    dbSecurityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(5432),
+      'Allow public access to PostgreSQL'
+    );
+
     // Create Elastic Beanstalk application
     const app = new elasticbeanstalk.CfnApplication(this, 'Application', {
       applicationName: 'are-you-employable-api',
