@@ -4,9 +4,6 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import routes from './routes/index.js';
 import swaggerOptions from './config/swagger.js';
-import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import assessmentRoutes from './routes/assessmentRoutes.js';
 
 const app = express();
 dotenv.config();
