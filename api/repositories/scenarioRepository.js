@@ -1,0 +1,89 @@
+// import db from '../database.js';
+
+// export const getScenarioInfo = async (scenarioId) => {
+//     const result = await db.query(
+//         `
+//         SELECT 
+//             s.scenario_id,
+//             s.title AS scenario_title,
+//             s.description AS scenario_description,
+//             qt.name AS type,
+//             qd.name AS difficulty,
+//             jsonb_agg(
+//                 jsonb_build_object(
+//                     'question_id', q.question_id,
+//                     'question_text', q.question_text,
+//                     'options', options
+//                 )
+//             ) AS questions
+//         FROM scenarios s
+//         JOIN question_type qt ON s.type_id = qt.question_type_id
+//         JOIN question_difficulty qd ON s.difficulty_id = qd.question_difficulty_id
+//         JOIN questions q ON q.scenario_id = s.scenario_id
+//         LEFT JOIN (
+//             SELECT 
+//                 qo.question_id,
+//                 jsonb_agg(
+//                     jsonb_build_object(
+//                         'option_id', qo.question_option_id,
+//                         'label', qo.label,
+//                         'value', qo.value
+//                     )
+//                 ) AS options
+//             FROM question_options qo
+//             GROUP BY qo.question_id
+//         ) options ON options.question_id = q.question_id
+//         WHERE s.scenario_id = $1
+//         GROUP BY s.scenario_id, qt.name, qd.name
+//         `,
+//         [scenarioId]
+//     );
+
+//     return result.rows[0];
+// };
+import db from '../database.js';
+
+export const getScenarioInfo = async (assessmentId, scenarioId) => {
+    const result = await db.query(
+        `
+        SELECT 
+            s.scenario_id,
+            s.title AS scenario_title,
+            s.description AS scenario_description,
+            qt.name AS type,
+            qd.name AS difficulty,
+            ass_scenario.scenario_index,
+            jsonb_agg(
+                jsonb_build_object(
+                    'question_id', q.question_id,
+                    'question_text', q.question_text,
+                    'options', options.options
+                )
+            ) AS questions
+        FROM scenarios s
+        JOIN question_type qt ON s.type_id = qt.question_type_id
+        JOIN question_difficulty qd ON s.difficulty_id = qd.question_difficulty_id
+        JOIN questions q ON q.scenario_id = s.scenario_id
+        JOIN assessment_scenarios ass_scenario ON ass_scenario.scenario_id = s.scenario_id
+        AND ass_scenario.assessment_id = $1
+        LEFT JOIN (
+            SELECT 
+                qo.question_id,
+                jsonb_agg(
+                    jsonb_build_object(
+                        'option_id', qo.question_option_id,
+                        'label', qo.label,
+                        'value', qo.value
+                    )
+                ) AS options
+            FROM question_options qo
+            GROUP BY qo.question_id
+        ) options ON options.question_id = q.question_id
+        WHERE s.scenario_id = $2
+        GROUP BY s.scenario_id, qt.name, qd.name, ass_scenario.scenario_index
+        `,
+        [assessmentId, scenarioId]
+    );
+
+    return result.rows[0];
+};
