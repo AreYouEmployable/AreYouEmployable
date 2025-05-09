@@ -13,9 +13,6 @@ dotenv.config();
 
 app.use(express.json());
 
-    res.status(200).json({ message: 'API running and healthy' });
-});
-
 app.get('/', (_req, res) => {
     res.status(200).send('API running and healthy');
 });
@@ -24,15 +21,16 @@ app.get('/', (_req, res) => {
 // Routes
 app.use('/api', routes);
 
-app.listen(process.env.PORT, async () => {
-    if (process.env.ENVIRONMENT === 'production') {
-        console.log(`🚀 Server running on ${process.env.BASE_URL}`)
-    } else {
 // API routes
 app.use('auth', authRoutes);
 app.use('user', userRoutes);
 app.use('assessment', assessmentRoutes);
 app.use('/', routes);
+
+app.listen(process.env.PORT, async () => {
+if (process.env.ENVIRONMENT === 'production') {
+    console.log(`🚀 Server running on ${process.env.BASE_URL}`)
+} else {
 
 app.listen(process.env.PORT, async () => { 
     if (process.env.ENVIRONMENT === 'production') {
@@ -41,5 +39,5 @@ app.listen(process.env.PORT, async () => {
         console.log(`🚀 Server running on http://localhost:${process.env.PORT}`)
     };
 });
-
+    }});
 export default app;

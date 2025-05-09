@@ -130,14 +130,12 @@ const verifyCreateOrFetchUser = async (req, res) => {
         throw new Error('id_token_validation_failed');
     }
 
-    console.log('Google ID token validated successfully. Payload:', payload);
-
     const googleUserId = payload.sub;
     const email = payload.email;
     const name = payload.name;
     const picture = payload.picture;
 
-    // const user = await findOrCreateUser(googleUserId, email, name, picture);
+    const user = await findOrCreateUser(googleUserId, email, name, picture);
 
 
     const clientUrl =  process.env.CLIENT_URI;
