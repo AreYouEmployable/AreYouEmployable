@@ -1,0 +1,38 @@
+.option-box {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f7fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.option-box:hover {
+  background-color: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.option-box input[type="checkbox"] {
+  margin-right: 0.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.option-box .text {
+  font-size: 1rem;
+  color: #2d3748;
+  flex: 1;
+}
+
+.option-box input[type="checkbox"]:checked + .text {
+  color: #2b6cb0;
+  font-weight: 500;
+}
+
+.option-box input[type="checkbox"]:checked ~ .option-box {
+  background-color: #ebf8ff;
+  border-color: #4299e1;
+} 

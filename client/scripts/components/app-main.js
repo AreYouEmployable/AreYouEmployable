@@ -45,17 +45,23 @@ class AppMain extends HTMLElement {
     }
     
     this.mainElement.innerHTML = '';
-    const component = document.createElement(componentName);
     
-    Object.entries(props).forEach(([key, value]) => {
-      if (typeof value === 'object' || typeof value === 'boolean') {
-        component.setAttribute(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
-      } else {
-        component.setAttribute(key, value);
-      }
-    });
-    
-    this.mainElement.appendChild(component);
+    try {
+      const component = document.createElement(componentName);
+      this.mainElement.appendChild(component);
+      
+      // Set attributes after the element is in the DOM
+      Object.entries(props).forEach(([key, value]) => {
+        if (typeof value === 'object' || typeof value === 'boolean') {
+          component.setAttribute(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+        } else {
+          component.setAttribute(key, value);
+        }
+      });
+    } catch (error) {
+      console.error('AppMain: Error creating component:', error);
+      this.mainElement.innerHTML = `<div class="error">Failed to load component: ${componentName}</div>`;
+    }
   }
 }
 
