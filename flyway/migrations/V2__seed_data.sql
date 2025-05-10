@@ -1,19 +1,22 @@
+-- Insert Constant Question Types
 INSERT INTO question_type (question_type_id, name) VALUES
     (1, 'Technical'),
     (2, 'Communication'),
     (3, 'Problem Solving'),
     (4, 'Soft Skills');
 
+-- Insert Constant Question Difficulties
 INSERT INTO question_difficulty (question_difficulty_id, name) VALUES
     (1, 'Easy'),
     (2, 'Medium'),
     (3, 'Hard');
 
+-- Insert Constant Assessment Statuses
 INSERT INTO assessment_status (assessment_status_id, name) VALUES
     (1, 'In Progress'),
     (2, 'Completed');
 
-    -- Insert Scenario
+-- Insert Scenario
 INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
 VALUES (
     1,
@@ -63,57 +66,57 @@ INSERT INTO question_options (question_option_id, question_id, label, value, is_
     (11, 3, 'C', 'Reject the PR with comments about efficiency', false, 'Rejecting without constructive feedback can discourage collaboration.'),
     (12, 3, 'D', 'Fix it yourself and push to their branch', false, 'This doesnt help them learn, and modifying someone elses branch without permission isnt appropriate.');
 
--- -- Insert Scenario 3
--- INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
--- VALUES (
---     3,
---     'System Design Challenge',
---     'You need to design a scalable application. How do you approach the architecture?',
---     3,  -- Problem Solving
---     3   -- Hard
--- );
+-- Insert Scenario 3
+INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
+VALUES (
+    3,
+    'System Design Challenge',
+    'You need to design a scalable application. How do you approach the architecture?',
+    3,  -- Problem Solving
+    3   -- Hard
+);
 
--- -- Insert Question for Scenario 3
--- INSERT INTO questions (question_id, scenario_id, question_text) VALUES
---     (4, 3, 'What''s your first step when designing a new system?');
+-- Insert Question for Scenario 3
+INSERT INTO questions (question_id, scenario_id, question_text, explanation) VALUES
+    (4, 3, 'What''s your first step when designing a new system?', NULL);
 
--- -- Insert Question Options for Question 4
--- INSERT INTO question_options (question_option_id, question_id, label, value) VALUES
---     (13, 4, 'A', 'Start coding immediately'),
---     (14, 4, 'B', 'Gather requirements and constraints'),
---     (15, 4, 'C', 'Choose the latest trending technologies'),
---     (16, 4, 'D', 'Create high-level diagrams of components');
+-- Insert Question Options for Question 4
+INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES
+    (13, 4, 'A', 'Start coding immediately', false, 'Coding without planning often leads to architectural problems later.'),
+    (14, 4, 'B', 'Gather requirements and constraints', true, 'Excellent! Understanding requirements first ensures your design meets actual needs.'),
+    (15, 4, 'C', 'Choose the latest trending technologies', false, 'Technology choices should be based on requirements, not trends.'),
+    (16, 4, 'D', 'Create high-level diagrams of components', true, 'Good approach! Visual modeling helps identify challenges early.');
 
--- -- Insert Scenario 4
--- INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
--- VALUES (
---     4,
---     'Team Conflict Resolution',
---     'Your team has differing opinions on implementation approach. How do you reach consensus?',
---     4,  -- Soft Skills
---     2   -- Medium
--- );
+-- Insert Scenario 4
+INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
+VALUES (
+    4,
+    'Team Conflict Resolution',
+    'Your team has differing opinions on implementation approach. How do you reach consensus?',
+    4,  -- Soft Skills
+    2   -- Medium
+);
 
--- -- Insert Question for Scenario 4
--- INSERT INTO questions (question_id, scenario_id, question_text) VALUES
---     (5, 4, 'Two senior developers disagree on architecture. How do you help resolve this?');
+-- Insert Question for Scenario 4
+INSERT INTO questions (question_id, scenario_id, question_text, explanation) VALUES
+    (5, 4, 'Two senior developers disagree on architecture. How do you help resolve this?', NULL);
 
--- -- Insert Question Options for Question 5
--- INSERT INTO question_options (question_option_id, question_id, label, value) VALUES
---     (17, 5, 'A', 'Let the most experienced developer decide'),
---     (18, 5, 'B', 'Facilitate a discussion focusing on trade-offs and project needs'),
---     (19, 5, 'C', 'Implement both approaches and see which works better'),
---     (20, 5, 'D', 'Ask the manager to make the final decision');
+-- Insert Question Options for Question 5
+INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES
+    (17, 5, 'A', 'Let the most experienced developer decide', false, 'Experience is valuable, but the best solutions often come from collaboration.'),
+    (18, 5, 'B', 'Facilitate a discussion focusing on trade-offs and project needs', true, 'Excellent! Focusing on project requirements keeps discussions productive.'),
+    (19, 5, 'C', 'Implement both approaches and see which works better', false, 'This creates duplicate work and likely architectural inconsistencies.'),
+    (20, 5, 'D', 'Ask the manager to make the final decision', false, 'Escalating immediately bypasses valuable team problem-solving.');
 
+-- INSERT INTO users (user_id, google_id, email, username, created_at)
+-- VALUES (1, 'test_user', 'test@example.com', 'testuser', NOW());
 
+-- INSERT INTO assessments (assessment_id, user_id, score, result_summary, assessment_status_id)
+-- VALUES (1, 1, NULL, NULL, 1);
 
-INSERT INTO users (user_id, google_id, email, username, created_at)
-VALUES (1, 'test_user', 'test@example.com', 'testuser', NOW());
-
-INSERT INTO assessments (assessment_id, user_id, score, result_summary, assessment_status_id)
-VALUES (1, 1, NULL, NULL, 1);
-
-INSERT INTO assessment_scenarios (assessment_scenario_id, assessment_id, scenario_id, scenario_index)
-VALUES 
-    (1, 1, 1, 1),
-    (2, 1, 2, 2);
+-- INSERT INTO assessment_scenarios (assessment_scenario_id, assessment_id, scenario_id, scenario_index)
+-- VALUES 
+--     (1, 1, 1, 1),
+--     (2, 1, 2, 2),
+--     (3, 1, 3, 3),
+--     (4, 1, 4, 4);
