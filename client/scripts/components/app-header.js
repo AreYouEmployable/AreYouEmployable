@@ -1,5 +1,6 @@
 import { store } from '../state.js'; 
 import { AuthService } from '../services/auth.js';
+import { router } from '../router.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -59,7 +60,7 @@ class AppHeader extends HTMLElement {
       <link rel="stylesheet" href="/styles/components/app-header.css">
       <header>
         <section class="header-content">
-          <a href="/" class="logo">Are You Employable?</a>
+          <a href="/" class="logo" data-link>Are You Employable?</a>
           <button class="hamburger" id="hamburger">
             <span></span>
             <span></span>
@@ -67,8 +68,9 @@ class AppHeader extends HTMLElement {
           </button>
           <section class="nav-links">
             ${isAuthenticated ? `
-              <a href="/assessment" class="assessment-link">Assessment</a>
-              <a href="/results">Results</a>
+              <a href="/assessment" class="assessment-link" data-link>Assessment</a>
+              <a href="/results" data-link>Results</a>
+              <a href="/contact" data-link>Contact</a>
               <section class="user-info">
                 ${pictureUrl ? `
                   <img src="${pictureUrl}" alt="${user?.name || 'User image'}" class="user-avatar" 
@@ -90,8 +92,8 @@ class AppHeader extends HTMLElement {
         <button class="close-button" id="close-menu">&times;</button>
         ${isAuthenticated ? `
           <div class="nav-links">
-            <a href="/assessment" class="assessment-link">Assessment</a>
-            <a href="/results">Results</a>
+            <a href="/assessment" class="assessment-link" data-link>Assessment</a>
+            <a href="/results" data-link>Results</a>
           </div>
           <section class="user-info">
             ${pictureUrl ? `
@@ -109,6 +111,10 @@ class AppHeader extends HTMLElement {
         `}
       </section>
     `;
+
+    this.shadowRoot.querySelectorAll('[data-link]').forEach(link => {
+      link.addEventListener('click', this.handleLinkClick.bind(this));
+    });
 
     const hamburger = this.shadowRoot.querySelector('#hamburger');
     const mobileMenu = this.shadowRoot.querySelector('#mobile-menu');
@@ -156,10 +162,7 @@ class AppHeader extends HTMLElement {
   handleLinkClick(e) {
     e.preventDefault();
     const path = e.target.getAttribute('href');
-    if (window.location.pathname !== path) {
-        window.history.pushState({}, '', path);
-    }
-    window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
+    router.navigateTo(path);
   }
 
   async renderGoogleSignIn() {
