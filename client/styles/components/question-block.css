@@ -1,0 +1,8 @@
+/* // components/question-box/question-box.css */
+.question-box {
+    background: #f4f4f4;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 6px;
+    font-size: 1rem;
+  }

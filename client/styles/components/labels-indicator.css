@@ -1,0 +1,20 @@
+
+/* // components/labels-indicator/labels-indicator.css */
+.labels {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 1rem;
+  }
+  .label {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    color: white;
+    font-weight: bold;
+  }
+  .label.technical {
+    background-color: #2196f3;
+  }
+  .label.difficulty {
+    background-color: #ff9800;
+  }

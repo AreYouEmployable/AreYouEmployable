@@ -1,0 +1,13 @@
+/* // components/question-header/question-header.css */
+.question-header {
+    padding: 1rem;
+  }
+  .question-header h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+  }
+  .question-header p {
+    margin: 0;
+    font-size: 1rem;
+    color: #666;
+  }

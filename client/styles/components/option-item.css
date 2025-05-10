@@ -1,0 +1,18 @@
+/* components/option-item/option-item.css */
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .option-item:hover {
+    background: #f0f0f0;
+  }
+  .option-item input[type="checkbox"] {
+    accent-color: #2196f3;
+  }
