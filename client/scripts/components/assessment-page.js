@@ -1,40 +1,38 @@
+import './progress-bar.js';
+import './navigation-controls.js';
+import './answer-option.js';
+import './submit-button.js';
+
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/assessment-page.css">
-  <div class="assessment-container">
-    <h1>Skills Assessment</h1>
-    <form id="assessment-form">
-      <div class="question">
-        <h3>1. How many years of experience do you have in your field?</h3>
-        <input type="number" name="experience" min="0" required>
-      </div>
-      
-      <div class="question">
-        <h3>2. What is your highest level of education?</h3>
-        <select name="education" required>
-          <option value="">Select an option</option>
-          <option value="high-school">High School</option>
-          <option value="bachelors">Bachelor's Degree</option>
-          <option value="masters">Master's Degree</option>
-          <option value="phd">PhD</option>
-        </select>
-      </div>
+  <section class="container">
+    <!-- Header Section -->
+    <header class="text-center mb-8">
+      <h2 class="scenario-title" id="scenario-title">Loading scenario title...</h2>
+      <p class="scenario-description" id="scenario-description">Loading scenario description...</p>
+    </header>
 
-      <div class="question">
-        <h3>3. Rate your communication skills (1-5)</h3>
-        <input type="range" name="communication" min="1" max="5" value="3" required>
-        <div class="range-labels">
-          <span>1</span>
-          <span>2</span>
-          <span>3</span>
-          <span>4</span>
-          <span>5</span>
-        </div>
-      </div>
+    <!-- Progress Bar Component -->
+    <progress-bar total="5" class="mb-6"></progress-bar>
 
-      <button type="submit" class="submit-btn">Submit Assessment</button>
-    </form>
-  </div>
+    <!-- Question Block (Container for each question) -->
+    <article class="question-block">
+      <!-- Question Header -->
+      <header class="question-header">
+        <h3 class="question-title" id="question-title">Loading question...</h3>
+        <p class="complexity-text">Complexity: <span id="complexity-level">-</span></p>
+      </header>
+
+      <!-- Option List (Dynamic options added here) -->
+      <form id="assessment-form">
+        <div id="options-list" class="options-list"></div>
+
+        <!-- Navigation Controls -->
+        <navigation-controls></navigation-controls>
+      </form>
+    </article>
+  </section>
 `;
 
 class AssessmentPage extends HTMLElement {
@@ -42,25 +40,118 @@ class AssessmentPage extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this.currentQuestion = 0;
+    this.totalQuestions = 5;
+    this.answers = new Map();
+    
+    // Sample questions data - replace with actual data source
+    this.questions = [
+      {
+        title: "Debugging Challenge",
+        description: "You've been tasked with fixing a critical bug in production. How do you approach the situation?",
+        complexity: "Medium",
+        options: [
+          "Immediately deploy a hotfix without testing",
+          "Analyze the error logs and reproduce the issue locally",
+          "Ask the team for help without investigating",
+          "Document the issue and wait for the next sprint"
+        ]
+      },
+      // Add more questions here
+    ];
   }
 
   connectedCallback() {
     const form = this.shadowRoot.querySelector('#assessment-form');
     form.addEventListener('submit', this.handleSubmit.bind(this));
+    
+    // Initialize progress bar
+    const progressBar = this.shadowRoot.querySelector('progress-bar');
+    progressBar.setAttribute('total', this.totalQuestions.toString());
+    
+    // Initialize navigation controls
+    const navControls = this.shadowRoot.querySelector('navigation-controls');
+    navControls.addEventListener('navigate', this.handleNavigation.bind(this));
+    
+    // Load first question
+    this.loadQuestion(this.currentQuestion);
+    this.updateNavigationState();
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const assessmentData = {
-      experience: formData.get('experience'),
-      education: formData.get('education'),
-      communication: formData.get('communication')
-    };
     
-    console.log('Assessment submitted:', assessmentData);
-    // TODO: Send data to backend
-    alert('Assessment submitted successfully!');
+    // Get selected options
+    const selectedOptions = Array.from(this.shadowRoot.querySelectorAll('answer-option'))
+      .map((option, index) => option.selected ? index : null)
+      .filter(index => index !== null);
+    
+    // Save answer for current question
+    this.answers.set(this.currentQuestion, {
+      selectedOptions,
+      questionId: this.currentQuestion
+    });
+    
+    // Update progress
+    const progressBar = this.shadowRoot.querySelector('progress-bar');
+    progressBar.nextStep();
+    
+    // Update navigation state
+    this.updateNavigationState();
+    
+    console.log('Answer submitted:', this.answers.get(this.currentQuestion));
+  }
+
+  handleNavigation(e) {
+    const { direction } = e.detail;
+    if (direction === 'prev' && this.currentQuestion > 0) {
+      this.currentQuestion--;
+    } else if (direction === 'next' && this.currentQuestion < this.totalQuestions - 1) {
+      this.currentQuestion++;
+    }
+    
+    // Load question data for the new current question
+    this.loadQuestion(this.currentQuestion);
+    this.updateNavigationState();
+  }
+
+  updateNavigationState() {
+    const navControls = this.shadowRoot.querySelector('navigation-controls');
+    navControls.canGoBack = this.currentQuestion > 0;
+    navControls.canGoForward = this.currentQuestion < this.totalQuestions - 1 && this.answers.has(this.currentQuestion);
+  }
+
+  loadQuestion(questionIndex) {
+    const question = this.questions[questionIndex];
+    if (!question) return;
+
+    // Update question title and description
+    const questionTitle = this.shadowRoot.querySelector('#question-title');
+    const complexityLevel = this.shadowRoot.querySelector('#complexity-level');
+    const scenarioTitle = this.shadowRoot.querySelector('#scenario-title');
+    const scenarioDescription = this.shadowRoot.querySelector('#scenario-description');
+    
+    questionTitle.textContent = question.title;
+    complexityLevel.textContent = question.complexity;
+    scenarioTitle.textContent = `Scenario ${questionIndex + 1}`;
+    scenarioDescription.textContent = question.description;
+    
+    // Create answer options
+    const optionsList = this.shadowRoot.querySelector('#options-list');
+    optionsList.innerHTML = '';
+    
+    question.options.forEach((optionText, index) => {
+      const option = document.createElement('answer-option');
+      option.text = optionText;
+      
+      // Restore saved answer if exists
+      const savedAnswer = this.answers.get(questionIndex);
+      if (savedAnswer && savedAnswer.selectedOptions.includes(index)) {
+        option.selected = true;
+      }
+      
+      optionsList.appendChild(option);
+    });
   }
 }
 

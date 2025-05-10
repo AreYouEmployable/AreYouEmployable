@@ -1,5 +1,6 @@
 import { store, actions } from './state.js';
 import { AuthService } from './services/auth.js';
+import { router } from './router.js';
 import './components/google-sign-in.js';
 import './components/error-page.js';
 
