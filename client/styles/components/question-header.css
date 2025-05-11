@@ -1,13 +1,18 @@
-/* // components/question-header/question-header.css */
 .question-header {
-    padding: 1rem;
-  }
-  .question-header h2 {
-    margin: 0 0 0.5rem;
-    font-size: 1.25rem;
-  }
-  .question-header p {
-    margin: 0;
-    font-size: 1rem;
-    color: #666;
-  }
+  margin-bottom: 0.2rem;
+}
+
+#question-title {
+  color: #1a202c;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  display: block; 
+}
+
+#question-description {
+  color: #021b31;
+  font-size: 1rem;
+  line-height: 1.4;  
+  margin-bottom: 0.4rem;
+}

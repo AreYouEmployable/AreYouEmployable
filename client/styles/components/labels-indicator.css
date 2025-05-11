@@ -1,20 +1,51 @@
+.labels-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1%;
+  margin-top: 0.4rem;
+}
 
-/* // components/labels-indicator/labels-indicator.css */
-.labels {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0 1rem;
-  }
-  .label {
-    padding: 0.25rem 0.75rem;
-    border-radius: 999px;
-    font-size: 0.875rem;
-    color: white;
-    font-weight: bold;
-  }
-  .label.technical {
-    background-color: #2196f3;
-  }
-  .label.difficulty {
-    background-color: #ff9800;
-  }
+.label {
+  background-color: #f8f9fa;
+  color: #727a83;
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  border: 1px solid #dee2e6;
+  font-weight: bold;
+}
+
+
+.label.scenario-type {
+  border: none; 
+}
+
+.label.technical {
+  background-color: #dbc5e4;
+  color: #9b4ee2;
+}
+
+.label.culture-fit {
+  background-color: #a7d1eb;
+  color: #3486ba;
+}
+
+
+.label.difficulty {
+  border: none; 
+}
+
+.label.easy {
+  background-color: #a5d6a7;
+  color: #1b5e20;
+}
+
+.label.medium {
+  background-color: #f2c98d;
+  color: #e15b12;
+}
+
+.label.hard {
+  background-color: #fda9a7;
+  color: #b71c1c;
+}

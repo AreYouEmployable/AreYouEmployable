@@ -1,46 +1,28 @@
+import './progress-bar.js';
+import './question-header.js';
+import './question-block.js';
+import './navigation-controls.js';
+import './answer-option.js';
+import './submit-button.js';
+import './labels-indicator.js';
+import './complexity-level-bar.js';
+
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/assessment-page.css">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
   <section class="container">
-    <!-- Header Section -->
     <header class="text-center mb-8">
-      <h2 class="text-2xl font-semibold text-gray-900" id="scenario-title">Loading scenario title...</h2>
-      <p class="text-gray-600" id="scenario-description">Loading scenario description...</p>
+      <h2 class="scenario-title" id="scenario-title">Loading scenario title...</h2>
     </header>
 
-    <!-- Progress Bar Indicator -->
-    <section class="progress-bar bg-gray-200 rounded-lg h-4 mb-6 overflow-hidden">
-      <div id="progress" class="bg-blue-600 h-4 transition-all duration-300" style="width: 20%;"></div>
-    </section>
+    <span class="progress-text">ASSESSMENT PROGRESS</span>
 
-    <!-- Question Block (Container for each question) -->
-    <article class="question-block bg-white shadow-md rounded-lg p-6">
-      <!-- Question Header -->
-      <header class="mb-4">
-        <h3 class="text-lg font-semibold text-gray-900" id="question-title">Loading question...</h3>
-        <p class="text-sm text-gray-500 mt-2">Complexity: <span id="complexity-level">-</span></p>
-      </header>
+    <progress-bar total="2" class="progress-bar mb-6"></progress-bar>
 
-      <!-- Option List (Dynamic options added here) -->
-      <form id="assessment-form" class="space-y-4">
-        <div id="options-list"></div>
-
-        <!-- Navigation Controls -->
-        <div class="flex justify-between mt-6">
-          <button type="button" id="prev-btn" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition hidden">
-            Previous
-          </button>
-          <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-            Submit Answer
-          </button>
-          <button type="button" id="next-btn" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition hidden">
-            Next
-          </button>
-        </div>
-      </form>
+    <article class="question-block mt-8" id="scenario-questions">
     </article>
+
+    <navigation-controls></navigation-controls>
   </section>
 `;
 
@@ -49,111 +31,210 @@ class AssessmentPage extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-
-  
-    this.progressBar = this.shadowRoot.querySelector('#progress');
-    this.title = this.shadowRoot.querySelector('#question-title');
-    this.complexityText = this.shadowRoot.querySelector('#complexity');
-    this.description = this.shadowRoot.querySelector('#scenario-description');
-    this.optionsList = this.shadowRoot.querySelector('#options-list');
-    this.prevBtn = this.shadowRoot.querySelector('#prev-btn');
-    this.nextBtn = this.shadowRoot.querySelector('#next-btn');
-
-    // Mock data (replacing API call)
-    this.scenarioData = {
-      scenario_id: 1,
-      scenario_title: "Debugging Challenge",
-      scenario_description: "You've been tasked with fixing a critical bug in production. How do you approach the situation?",
-      type: "Technical",
-      difficulty: "Medium",  // You can change this to "Easy", "Hard", etc.
-      questions: [
+    this.currentScenario = 0;
+    this.totalScenarios = 2;
+    this.answers = new Map();
+    this.submittedCurrentScenario = false;
+    this.assessmentComplete = false;
+    this.scenarioQuestionsContainer = null; 
+    this.scenarios = [
+      [
         {
-          question_id: 2,
-          question_text: "You found that a third-party API is down. How do you handle this?",
-          options: [
-            { option_id: 5, label: "A", value: "Implement a fallback mechanism" },
-            { option_id: 6, label: "B", value: "Wait for the API to come back online" },
-            { option_id: 7, label: "C", value: "Add error messaging and graceful degradation" },
-            { option_id: 8, label: "D", value: "Complain to the API provider" }
-          ]
+          title: "Debugging Challenge 1",
+          description: "Fixing bug 1...",
+          complexity: "Medium",
+          options: ["A1", "B1", "C1", "D1"]
         },
         {
-          question_id: 1,
-          question_text: "The production website is showing a blank page. What's your first step?",
-          options: [
-            { option_id: 1, label: "A", value: "Immediately roll back to the previous version" },
-            { option_id: 2, label: "B", value: "Check browser console and server logs" },
-            { option_id: 3, label: "C", value: "Ask another developer what changed" },
-            { option_id: 4, label: "D", value: "Try to reproduce the issue locally" }
-          ]
+          title: "Debugging Challenge 2",
+          description: "Fixing bug 2...",
+          complexity: "Easy",
+          options: ["A2", "B2", "C2", "D2"]
+        },
+        {
+          title: "Debugging Challenge 3",
+          description: "Fixing bug 3...",
+          complexity: "Hard",
+          options: ["A3", "B3", "C3", "D3"]
+        },
+        {
+          title: "Debugging Challenge 4",
+          description: "Fixing bug 4...",
+          complexity: "Medium",
+          options: ["A4", "B4", "C4", "D4"]
+        },
+        {
+          title: "Debugging Challenge 5",
+          description: "Fixing bug 5...",
+          complexity: "Easy",
+          options: ["A5", "B5", "C5", "D5"]
+        }
+      ],
+      [
+        {
+          title: "Team Collaboration",
+          description: "How do you handle disagreements within a team?",
+          complexity: "Easy",
+          options: ["Avoid confrontation", "Force your opinion", "Listen and find a compromise", "Escalate immediately"]
+        },
+        {
+          title: "Feedback Acceptance",
+          description: "How do you react to constructive criticism?",
+          complexity: "Medium",
+          options: ["Get defensive", "Ignore it", "Reflect and learn", "Argue about it"]
+        },
+        {
+          title: "Dealing with Pressure",
+          description: "How do you manage stress in a fast-paced environment?",
+          complexity: "Medium",
+          options: ["Panic", "Work harder without breaks", "Prioritize and take breaks", "Blame others"]
+        },
+        {
+          title: "Communication Style",
+          description: "What is your preferred method of communication for important updates?",
+          complexity: "Easy",
+          options: ["Informal chat", "Email", "Meeting", "Shouting across the office"]
+        },
+        {
+          title: "Adaptability",
+          description: "How do you handle changes in project requirements?",
+          complexity: "Medium",
+          options: ["Resist the changes", "Complain loudly", "Assess the impact and adapt", "Ignore the new requirements"]
         }
       ]
-    };
-
-    this.questionIndex = 0;
-    this.currentQuestionId = null;
+    ];
+    this.totalScenarios = this.scenarios.length;
   }
 
   connectedCallback() {
-    this.form.addEventListener('submit', this.handleSubmit.bind(this));
-    this.prevBtn.addEventListener('click', this.prevQuestion.bind(this));
-    this.nextBtn.addEventListener('click', this.nextQuestion.bind(this));
-    this.renderQuestion(this.scenarioData.questions[this.questionIndex]);
+    const navControls = this.shadowRoot.querySelector('navigation-controls');
+    navControls.addEventListener('navigate', this.handleNavigation.bind(this));
+
+    const progressBar = this.shadowRoot.querySelector('progress-bar');
+    progressBar.setAttribute('total', this.totalScenarios.toString());
+    this.updateProgressBarText();
+
+    this.scenarioQuestionsContainer = this.shadowRoot.querySelector('#scenario-questions'); // Store here
+    this.loadScenario(this.currentScenario);
+    this.updateNavigationState();
   }
 
-  renderQuestion(question) {
-    this.currentQuestionId = question.question_id;
-    this.title.textContent = question.question_text;
-    this.complexityText.textContent = `Complexity: ${this.scenarioData.difficulty}`;
-    this.description.textContent = this.scenarioData.scenario_description;
+  handleScenarioSubmit(e) {
+    e.preventDefault();
 
-    const progressPercent = ((this.questionIndex + 1) / this.scenarioData.questions.length) * 100;
-    this.progressBar.style.width = `${progressPercent}%`; 
+    const currentScenarioQuestions = this.shadowRoot.querySelectorAll('.question-item');
+    const scenarioAnswers = [];
 
-    this.optionsList.innerHTML = '';  
-    question.options.forEach(opt => {
-      const label = document.createElement('label');
-      label.classList.add('option', 'flex', 'items-start', 'space-x-3');
-      label.innerHTML = `
-        <input type="checkbox" name="answer" value="${opt.option_id}" class="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"/>
-        <span class="ml-2 text-gray-900">${opt.label}. ${opt.value}</span>
-      `;
-      this.optionsList.appendChild(label);
+    currentScenarioQuestions.forEach((questionElement, index) => {
+      const selectedOptions = Array.from(questionElement.querySelectorAll('answer-option'))
+        .map((option, optionIndex) => option.selected ? optionIndex : null)
+        .filter(index => index !== null);
+      scenarioAnswers.push({ questionIndex: index, selectedOptions });
     });
 
-    
-    this.prevBtn.classList.toggle('hidden', this.questionIndex === 0);
-    this.nextBtn.classList.toggle('hidden', this.questionIndex === this.scenarioData.questions.length - 1);
-  }
+    this.answers.set(this.currentScenario, scenarioAnswers);
+    this.submittedCurrentScenario = true;
+    this.updateNavigationState();
 
-  handleSubmit(e) {
-    e.preventDefault();
-    const selected = Array.from(this.form.querySelectorAll('input[name="answer"]:checked'))
-      .map(cb => Number(cb.value));
+    console.log('Answers submitted for scenario:', this.answers.get(this.currentScenario));
 
-    if (selected.length === 0) {
-      alert('Please select at least one option.');
-      return;
-    }
-
-    alert('Answer submitted!');
-    this.nextQuestion();
-  }
-
-  prevQuestion() {
-    if (this.questionIndex > 0) {
-      this.questionIndex--;
-      this.renderQuestion(this.scenarioData.questions[this.questionIndex]);
+    if (this.currentScenario === this.totalScenarios - 1) {
+      this.assessmentComplete = true;
+      this.updateNavigationState();
     }
   }
 
-  nextQuestion() {
-    if (this.questionIndex < this.scenarioData.questions.length - 1) {
-      this.questionIndex++;
-      this.renderQuestion(this.scenarioData.questions[this.questionIndex]);
-    } else {
-      alert('Assessment complete!');
+  handleNavigation(e) {
+    const { direction } = e.detail;
+    if (direction === 'prev' && this.currentScenario > 0) {
+      this.currentScenario--;
+      this.submittedCurrentScenario = this.answers.has(this.currentScenario);
+      this.assessmentComplete = false;
+    } else if (direction === 'next' && this.submittedCurrentScenario) {
+      if (this.currentScenario < this.totalScenarios - 1) {
+        this.currentScenario++;
+        this.submittedCurrentScenario = false;
+      } else if (this.assessmentComplete) {
+        this.finishAssessment();
+      }
     }
+
+    this.loadScenario(this.currentScenario);
+    this.updateNavigationState();
+    this.updateProgressBarText();
+  }
+
+  updateNavigationState() {
+    const navControls = this.shadowRoot.querySelector('navigation-controls');
+    navControls.canGoBack = this.currentScenario > 0;
+    navControls.canGoForward = this.submittedCurrentScenario; // Corrected line
+    navControls.isLastScenario = this.currentScenario === this.totalScenarios - 1;
+  }
+
+  loadScenario(scenarioIndex) {
+    const scenario = this.scenarios[scenarioIndex];
+    if (!scenario) return;
+
+    const scenarioTitle = this.shadowRoot.querySelector('#scenario-title');
+    scenarioTitle.textContent = `Scenario ${scenarioIndex + 1}`;
+
+    const scenarioQuestionsContainer = this.scenarioQuestionsContainer; // Use the stored reference
+    scenarioQuestionsContainer.innerHTML = '';
+
+    scenario.forEach((question, index) => {
+      const questionItem = document.createElement('div');
+      questionItem.classList.add('question-item');
+
+      const labelsIndicator = document.createElement('labels-indicator');
+      const scenarioType = scenarioIndex === 0 ? "Technical" : "Culture Fit";
+      labelsIndicator.setAttribute('labels', JSON.stringify([scenarioType, question.complexity]));
+      labelsIndicator.setAttribute('difficulty', question.complexity.toLowerCase());
+      questionItem.appendChild(labelsIndicator);
+
+      const questionHeader = document.createElement('question-header');
+      questionHeader.setAttribute('title', question.title);
+      questionHeader.setAttribute('description', question.description);
+      questionItem.appendChild(questionHeader);
+
+      const optionsList = document.createElement('div');
+      optionsList.classList.add('options-list');
+
+      question.options.forEach((optionText, optionIndex) => {
+        const option = document.createElement('answer-option');
+        option.text = optionText;
+
+        const savedAnswersForScenario = this.answers.get(scenarioIndex);
+        if (savedAnswersForScenario && savedAnswersForScenario[index] && savedAnswersForScenario[index].selectedOptions.includes(optionIndex)) {
+          option.selected = true;
+        }
+        optionsList.appendChild(option);
+      });
+      questionItem.appendChild(optionsList);
+
+      scenarioQuestionsContainer.appendChild(questionItem);
+    });
+
+    const submitButton = document.createElement('submit-button');
+    submitButton.id = 'submit-scenario';
+    submitButton.classList.add('mt-4');
+    submitButton.addEventListener('click', this.handleScenarioSubmit.bind(this));
+    scenarioQuestionsContainer.appendChild(submitButton);
+
+    this.submittedCurrentScenario = this.answers.has(scenarioIndex);
+    this.updateNavigationState();
+  }
+
+  updateProgressBarText() {
+    const progressBar = this.shadowRoot.querySelector('progress-bar');
+    progressBar.setAttribute('total', this.totalScenarios.toString());
+    if (progressBar) {
+      progressBar.setAttribute('text-position', 'end');
+    }
+  }
+
+  finishAssessment() {
+    console.log('Assessment finished. Navigating to the next page...');
+    window.location.href = '/assessment-results';
   }
 }
 

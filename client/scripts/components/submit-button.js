@@ -1,6 +1,6 @@
 const template = document.createElement('template');
       template.innerHTML = `
-        <link rel="stylesheet" href="components/submit-button/submit-button.css">
+        <link rel="stylesheet" href="styles/components/submit-button.css">
         <button class="submit-button">Submit Answer</button>
       `;
 class SubmitButton extends HTMLElement {

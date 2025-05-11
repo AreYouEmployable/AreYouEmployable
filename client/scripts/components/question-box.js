@@ -1,6 +1,6 @@
 const template = document.createElement('template');
       template.innerHTML = `
-        <link rel="stylesheet" href="components/question-box/question-box.css">
+        <link rel="stylesheet" href="styles/components/question-box.css">
         <div class="question-box">
           <p>The production website is showing a blank page. What's your first step?</p>
         </div>

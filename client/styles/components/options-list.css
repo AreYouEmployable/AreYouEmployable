@@ -1,8 +1,8 @@
-/* // components/options-list/options-list.css */
 .options-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0 1rem;
-    margin-top: 1rem;
-  }
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}

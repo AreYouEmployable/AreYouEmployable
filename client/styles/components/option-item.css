@@ -1,18 +1,27 @@
-/* components/option-item/option-item.css */
-.option-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 0.75rem;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .option-item:hover {
-    background: #f0f0f0;
-  }
-  .option-item input[type="checkbox"] {
-    accent-color: #2196f3;
-  }
+/* .option-item label {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa; 
+  color: #495057; 
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.option-item label:hover {
+  background-color: #e9ecef; 
+  border-color: #adb5bd; 
+}
+
+.option-item input[type="radio"] {
+  margin-right: 0.75rem;
+}
+
+.option-item input[type="radio"]:focus + span {
+}
+
+.option-item input[type="radio"]:checked + span {
+  font-weight: 500;
+} */

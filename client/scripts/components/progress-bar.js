@@ -3,6 +3,7 @@ template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/progress-bar.css">
   <section class="progress-container">
     <div class="progress-bar" id="bar">0%</div>
+    <div class="progress-text-end">0%</div>
   </section>
 `;
 
@@ -13,6 +14,21 @@ class ProgressBar extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.current = 0;
     this.total = parseInt(this.getAttribute('total')) || 5;
+    this.textPosition = this.getAttribute('text-position') || 'start'; // Default to 'start'
+  }
+
+  static get observedAttributes() {
+    return ['total', 'text-position'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'total' && oldValue !== newValue) {
+      this.total = parseInt(newValue) || 5;
+      this.updateBar();
+    } else if (name === 'text-position' && oldValue !== newValue) {
+      this.textPosition = newValue;
+      this.updateBar();
+    }
   }
 
   connectedCallback() {
@@ -26,11 +42,46 @@ class ProgressBar extends HTMLElement {
     }
   }
 
+  previousStep() {
+    if (this.current > 0) {
+      this.current--;
+      this.updateBar();
+    }
+  }
+
   updateBar() {
     const percent = Math.round((this.current / this.total) * 100);
     const bar = this.shadowRoot.getElementById('bar');
-    bar.style.width = percent + '%';
-    bar.textContent = percent + '%';
+    const textEnd = this.shadowRoot.querySelector('.progress-text-end');
+
+    bar.style.width = `${percent}%`;
+
+    if (this.textPosition === 'end') {
+      bar.textContent = ''; 
+      textEnd.textContent = `${percent}%`;
+      textEnd.style.display = 'block';
+    } else {
+      bar.textContent = `${percent}%`;
+      textEnd.style.display = 'none';
+    }
+
+    
+    this.dispatchEvent(new CustomEvent('progress-update', {
+      detail: { current: this.current, total: this.total, percent },
+      bubbles: true,
+      composed: true
+    }));
+
+    this.togglePulseAnimation(percent); 
+  }
+
+  togglePulseAnimation(percent) {
+    const progressBarElement = this.shadowRoot.querySelector('.progress-bar');
+    if (percent === 0) {
+      progressBarElement.style.animation = 'none'; 
+    } else if (!progressBarElement.style.animation) {
+      progressBarElement.style.animation = 'progress-pulse 1s ease-out';
+    }
   }
 }
 
