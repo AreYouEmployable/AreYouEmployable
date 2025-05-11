@@ -72,7 +72,7 @@ const verifyCreateOrFetchUser = async (req, res) => {
     const name = payload.name;
     const picture = payload.picture;
 
-    const user = await findOrCreateUser(googleUserId, email, name, picture);
+    // const user = await findOrCreateUser(googleUserId, email, name, picture);
 
 
     const clientUrl =  process.env.CLIENT_URI;

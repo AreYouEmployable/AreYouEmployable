@@ -10,7 +10,7 @@
       const error = params.get('error');
       
       if (error) {
-        window.location.href = `http://localhost:5173?error=${encodeURIComponent(error)}`;
+        window.location.href = `http://localhost:5500?error=${encodeURIComponent(error)}`;
       } else if (code) {
         try {
           const response = await fetch(`/api/auth/google/callback?code=${encodeURIComponent(code)}`, {
@@ -26,10 +26,10 @@
           
           localStorage.setItem('jwt', token);
           
-          window.location.href = 'http://localhost:5173';
+          window.location.href = 'http://localhost:5500';
         } catch (error) {
           console.error('Auth error:', error);
-          window.location.href = `http://localhost:5173?error=${encodeURIComponent(error.message)}`;
+          window.location.href = `http://localhost:5500?error=${encodeURIComponent(error.message)}`;
         }
       }
     };
