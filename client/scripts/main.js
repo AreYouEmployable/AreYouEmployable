@@ -2,6 +2,7 @@ import { store, actions } from './state.js';
 import { AuthService } from './services/auth.js';
 import './components/google-sign-in.js';
 import './components/error-page.js';
+import './components/forbidden-page.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);

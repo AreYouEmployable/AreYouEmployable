@@ -6,6 +6,8 @@ import './answer-option.js';
 import './submit-button.js';
 import './labels-indicator.js';
 import './complexity-level-bar.js';
+import { ApiService } from '../services/api.js';
+import { AuthService } from '../services/auth.js';
 
 const template = document.createElement('template');
 template.innerHTML = `

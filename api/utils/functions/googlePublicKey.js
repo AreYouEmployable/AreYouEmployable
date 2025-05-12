@@ -59,7 +59,6 @@ export async function getGooglePublicKey(kid) {
     });
     return pemPublicKey;
   } catch (conversionError) {
-    console.error('Error converting JWK to PEM using crypto module:', conversionError);
     throw new Error('Failed to convert Google public key to PEM format.');
   }
 }

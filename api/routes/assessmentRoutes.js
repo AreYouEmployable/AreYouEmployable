@@ -4,7 +4,7 @@ import { verifyGoogleIdToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', verifyGoogleIdToken, createAssessment);
+router.post('/create', verifyGoogleIdToken, createAssessment);
 router.get('/history', verifyGoogleIdToken, getAssessments);
 router.get('/submit', verifyGoogleIdToken, );
 router.get('/:id', verifyGoogleIdToken, getAssessment);
