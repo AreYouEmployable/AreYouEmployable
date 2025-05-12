@@ -3,7 +3,7 @@ template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/answer-option.css">
   <label class="option-box">
     <input type="checkbox" />
-    <span class="text" id="labelText">Answer option</span>
+    <span id="labelText">Answer option</span>
   </label>
 `;
 
@@ -28,5 +28,3 @@ class AnswerOption extends HTMLElement {
 }
 
 customElements.define('answer-option', AnswerOption);
-
-

@@ -1,132 +1,183 @@
 .container {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.assessment-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h3 {
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+  margin-top: 4rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.progress-text {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #1b81d4;
+  background-color: #e0f2f7;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3rem;
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+.question-block,
+.question-item {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.question-header {
+  margin-bottom: 0.5rem;
+}
+
+.question-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.scenario-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.scenario-description {
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.options-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.options-list li {
+  padding-left: 0;
+}
+
+input[type="number"],
+select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+input[type="range"] {
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+:focus {
+  outline: 2px solid #1b81d4;
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .container,
+  .assessment-container {
+    padding: 1.5rem 1rem;
   }
-  
-  .text-center {
-    text-align: center;
+
+  .scenario-title {
+    font-size: 1.25rem;
   }
-  
-  .mb-8 {
-    margin-bottom: 2rem;
-    margin-top: 4rem;
+
+  .question-title {
+    font-size: 1rem;
   }
-  
-  .mb-6 {
-    margin-bottom: 1.5rem;
+
+  input[type="number"],
+  select {
+    font-size: 0.95rem;
+    padding: 0.75rem;
   }
-  
-  .mb-4 {
-    margin-bottom: 1rem;
-  }
-  
-  .mt-6 {
-    margin-top: 1.5rem;
-  }
-  
-  .mt-2 {
-    margin-top: 0.5rem;
+
+  .range-labels {
+    font-size: 0.85rem;
   }
 
   .progress-text {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: #1b81d4;
-    border: 1px; 
-    background-color: #e0f2f7; 
-    padding: 0.2rem 0.5rem;
-    border-radius: 3rem; 
-    margin-top: 20%;
+    font-size: 0.6rem;
   }
+}
 
-.question-block {
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-  }
-  
-  .question-header {
-    margin-bottom: 0.5rem;
-  }
-  
-  .question-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #1a202c;
-  }
-  
-  
-  .options-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin: 1rem 0;
-  }
-  
-  .scenario-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1a202c;
-  }
-  
-  .scenario-description {
-    color: #4a5568;
-    line-height: 1.5;
-  }
-  
+@media (max-width: 480px) {
+  .container,
   .assessment-container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
   }
-  
+
   h1 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 2rem;
+    font-size: 1.5rem;
   }
-  
-  .question {
-    margin-bottom: 2rem;
+
+  .scenario-title {
+    font-size: 1.1rem;
   }
-  
-  h3 {
-    color: #444;
-    margin-bottom: 1rem;
+
+  .question-title {
+    font-size: 0.95rem;
   }
-  
-  input[type="number"],
-  select {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+
+  .progress-text {
+    margin-top: 0.5rem;
+    font-size: 0.55rem;
   }
-  
-  input[type="range"] {
-    width: 100%;
-    margin: 1rem 0;
-  }
-  
-  .range-labels {
-    display: flex;
-    justify-content: space-between;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  
-
-
-
-
-
-
-  
-
-  
+}

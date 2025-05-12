@@ -3,12 +3,13 @@ class OptionsList extends HTMLElement {
     super();
     const template = document.createElement('template');
     template.innerHTML = `
-      <link rel="stylesheet" href="styles/components/options-list.css"
-      <div class="options-list">
+      <link rel="stylesheet" href="styles/components/options-list.css">
+      <section class="options-list">
         <slot></slot>
-      </div>
+      </section>
     `;
     this.attachShadow({ mode: 'open' }).appendChild(template.content.cloneNode(true));
   }
 }
+
 customElements.define('options-list', OptionsList);

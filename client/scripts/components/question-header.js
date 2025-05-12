@@ -1,10 +1,10 @@
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="styles/components/question-header.css">
-  <div class="question-header">
+  <header class="question-header">
     <h2 id="question-title"></h2>
     <p id="question-description"></p>
-  </div>
+  </header>
 `;
 
 class QuestionHeader extends HTMLElement {
