@@ -1,0 +1,25 @@
+/* .complexity-container {
+    margin: 1rem 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .level-bar {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .level-bar.easy {
+    background-color: #10b981;
+  }
+  .level-bar.medium {
+    background-color: #f59e0b;
+  }
+  .level-bar.hard {
+    background-color: #ef4444;
+  }
+   */

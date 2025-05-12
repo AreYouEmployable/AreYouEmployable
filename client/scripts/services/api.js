@@ -1,6 +1,9 @@
+import { config } from '../config.js';
 import { AuthService } from './auth.js';
 
+const API_BASE_URL = config.API_URL;
 export class ApiService {
+    
     static async request(endpoint, options = {}) {
         const token = AuthService.getToken();
         if (!token) {
@@ -11,25 +14,33 @@ export class ApiService {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            credentials: 'include'
         };
 
-        const response = await fetch(endpoint, {
-            ...defaultOptions,
-            ...options,
-            headers: {
-                ...defaultOptions.headers,
-                ...options.headers
-            }
-        });
-        if (!response.ok) {
-            if (response.status === 403) {
-                throw new Error('forbidden');
-            }
-            throw new Error(`API request failed: ${response.statusText}`);
-        }
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                ...defaultOptions,
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...options.headers
+                }
+            });
 
-        return response.json();
+            if (!response.ok) {
+                if (response.status === 403) {
+                    throw new Error('forbidden');
+                }
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `API request failed: ${response.statusText}`);
+            }
+
+            return response.json();
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
     }
 
     static async get(endpoint) {

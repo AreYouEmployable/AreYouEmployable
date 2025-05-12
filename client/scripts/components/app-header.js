@@ -67,7 +67,7 @@ class AppHeader extends HTMLElement {
           </button>
           <section class="nav-links">
             ${isAuthenticated ? `
-              <a href="/assessment" class="assessment-link">Assessment</a>
+              <a href="/assessment" class="assessment-page">Assessment</a>
               <a href="/results">Results</a>
               <section class="user-info">
                 ${pictureUrl ? `

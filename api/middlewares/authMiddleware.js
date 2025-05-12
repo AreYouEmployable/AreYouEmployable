@@ -1,11 +1,11 @@
 import { getGooglePublicKey } from "../utils/functions/googlePublicKey.js";
+import jwt from 'jsonwebtoken';
 
 const verifyGoogleIdToken = async (req, res, next) => {
     try {
       const authHeader = req.headers.authorization;
   
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.warn('Auth Middleware: Authorization header missing or not Bearer.');
         return res.status(401).json({ 
           error: 'unauthorized', 
           message: 'Authorization header is missing or not in Bearer format.' 
@@ -14,13 +14,12 @@ const verifyGoogleIdToken = async (req, res, next) => {
   
       const id_token = authHeader.split(' ')[1];
       if (!id_token) {
-        console.warn('Auth Middleware: ID token missing after Bearer.');
         return res.status(401).json({ 
           error: 'unauthorized', 
           message: 'ID token is missing.' 
         });
       }
-  
+
       const decodedTokenUnverified = jwt.decode(id_token, { complete: true });
       if (!decodedTokenUnverified || !decodedTokenUnverified.header || !decodedTokenUnverified.header.kid) {
         return res.status(401).json({ 

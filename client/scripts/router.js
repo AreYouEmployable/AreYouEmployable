@@ -1,13 +1,28 @@
+import { store } from './state.js';
+
 class Router {
   constructor(routes) {
       this.routes = routes;
       this.currentRoute = null;
       this.init();
+      
+      // Listen for assessment start event
+      document.addEventListener('start-assessment', () => {
+          this.navigateTo('/assessment');
+      });
   }
 
   init() {
+      // Handle browser back/forward buttons
       window.addEventListener('popstate', () => this.handleRouting());
+      
+      // Handle direct URL navigation
+      window.addEventListener('load', () => this.handleRouting());
+      
+      // Handle hash changes
+      window.addEventListener('hashchange', () => this.handleRouting());
 
+      // Initial route handling
       if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', () => this.handleRouting());
       } else {
@@ -36,6 +51,11 @@ class Router {
               return;
           }
       }
+
+      // Check if route is protected and user is not authenticated
+      if (targetRoute.protected && !this.isAuthenticated()) {
+          targetRoute = this.routes.find(r => r.path === '/forbidden');
+      }
       
       if (this.currentRoute === targetRoute) {
           return;
@@ -43,6 +63,11 @@ class Router {
       
       this.currentRoute = targetRoute;
       this.loadComponent(targetRoute.component, targetRoute.data);
+  }
+
+  isAuthenticated() {
+      const state = store.getState();
+      return state.auth?.isAuthenticated || false;
   }
 
   loadComponent(componentName, data = {}) {
@@ -74,7 +99,8 @@ const routes = [
   { path: '/', component: 'home-page', data: { title: 'Welcome Home' } },
   { path: '/about', component: 'about-page', data: { title: 'About Us' } },
   { path: '/contact', component: 'contact-page', data: { title: 'Contact Us' } },
-  {path: '/assessment', component: 'assessment-page', data: { title: 'Assessment' } },
+  { path: '/assessment', component: 'assessment-page', data: { title: 'Assessment' }, protected: true },
+  { path: '/forbidden', component: 'forbidden-page', data: { title: '403 Forbidden' } },
   { path: '*', component: 'not-found-page', data: { title: '404 Not Found' } }
 ];
 

@@ -1,0 +1,49 @@
+.navigation-controls {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.nav-button {
+  flex: 1 1 auto;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 120px;
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.prev-button {
+  background-color: #4a5568;
+  color: white;
+}
+
+.prev-button:hover:not(:disabled) {
+  background-color: #2d3748;
+}
+
+.next-button {
+  background-color: #48bb78;
+  color: white;
+}
+
+.next-button:hover:not(:disabled) {
+  background-color: #38a169;
+}
+
+@media (max-width: 480px) {
+  .navigation-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
