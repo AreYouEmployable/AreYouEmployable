@@ -12,7 +12,7 @@ import { AuthService } from '../services/auth.js';
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/assessment-page.css">
-  <main class="container" role="main">
+  <main class="container">
     <header class="text-center mb-8">
       <h2 class="scenario-title" id="scenario-title">Loading scenario title...</h2>
     </header>
@@ -22,7 +22,6 @@ template.innerHTML = `
     <progress-bar total="2" class="progress-bar mb-6"></progress-bar>
 
     <section class="question-block mt-8" id="scenario-questions">
-      <!-- Questions dynamically injected here -->
     </section>
 
     <navigation-controls></navigation-controls>

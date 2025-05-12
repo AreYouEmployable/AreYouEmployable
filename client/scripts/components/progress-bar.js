@@ -3,9 +3,8 @@ template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/progress-bar.css">
   <section class="progress-container">
     <progress class="progress-bar" id="bar" value="0" max="100">0%</progress>
-    <div class="progress-text-end">0%</div>
-  </section>
-`;
+    <output class="progress-text-end" id="label">0%</output>
+  </section>`;
 
 class ProgressBar extends HTMLElement {
   constructor() {
