@@ -1,10 +1,10 @@
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/navigation-controls.css">
-  <nav class="navigation-controls" aria-label="Scenario navigation">
-    <button id="prev-btn" class="nav-button prev-button" disabled type="button">Previous</button>
-    <button id="next-btn" class="nav-button next-button" disabled type="button">Next</button>
-  </nav>
+  <div class="navigation-controls">
+    <button id="prev-btn" class="nav-button prev-button" disabled>Previous</button>
+    <button id="next-btn" class="nav-button next-button" disabled>Next</button>
+  </div>
 `;
 
 class NavigationControls extends HTMLElement {
@@ -13,7 +13,7 @@ class NavigationControls extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.nextButton = this.shadowRoot.getElementById('next-btn');
-    this.prevButton = this.shadowRoot.getElementById('prev-btn');
+    this.prevButton = this.shadowRoot.getElementById('prev-btn'); 
     this._canGoForward = false;
     this._canGoBack = false;
     this._isLastScenario = false;
@@ -38,13 +38,13 @@ class NavigationControls extends HTMLElement {
   }
 
   set canGoBack(value) {
-    this._canGoBack = value;
-    this.prevButton.disabled = !value;
+    this._canGoBack = value; 
+    this.prevButton.disabled = !value; 
   }
 
   set canGoForward(value) {
-    this._canGoForward = value;
-    this.nextButton.disabled = !value;
+    this._canGoForward = value; 
+    this.nextButton.disabled = !value; 
     this._updateNextButtonText();
   }
 
@@ -54,7 +54,11 @@ class NavigationControls extends HTMLElement {
   }
 
   _updateNextButtonText() {
-    this.nextButton.textContent = this._isLastScenario ? 'Finish Assessment' : 'Next';
+    if (this._isLastScenario) {
+      this.nextButton.textContent = 'Finish Assessment';
+    } else {
+      this.nextButton.textContent = 'Next';
+    }
     this.nextButton.disabled = !this._canGoForward;
   }
 

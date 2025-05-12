@@ -6,27 +6,26 @@ import './answer-option.js';
 import './submit-button.js';
 import './labels-indicator.js';
 import './complexity-level-bar.js';
-// import { ApiService } from '../services/api.js';
-// import { AuthService } from '../services/auth.js';
+import { ApiService } from '../services/api.js';
+import { AuthService } from '../services/auth.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/assessment-page.css">
-  <main class="container" role="main">
+  <section class="container">
     <header class="text-center mb-8">
       <h2 class="scenario-title" id="scenario-title">Loading scenario title...</h2>
     </header>
 
-    <p class="progress-text">ASSESSMENT PROGRESS</p>
+    <span class="progress-text">ASSESSMENT PROGRESS</span>
 
     <progress-bar total="2" class="progress-bar mb-6"></progress-bar>
 
-    <section class="question-block mt-8" id="scenario-questions">
-      <!-- Questions dynamically injected here -->
-    </section>
+    <article class="question-block mt-8" id="scenario-questions">
+    </article>
 
     <navigation-controls></navigation-controls>
-  </main>
+  </section>
 `;
 
 class AssessmentPage extends HTMLElement {
@@ -39,9 +38,7 @@ class AssessmentPage extends HTMLElement {
     this.answers = new Map();
     this.submittedCurrentScenario = false;
     this.assessmentComplete = false;
-    this.scenarioQuestionsContainer = null;
-    this.progressBar = null; 
-    this.navControls = null;
+    this.scenarioQuestionsContainer = null; 
     this.scenarios = [
       [
         {
@@ -112,14 +109,14 @@ class AssessmentPage extends HTMLElement {
   }
 
   connectedCallback() {
-    this.navControls = this.shadowRoot.querySelector('navigation-controls');
-    this.navControls.addEventListener('navigate', this.handleNavigation.bind(this));
+    const navControls = this.shadowRoot.querySelector('navigation-controls');
+    navControls.addEventListener('navigate', this.handleNavigation.bind(this));
 
-    this.progressBar = this.shadowRoot.querySelector('progress-bar'); 
-    this.progressBar.setAttribute('total', this.totalScenarios.toString());
+    const progressBar = this.shadowRoot.querySelector('progress-bar');
+    progressBar.setAttribute('total', this.totalScenarios.toString());
     this.updateProgressBarText();
 
-    this.scenarioQuestionsContainer = this.shadowRoot.querySelector('#scenario-questions');
+    this.scenarioQuestionsContainer = this.shadowRoot.querySelector('#scenario-questions'); // Store here
     this.loadScenario(this.currentScenario);
     this.updateNavigationState();
   }
@@ -140,7 +137,6 @@ class AssessmentPage extends HTMLElement {
     this.answers.set(this.currentScenario, scenarioAnswers);
     this.submittedCurrentScenario = true;
     this.updateNavigationState();
-    this.updateProgressBarValue(); 
 
     console.log('Answers submitted for scenario:', this.answers.get(this.currentScenario));
 
@@ -168,13 +164,13 @@ class AssessmentPage extends HTMLElement {
     this.loadScenario(this.currentScenario);
     this.updateNavigationState();
     this.updateProgressBarText();
-    this.updateProgressBarValue(); 
   }
 
   updateNavigationState() {
-    this.navControls.canGoBack = this.currentScenario > 0;
-    this.navControls.canGoForward = this.submittedCurrentScenario;
-    this.navControls.isLastScenario = this.currentScenario === this.totalScenarios - 1;
+    const navControls = this.shadowRoot.querySelector('navigation-controls');
+    navControls.canGoBack = this.currentScenario > 0;
+    navControls.canGoForward = this.submittedCurrentScenario; // Corrected line
+    navControls.isLastScenario = this.currentScenario === this.totalScenarios - 1;
   }
 
   loadScenario(scenarioIndex) {
@@ -184,11 +180,11 @@ class AssessmentPage extends HTMLElement {
     const scenarioTitle = this.shadowRoot.querySelector('#scenario-title');
     scenarioTitle.textContent = `Scenario ${scenarioIndex + 1}`;
 
-    const scenarioQuestionsContainer = this.scenarioQuestionsContainer;
+    const scenarioQuestionsContainer = this.scenarioQuestionsContainer; // Use the stored reference
     scenarioQuestionsContainer.innerHTML = '';
 
     scenario.forEach((question, index) => {
-      const questionItem = document.createElement('article');
+      const questionItem = document.createElement('div');
       questionItem.classList.add('question-item');
 
       const labelsIndicator = document.createElement('labels-indicator');
@@ -202,24 +198,21 @@ class AssessmentPage extends HTMLElement {
       questionHeader.setAttribute('description', question.description);
       questionItem.appendChild(questionHeader);
 
-      const optionsList = document.createElement('ul');
+      const optionsList = document.createElement('div');
       optionsList.classList.add('options-list');
 
       question.options.forEach((optionText, optionIndex) => {
-        const listItem = document.createElement('li');
         const option = document.createElement('answer-option');
         option.text = optionText;
 
         const savedAnswersForScenario = this.answers.get(scenarioIndex);
-        if (savedAnswersForScenario && savedAnswersForScenario[index]?.selectedOptions.includes(optionIndex)) {
+        if (savedAnswersForScenario && savedAnswersForScenario[index] && savedAnswersForScenario[index].selectedOptions.includes(optionIndex)) {
           option.selected = true;
         }
-
-        listItem.appendChild(option);
-        optionsList.appendChild(listItem);
+        optionsList.appendChild(option);
       });
-
       questionItem.appendChild(optionsList);
+
       scenarioQuestionsContainer.appendChild(questionItem);
     });
 
@@ -241,13 +234,8 @@ class AssessmentPage extends HTMLElement {
     }
   }
 
-  updateProgressBarValue() {
-    if (this.progressBar) {
-      this.progressBar.setAttribute('value', (this.currentScenario + (this.submittedCurrentScenario ? 1 : 0)).toString());
-    }
-  }
-
   finishAssessment() {
+    console.log('Assessment finished. Navigating to the next page...');
     window.location.href = '/assessment-results';
   }
 }

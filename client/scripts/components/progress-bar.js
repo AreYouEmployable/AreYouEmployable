@@ -2,7 +2,7 @@ const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/progress-bar.css">
   <section class="progress-container">
-    <progress class="progress-bar" id="bar" value="0" max="100">0%</progress>
+    <div class="progress-bar" id="bar">0%</div>
     <div class="progress-text-end">0%</div>
   </section>
 `;
@@ -14,7 +14,7 @@ class ProgressBar extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.current = 0;
     this.total = parseInt(this.getAttribute('total')) || 5;
-    this.textPosition = this.getAttribute('text-position') || 'start';
+    this.textPosition = this.getAttribute('text-position') || 'start'; // Default to 'start'
   }
 
   static get observedAttributes() {
@@ -54,7 +54,7 @@ class ProgressBar extends HTMLElement {
     const bar = this.shadowRoot.getElementById('bar');
     const textEnd = this.shadowRoot.querySelector('.progress-text-end');
 
-    bar.value = percent;
+    bar.style.width = `${percent}%`;
 
     if (this.textPosition === 'end') {
       bar.textContent = ''; 
@@ -65,19 +65,20 @@ class ProgressBar extends HTMLElement {
       textEnd.style.display = 'none';
     }
 
+    
     this.dispatchEvent(new CustomEvent('progress-update', {
       detail: { current: this.current, total: this.total, percent },
       bubbles: true,
       composed: true
     }));
 
-    this.togglePulseAnimation(percent);
+    this.togglePulseAnimation(percent); 
   }
 
   togglePulseAnimation(percent) {
     const progressBarElement = this.shadowRoot.querySelector('.progress-bar');
     if (percent === 0) {
-      progressBarElement.style.animation = 'none';
+      progressBarElement.style.animation = 'none'; 
     } else if (!progressBarElement.style.animation) {
       progressBarElement.style.animation = 'progress-pulse 1s ease-out';
     }

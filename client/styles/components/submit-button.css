@@ -1,22 +1,21 @@
 .submit-button {
-  background-color: #4fa3fd;
-  color: #fff;
+  background-color: #4fa3fd; 
+  color: #fff; 
   border: none;
   border-radius: 0.375rem;
-  padding: 0.5rem 1.2rem;
+  padding: 0.5rem 1.2rem; 
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1); 
 }
 
 .submit-button:hover {
-  background-color: #bfbfbf;
-}
+  background-color: #bfbfbf; }
 
 .submit-button:focus {
   outline: none;
-  box-shadow: 0 0 0 0.2rem #90c2f780;
+  box-shadow: 0 0 0 0.2rem #90c2f780; /
 }
 
 .mt-4 {

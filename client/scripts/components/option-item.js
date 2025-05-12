@@ -1,6 +1,5 @@
 const template = document.createElement('template');
 template.innerHTML = `
-<link rel="stylesheet" href="/styles/components/option-item.css">
   <label class="flex items-center space-x-2">
     <input type="checkbox" name="answer" class="form-checkbox text-blue-600" />
     <span></span>
