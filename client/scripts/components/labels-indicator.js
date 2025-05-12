@@ -1,10 +1,7 @@
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="styles/components/labels-indicator.css">
-  <div class="labels-container">
-    <span class="label scenario-type"></span>
-    <span class="label difficulty"></span>
-  </div>
+  <ul class="labels-container" role="list"></ul>
 `;
 
 class LabelsIndicator extends HTMLElement {
@@ -26,8 +23,7 @@ class LabelsIndicator extends HTMLElement {
       try {
         this._labels = JSON.parse(newValue);
         this.render();
-      } catch (error) {
-        console.error('Invalid JSON for labels attribute:', error);
+      } catch {
         this._labels = [];
         this.render();
       }
@@ -44,15 +40,15 @@ class LabelsIndicator extends HTMLElement {
   render() {
     this.labelsContainer.innerHTML = '';
     this._labels.forEach((label, index) => {
-      const labelElement = document.createElement('span');
-      labelElement.classList.add('label');
-      labelElement.textContent = label;
-      this.labelsContainer.appendChild(labelElement);
+      const item = document.createElement('li');
+      item.classList.add('label');
+      item.textContent = label;
+      this.labelsContainer.appendChild(item);
       if (index === 1 && ['easy', 'medium', 'hard'].includes(this._difficulty)) {
-        labelElement.classList.add(this._difficulty);
+        item.classList.add(this._difficulty);
       }
       if (index === 0) {
-        labelElement.classList.add('scenario-type');
+        item.classList.add('scenario-type');
       }
     });
     this.updateLabelColors();
@@ -62,18 +58,17 @@ class LabelsIndicator extends HTMLElement {
     const labelElements = this.shadowRoot.querySelectorAll('.label');
     labelElements.forEach((labelElement, index) => {
       if (index === 1) {
-        labelElement.classList.remove('easy', 'medium', 'hard', 'difficulty');
+        labelElement.classList.remove('easy', 'medium', 'hard');
         if (this._difficulty) {
           labelElement.classList.add(this._difficulty);
         }
       } else if (index === 0) {
-        labelElement.className = 'label scenario-type'; 
+        labelElement.className = 'label scenario-type';
         if (this._labels[0] === 'Technical') {
           labelElement.classList.add('technical');
         } else if (this._labels[0] === 'Culture Fit') {
           labelElement.classList.add('culture-fit');
         }
-        // Add more conditions for other scenario types if needed
       }
     });
   }

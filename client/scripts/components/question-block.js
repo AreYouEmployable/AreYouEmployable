@@ -33,7 +33,7 @@ class QuestionBlock extends HTMLElement {
 
   set options(optionTexts) {
     const container = this.shadowRoot.getElementById('options');
-    container.innerHTML = '';
+    container.innerHTML = ''; 
     optionTexts.forEach(text => {
       const option = document.createElement('answer-option');
       option.text = text;
