@@ -7,6 +7,7 @@ export class ApiService {
     static async request(endpoint, options = {}) {
         const token = AuthService.getToken();
         if (!token) {
+            window.location.href = '/forbidden';
             throw new Error('Not authenticated');
         }
 
@@ -29,10 +30,21 @@ export class ApiService {
             });
 
             if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                
+                // Handle token expiration
+                if (errorData.error === 'token_expired' || response.status === 401) {
+                    AuthService.clearToken();
+                    window.location.href = '/forbidden';
+                    throw new Error('Token expired');
+                }
+                
+                // Handle forbidden access
                 if (response.status === 403) {
+                    window.location.href = '/forbidden';
                     throw new Error('forbidden');
                 }
-                const errorData = await response.json().catch(() => ({}));
+
                 throw new Error(errorData.message || `API request failed: ${response.statusText}`);
             }
 
