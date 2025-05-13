@@ -1,0 +1,36 @@
+.card {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-family: sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.header-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.score span {
+  font-size: 14px;
+  color: #6b7280;
+  margin-left: 4px;
+}

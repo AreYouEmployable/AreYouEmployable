@@ -74,6 +74,7 @@ const routes = [
   { path: '/', component: 'home-page', data: { title: 'Welcome Home' } },
   { path: '/about', component: 'about-page', data: { title: 'About Us' } },
   { path: '/contact', component: 'contact-page', data: { title: 'Contact Us' } },
+  { path: '/results', component: 'results-page', data: { title: 'Results' } },
   {path: '/assessment', component: 'assessment-page', data: { title: 'Assessment' } },
   { path: '*', component: 'not-found-page', data: { title: '404 Not Found' } }
 ];
