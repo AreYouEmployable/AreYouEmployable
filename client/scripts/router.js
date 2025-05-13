@@ -100,8 +100,8 @@ const routes = [
   { path: '/about', component: 'about-page', data: { title: 'About Us' } },
   { path: '/contact', component: 'contact-page', data: { title: 'Contact Us' } },
   { path: '/assessment', component: 'assessment-page', data: { title: 'Assessment' }, protected: true },
-  { path: '/forbidden', component: 'forbidden-page', data: { title: '403 Forbidden' } },
-  { path: '*', component: 'not-found-page', data: { title: '404 Not Found' } }
+  { path: '/forbidden', component: 'forbidden-page', data: { title: '' } },
+  { path: '*', component: 'not-found-page', data: { title: '' } }
 ];
 
 export const router = new Router(routes);

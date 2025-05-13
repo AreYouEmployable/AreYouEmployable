@@ -12,17 +12,20 @@ import { AuthService } from '../services/auth.js';
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/assessment-page.css">
-  <main class="container">
-    <header class="text-center mb-8">
-      <h2 class="scenario-title" id="scenario-title">Loading scenario title...</h2>
-    </header>
-
-    <p class="progress-text">ASSESSMENT PROGRESS</p>
-
+  <section class="container">
+    <span class="progress-text">ASSESSMENT PROGRESS</span>
     <progress-bar total="2" class="progress-bar mb-6"></progress-bar>
 
-    <section class="question-block mt-8" id="scenario-questions">
-    </section>
+    <article class="scenario-card">
+      <header class="scenario-header">
+        <h2 class="scenario-title" id="scenario-title">Loading scenario title...</h2>
+        <p class="scenario-description" id="scenario-description"></p>
+        <labels-indicator class="scenario-labels"></labels-indicator>
+      </header>
+
+      <article class="question-block mt-8" id="scenario-questions">
+      </article>
+    </article>
 
     <navigation-controls></navigation-controls>
   </main>
@@ -34,96 +37,41 @@ class AssessmentPage extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.currentScenario = 0;
-    this.totalScenarios = 2;
+    this.totalScenarios = 0;
     this.answers = new Map();
     this.submittedCurrentScenario = false;
     this.assessmentComplete = false;
     this.scenarioQuestionsContainer = null;
-    this.progressBar = null; 
-    this.navControls = null;
-    this.scenarios = [
-      [
-        {
-          title: "Debugging Challenge 1",
-          description: "Fixing bug 1...",
-          complexity: "Medium",
-          options: ["A1", "B1", "C1", "D1"]
-        },
-        {
-          title: "Debugging Challenge 2",
-          description: "Fixing bug 2...",
-          complexity: "Easy",
-          options: ["A2", "B2", "C2", "D2"]
-        },
-        {
-          title: "Debugging Challenge 3",
-          description: "Fixing bug 3...",
-          complexity: "Hard",
-          options: ["A3", "B3", "C3", "D3"]
-        },
-        {
-          title: "Debugging Challenge 4",
-          description: "Fixing bug 4...",
-          complexity: "Medium",
-          options: ["A4", "B4", "C4", "D4"]
-        },
-        {
-          title: "Debugging Challenge 5",
-          description: "Fixing bug 5...",
-          complexity: "Easy",
-          options: ["A5", "B5", "C5", "D5"]
-        }
-      ],
-      [
-        {
-          title: "Team Collaboration",
-          description: "How do you handle disagreements within a team?",
-          complexity: "Easy",
-          options: ["Avoid confrontation", "Force your opinion", "Listen and find a compromise", "Escalate immediately"]
-        },
-        {
-          title: "Feedback Acceptance",
-          description: "How do you react to constructive criticism?",
-          complexity: "Medium",
-          options: ["Get defensive", "Ignore it", "Reflect and learn", "Argue about it"]
-        },
-        {
-          title: "Dealing with Pressure",
-          description: "How do you manage stress in a fast-paced environment?",
-          complexity: "Medium",
-          options: ["Panic", "Work harder without breaks", "Prioritize and take breaks", "Blame others"]
-        },
-        {
-          title: "Communication Style",
-          description: "What is your preferred method of communication for important updates?",
-          complexity: "Easy",
-          options: ["Informal chat", "Email", "Meeting", "Shouting across the office"]
-        },
-        {
-          title: "Adaptability",
-          description: "How do you handle changes in project requirements?",
-          complexity: "Medium",
-          options: ["Resist the changes", "Complain loudly", "Assess the impact and adapt", "Ignore the new requirements"]
-        }
-      ]
-    ];
-    this.totalScenarios = this.scenarios.length;
+    this.scenarios = [];
+    this.assessment = null;
   }
 
-  connectedCallback() {
-    this.navControls = this.shadowRoot.querySelector('navigation-controls');
-    this.navControls.addEventListener('navigate', this.handleNavigation.bind(this));
+  async connectedCallback() {
+    const navControls = this.shadowRoot.querySelector('navigation-controls');
+    navControls.addEventListener('navigate', this.handleNavigation.bind(this));
 
-    this.progressBar = this.shadowRoot.querySelector('progress-bar'); 
-    this.progressBar.setAttribute('total', this.totalScenarios.toString());
-    this.updateProgressBarText();
-
+    const progressBar = this.shadowRoot.querySelector('progress-bar');
     this.scenarioQuestionsContainer = this.shadowRoot.querySelector('#scenario-questions');
-    this.loadScenario(this.currentScenario);
+    
+    try {
+      const response = await ApiService.post('/api/assessment/create');
+      if (response) {
+        this.assessment= response;
+        this.scenarios = response.scenario;
+        this.totalScenarios = this.scenarios.length;
+        progressBar.setAttribute('total', this.totalScenarios.toString());
+        this.loadScenario(this.currentScenario);
+      } else {
+        console.error('Failed to fetch scenarios:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching scenarios:', error);
+    }
+    
     this.updateNavigationState();
   }
 
-  handleScenarioSubmit(e) {
+  async handleScenarioSubmit(e) {
     e.preventDefault();
 
     const currentScenarioQuestions = this.shadowRoot.querySelectorAll('.question-item');
@@ -135,17 +83,29 @@ class AssessmentPage extends HTMLElement {
         .filter(index => index !== null);
       scenarioAnswers.push({ questionIndex: index, selectedOptions });
     });
+    console.log(this.scenarios);
+    try {
+      // Submit the current scenario's answers
+      const response = await ApiService.post('/api/assessment/submit-scenario', {
+        scenarioIndex: this.currentScenario,
+        answers: scenarioAnswers,
+        assessmentId: this.assessment.assessmentId
+      });
 
-    this.answers.set(this.currentScenario, scenarioAnswers);
-    this.submittedCurrentScenario = true;
-    this.updateNavigationState();
-    this.updateProgressBarValue(); 
-
-    console.log('Answers submitted for scenario:', this.answers.get(this.currentScenario));
-
-    if (this.currentScenario === this.totalScenarios - 1) {
-      this.assessmentComplete = true;
+      console.log('Scenario submitted successfully:', response);
+      
+      // Store the answers locally
+      this.answers.set(this.currentScenario, scenarioAnswers);
+      this.submittedCurrentScenario = true;
       this.updateNavigationState();
+
+      // If this was the last scenario, mark assessment as complete
+      if (response.isComplete) {
+        this.assessmentComplete = true;
+        this.updateNavigationState();
+      }
+    } catch (error) {
+      console.error('Error submitting scenario:', error);
     }
   }
 
@@ -171,70 +131,75 @@ class AssessmentPage extends HTMLElement {
   }
 
   updateNavigationState() {
-    this.navControls.canGoBack = this.currentScenario > 0;
-    this.navControls.canGoForward = this.submittedCurrentScenario;
-    this.navControls.isLastScenario = this.currentScenario === this.totalScenarios - 1;
+    const navControls = this.shadowRoot.querySelector('navigation-controls');
+    navControls.canGoBack = this.currentScenario > 0;
+    navControls.canGoForward = this.submittedCurrentScenario;
+    navControls.isLastScenario = this.currentScenario === this.totalScenarios - 1;
   }
 
-  loadScenario(scenarioIndex) {
-    const scenario = this.scenarios[scenarioIndex];
-    if (!scenario) return;
+  loadScenario(index) {
+    if (!this.scenarios || !this.scenarios[index]) return;
 
+    const currentScenario = this.scenarios[index];
     const scenarioTitle = this.shadowRoot.querySelector('#scenario-title');
-    scenarioTitle.textContent = `Scenario ${scenarioIndex + 1}`;
+    const scenarioDescription = this.shadowRoot.querySelector('#scenario-description');
+    const labelsIndicator = this.shadowRoot.querySelector('.scenario-labels');
+    
+    scenarioTitle.textContent = currentScenario.scenario_title;
+    scenarioDescription.textContent = currentScenario.scenario_description;
+    
+    // Set labels once for the entire scenario
+    labelsIndicator.setAttribute('labels', JSON.stringify([currentScenario.type, currentScenario.difficulty]));
+    labelsIndicator.setAttribute('difficulty', currentScenario.difficulty.toLowerCase());
 
-    const scenarioQuestionsContainer = this.scenarioQuestionsContainer;
-    scenarioQuestionsContainer.innerHTML = '';
-
-    scenario.forEach((question, index) => {
-      const questionItem = document.createElement('article');
-      questionItem.classList.add('question-item');
-
-      const labelsIndicator = document.createElement('labels-indicator');
-      const scenarioType = scenarioIndex === 0 ? "Technical" : "Culture Fit";
-      labelsIndicator.setAttribute('labels', JSON.stringify([scenarioType, question.complexity]));
-      labelsIndicator.setAttribute('difficulty', question.complexity.toLowerCase());
-      questionItem.appendChild(labelsIndicator);
-
+    this.scenarioQuestionsContainer.innerHTML = '';
+    
+    currentScenario.questions.forEach((question, questionIndex) => {
+      const questionElement = document.createElement('div');
+      questionElement.className = 'question-item';
+      
       const questionHeader = document.createElement('question-header');
-      questionHeader.setAttribute('title', question.title);
-      questionHeader.setAttribute('description', question.description);
-      questionItem.appendChild(questionHeader);
-
-      const optionsList = document.createElement('ul');
-      optionsList.classList.add('options-list');
-
-      question.options.forEach((optionText, optionIndex) => {
-        const listItem = document.createElement('li');
-        const option = document.createElement('answer-option');
-        option.text = optionText;
-
-        const savedAnswersForScenario = this.answers.get(scenarioIndex);
-        if (savedAnswersForScenario && savedAnswersForScenario[index]?.selectedOptions.includes(optionIndex)) {
-          option.selected = true;
+      questionHeader.setAttribute('title', question.question_text);
+      
+      const optionsList = document.createElement('div');
+      optionsList.className = 'options-list';
+      
+      question.options.forEach((option) => {
+        const answerOption = document.createElement('answer-option');
+        answerOption.text = option.value;
+        answerOption.setAttribute('option-id', option.option_id);
+        
+        // Check if this option was previously selected
+        const savedAnswers = this.answers.get(index);
+        if (savedAnswers) {
+          const questionAnswer = savedAnswers.find(a => a.questionIndex === questionIndex);
+          if (questionAnswer && questionAnswer.selectedOptions.includes(option.option_id)) {
+            answerOption.selected = true;
+          }
         }
-
-        listItem.appendChild(option);
-        optionsList.appendChild(listItem);
+        
+        optionsList.appendChild(answerOption);
       });
-
-      questionItem.appendChild(optionsList);
-      scenarioQuestionsContainer.appendChild(questionItem);
+      
+      questionElement.appendChild(questionHeader);
+      questionElement.appendChild(optionsList);
+      this.scenarioQuestionsContainer.appendChild(questionElement);
     });
 
     const submitButton = document.createElement('submit-button');
     submitButton.id = 'submit-scenario';
     submitButton.classList.add('mt-4');
     submitButton.addEventListener('click', this.handleScenarioSubmit.bind(this));
-    scenarioQuestionsContainer.appendChild(submitButton);
+    this.scenarioQuestionsContainer.appendChild(submitButton);
 
-    this.submittedCurrentScenario = this.answers.has(scenarioIndex);
+    this.submittedCurrentScenario = this.answers.has(index);
     this.updateNavigationState();
   }
 
   updateProgressBarText() {
     const progressBar = this.shadowRoot.querySelector('progress-bar');
     progressBar.setAttribute('total', this.totalScenarios.toString());
+    progressBar.setAttribute('current', (this.currentScenario + 1).toString());
     if (progressBar) {
       progressBar.setAttribute('text-position', 'end');
     }

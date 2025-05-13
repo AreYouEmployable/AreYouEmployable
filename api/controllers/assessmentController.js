@@ -70,4 +70,17 @@ const submitAssessmentHandler = async (req, res) => {
     }
 };
 
-export { createAssessment, getAssessment, getAssessments, submitAssessmentHandler };
+const submitScenarioHandler = async (req, res) => {
+    try {
+        console.log(req.body);
+        const assessmentId = parseInt(req.body.assessmentId,);
+        const scenarioIndex = parseInt(req.body.scenarioIndex,);
+        const answers = req.body.answers;
+        const result = await assessmentService.submitScenario(assessmentId, scenarioIndex, answers);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+export { createAssessment, getAssessment, getAssessments, submitAssessmentHandler ,submitScenarioHandler};

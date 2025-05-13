@@ -59,7 +59,7 @@ class AppHeader extends HTMLElement {
       <link rel="stylesheet" href="/styles/components/app-header.css">
       <header>
         <section class="header-content">
-          <a href="/" class="logo">Are You Employable?</a>
+          <a href="/" class="logo">Employability Assessment</a>
           <button class="hamburger" id="hamburger">
             <span></span>
             <span></span>
