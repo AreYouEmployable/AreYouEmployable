@@ -2,8 +2,8 @@ const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/progress-bar.css">
   <section class="progress-container">
-    <progress class="progress-bar" id="bar" value="0" max="100">0%</progress>
-    <output class="progress-text-end" id="label">0%</output>
+    <progress class="progress-bar" id="bar" value="0" max="100"></progress>
+    <div class="progress-text" id="progress-text">0%</div>
   </section>`;
 
 class ProgressBar extends HTMLElement {
@@ -17,7 +17,7 @@ class ProgressBar extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['total', 'text-position'];
+    return ['total', 'text-position', 'value', 'current'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -26,6 +26,9 @@ class ProgressBar extends HTMLElement {
       this.updateBar();
     } else if (name === 'text-position' && oldValue !== newValue) {
       this.textPosition = newValue;
+      this.updateBar();
+    } else if ((name === 'value' || name === 'current') && oldValue !== newValue) {
+      this.current = parseInt(newValue) || 0;
       this.updateBar();
     }
   }
@@ -51,18 +54,11 @@ class ProgressBar extends HTMLElement {
   updateBar() {
     const percent = Math.round((this.current / this.total) * 100);
     const bar = this.shadowRoot.getElementById('bar');
-    const textEnd = this.shadowRoot.querySelector('.progress-text-end');
-
+    const progressText = this.shadowRoot.getElementById('progress-text');
+    
     bar.value = percent;
-
-    if (this.textPosition === 'end') {
-      bar.textContent = ''; 
-      textEnd.textContent = `${percent}%`;
-      textEnd.style.display = 'block';
-    } else {
-      bar.textContent = `${percent}%`;
-      textEnd.style.display = 'none';
-    }
+    bar.max = 100;
+    progressText.textContent = `${percent}%`;
 
     this.dispatchEvent(new CustomEvent('progress-update', {
       detail: { current: this.current, total: this.total, percent },
