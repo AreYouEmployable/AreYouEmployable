@@ -53,6 +53,7 @@ export class CdkStack extends cdk.Stack {
           originAccessLevels: [cloudfront.AccessLevel.READ],
         }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
       },
       defaultRootObject: 'index.html',
       errorResponses: [
