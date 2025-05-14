@@ -12,7 +12,7 @@ const swaggerOptions = {
         description: 'Development server',
       },
       {
-        url: `https://${process.env.BASE_URL}`,
+        url: `http://${process.env.BASE_URL}`,
         description: 'Production server',
       },
     ],
