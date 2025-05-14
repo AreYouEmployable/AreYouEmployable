@@ -250,7 +250,7 @@ export class CdkStack extends cdk.Stack {
 
     const apiDistribution = new cloudfront.Distribution(this, 'AreYouEmployableApiDistribution', {
       defaultBehavior: {
-        origin: new origins.HttpOrigin(environment.attrEndpointUrl, {
+        origin: new origins.HttpOrigin('are-you-employable-api-env.eba-smptqyru.af-south-1.elasticbeanstalk.com', {
           protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
         }),
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
