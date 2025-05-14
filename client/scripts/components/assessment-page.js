@@ -1,11 +1,11 @@
 import './progress-bar.js';
 import './question-header.js';
-import './question-block.js'; // This might not be directly used if questions are rendered dynamically
+import './question-block.js';
 import './navigation-controls.js';
 import './answer-option.js';
 import './submit-button.js';
 import './labels-indicator.js';
-import './complexity-level-bar.js'; // Not explicitly used in the provided logic, but kept from your imports
+import './complexity-level-bar.js'; 
 import { ApiService } from '../services/api.js';
 import { AuthService } from '../services/auth.js';
 
@@ -37,16 +37,14 @@ class AssessmentPage extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
 
     this.assessmentId = null;
-    // this.assessmentSummary = null; // Data from initial fetch will be the first scenario's data
     this.currentScenarioData = null;
 
-    this.currentScenario = 0; // 0-indexed internally for the current scenario being processed/displayed
+    this.currentScenario = 0; 
     this.totalScenarios = 0;
-    this.answers = new Map(); // Stores answers for submitted scenarios: { scenarioIndex (0-based) -> answersPayload }
-    this.submittedCurrentScenario = false; // Tracks if the *currently displayed* scenario's answers have been submitted
-    this.assessmentComplete = false; // True when the backend confirms all scenarios are done
+    this.answers = new Map(); 
+    this.submittedCurrentScenario = false;
+    this.assessmentComplete = false;
 
-    // DOM Elements
     this.progressBarElement = this.shadowRoot.querySelector('progress-bar');
     this.scenarioTitleElement = this.shadowRoot.querySelector('#scenario-title');
     this.scenarioDescriptionElement = this.shadowRoot.querySelector('#scenario-description');
@@ -59,7 +57,6 @@ class AssessmentPage extends HTMLElement {
     this.navControlsElement.addEventListener('navigate', this.handleNavigation.bind(this));
     
     try {
-      // 0. Get User Info (asynchronously)
       const user = await AuthService.getUserInfo();
       if (!user || !user.id) {
         this.displayError("User not authenticated. Please sign in to start an assessment.");
@@ -71,18 +68,13 @@ class AssessmentPage extends HTMLElement {
       }
       const userIdForApi = user.id; 
 
-      // 1. Create Assessment
       const createResponse = await ApiService.post('/api/assessment/create', { userId: userIdForApi });
 
       if (!createResponse || !createResponse.assessmentId) {
         throw new Error('Failed to create assessment or assessmentId not returned.');
       }
       this.assessmentId = createResponse.assessmentId;
-      console.log('AssessmentPage: Assessment created with ID:', this.assessmentId);
-
-      // 2. Fetch the first scenario's data (which also includes totalScenarios)
       const firstScenarioAndSummaryData = await ApiService.get(`/api/assessment/${this.assessmentId}`);
-      console.log('AssessmentPage: Data from initial assessment fetch (first scenario & summary):', firstScenarioAndSummaryData); 
 
       if (!firstScenarioAndSummaryData || typeof firstScenarioAndSummaryData.index === 'undefined' || typeof firstScenarioAndSummaryData.totalScenarios === 'undefined') {
         throw new Error('AssessmentPage: Failed to fetch initial assessment data, or data is malformed (missing index or totalScenarios).');
@@ -92,11 +84,10 @@ class AssessmentPage extends HTMLElement {
       this.currentScenario = firstScenarioAndSummaryData.index - 1; 
       this.currentScenarioData = firstScenarioAndSummaryData;
 
-      // Initialize progress bar
       if (this.progressBarElement) {
         this.progressBarElement.setAttribute('total', this.totalScenarios.toString());
-        this.progressBarElement.setAttribute('current', (this.currentScenario + 1).toString());
-        this.progressBarElement.setAttribute('value', (this.currentScenario + 1).toString());
+        this.progressBarElement.setAttribute('current', '0');
+        this.progressBarElement.setAttribute('value', '0');
       }
 
       if (this.totalScenarios > 0) {
@@ -132,7 +123,7 @@ class AssessmentPage extends HTMLElement {
     }
   }
 
-  async loadScenario(index) { // index is 0-based
+  async loadScenario(index) {
     if (!this.assessmentId) {
       console.error("AssessmentPage: Cannot load scenario: assessmentId is not set.");
       this.displayError("Assessment ID is missing. Cannot load scenario.");
@@ -157,8 +148,7 @@ class AssessmentPage extends HTMLElement {
     this.submittedCurrentScenario = this.answers.has(index); 
 
     try {
-      const scenarioIndexForAPI = index + 1; // Convert to 1-based index for API
-      console.log(`AssessmentPage: Loading scenario ${scenarioIndexForAPI} (index ${index}) for assessment ${this.assessmentId}`);
+      const scenarioIndexForAPI = index + 1;
       const scenarioData = await ApiService.get(`/api/assessment/${this.assessmentId}/scenarios/${scenarioIndexForAPI}`);
 
       if (!scenarioData) {
@@ -178,11 +168,8 @@ class AssessmentPage extends HTMLElement {
       this.renderQuestionsAndSubmit();
       
       this.updateNavigationState();
-      this.updateProgressBarText();
-      this.updateProgressBarValue();
 
     } catch (error) {
-      console.error(`AssessmentPage: Error loading scenario ${index}:`, error);
       this.displayError(`Failed to load scenario: ${error.message}`);
       this.currentScenarioData = null;
       this.updateNavigationState();
@@ -248,7 +235,6 @@ class AssessmentPage extends HTMLElement {
     if (e) e.preventDefault(); 
     
     if (this.submittedCurrentScenario) {
-        console.warn("AssessmentPage: Scenario already submitted. Ignoring duplicate submit attempt.");
         return;
     }
 
@@ -256,7 +242,6 @@ class AssessmentPage extends HTMLElement {
     let allQuestionsAnswered = true;
 
     if (this.currentScenarioData && this.currentScenarioData.questions && this.currentScenarioData.questions.length > 0) {
-        console.log("AssessmentPage: Checking answers for scenario:", this.currentScenarioData.title);
         this.currentScenarioData.questions.forEach((question, qIndex) => {
             const questionElement = this.scenarioQuestionsContainer.querySelectorAll('.question-item')[qIndex];
             let questionAnsweredThisCheck = false;
@@ -273,23 +258,19 @@ class AssessmentPage extends HTMLElement {
             }
             if (!questionAnsweredThisCheck) {
                 allQuestionsAnswered = false; 
-                console.log(`AssessmentPage: Question ID ${question.question_id} ('${question.question_text}') is NOT answered.`);
             }
         });
 
         if (!allQuestionsAnswered) {
-            console.log("AssessmentPage: Not all questions answered. Triggering alert.");
             alert('Please answer all questions for this scenario before submitting.'); 
             return;
         }
     } else {
-        console.log("AssessmentPage: No questions to submit for this scenario.");
         this.submittedCurrentScenario = true;
         this.updateNavigationState();
         return;
     }
     
-    console.log("AssessmentPage: All questions answered. Proceeding to submit payload:", scenarioAnswersPayload);
     try {
         const scenarioIndexForAPI = this.currentScenario + 1; 
         const response = await ApiService.post('/api/assessment/submit-scenario', {
@@ -298,8 +279,6 @@ class AssessmentPage extends HTMLElement {
             answers: scenarioAnswersPayload,
         });
 
-        console.log(`AssessmentPage: Scenario ${scenarioIndexForAPI} submitted successfully:`, response);
-        
         this.answers.set(this.currentScenario, scenarioAnswersPayload); 
         this.submittedCurrentScenario = true;
         
@@ -310,9 +289,13 @@ class AssessmentPage extends HTMLElement {
         }
 
         this.updateNavigationState();
+        if (this.progressBarElement) {
+            const completedScenarios = this.answers.size;
+            this.progressBarElement.setAttribute('current', completedScenarios.toString());
+            this.progressBarElement.setAttribute('value', completedScenarios.toString());
+        }
 
     } catch (error) {
-        console.error('AssessmentPage: Error submitting scenario:', error);
         const errorP = document.createElement('p');
         errorP.style.color = 'red';
         errorP.textContent = `Error submitting answers: ${error.message}`;
@@ -324,7 +307,6 @@ class AssessmentPage extends HTMLElement {
 
   handleNavigation(e) {
     const { direction } = e.detail;
-    console.log(`AssessmentPage: Navigation event - ${direction}`);
     if (direction === 'prev' && this.currentScenario > 0) {
         this.currentScenario--;
         this.assessmentComplete = false; 
@@ -334,7 +316,6 @@ class AssessmentPage extends HTMLElement {
                          (this.currentScenarioData && (!this.currentScenarioData.questions || this.currentScenarioData.questions.length === 0));
 
         if (!canProceed) {
-            console.log("AssessmentPage: Cannot navigate next. Current scenario not submitted.");
             alert("Please submit your answers for the current scenario before proceeding.");
             return;
         }
@@ -343,7 +324,6 @@ class AssessmentPage extends HTMLElement {
             this.currentScenario++;
             this.loadScenario(this.currentScenario);
         } else if (this.currentScenario === this.totalScenarios - 1 && canProceed) {
-            console.log("AssessmentPage: Last scenario submitted. Finishing assessment.");
             this.finishAssessment();
         }
     }
@@ -352,13 +332,8 @@ class AssessmentPage extends HTMLElement {
   updateNavigationState() {
     if (!this.navControlsElement) return;
     
-    // Can go back if not on first scenario and assessment not complete
     this.navControlsElement.canGoBack = this.currentScenario > 0 && !this.assessmentComplete;
 
-    // Can go forward if:
-    // 1. Current scenario is submitted or has no questions
-    // 2. Assessment is not complete
-    // 3. Not on last scenario
     const currentScenarioHasQuestions = this.currentScenarioData && 
                                       this.currentScenarioData.questions && 
                                       this.currentScenarioData.questions.length > 0;
@@ -369,7 +344,6 @@ class AssessmentPage extends HTMLElement {
                                           this.totalScenarios > 0 && 
                                           this.currentScenario < this.totalScenarios;
     
-    // Set last scenario flag for "Complete Assessment" button text
     if (this.currentScenario === this.totalScenarios - 1 && 
         canProceedFromCurrent && 
         this.totalScenarios > 0) {
@@ -378,10 +352,7 @@ class AssessmentPage extends HTMLElement {
         this.navControlsElement.isLastScenario = false;
     }
 
-    // Hide navigation if assessment is complete
     this.navControlsElement.style.display = this.assessmentComplete ? 'none' : '';
-    
-    console.log(`AssessmentPage: Updated navigation state - canGoBack: ${this.navControlsElement.canGoBack}, canGoForward: ${this.navControlsElement.canGoForward}, isLast: ${this.navControlsElement.isLastScenario}`);
   }
 
   updateProgressBarText() {
@@ -398,7 +369,6 @@ class AssessmentPage extends HTMLElement {
   }
 
   async finishAssessment() {
-    console.log("AssessmentPage: Finishing assessment...");
     this.assessmentComplete = true; 
     this.updateNavigationState(); 
     
@@ -409,7 +379,7 @@ class AssessmentPage extends HTMLElement {
 
 
     try {
-        // Optional: await ApiService.post(`/api/assessment/${this.assessmentId}/finalize`);
+        // await ApiService.post(`/api/assessment/${this.assessmentId}/finalize`);
     } catch (finalizationError) {
         console.error("AssessmentPage: Error during final assessment finalization call:", finalizationError);
     }

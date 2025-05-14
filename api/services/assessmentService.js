@@ -1,6 +1,6 @@
-import pool from '../database.js';// Your database connection pool
+import pool from '../database.js';
 import * as assessmentRepository from '../repositories/assessmentRepository.js';
-import * as scenarioRepository from '../repositories/scenarioRepository.js'; // Or import from assessmentRepository if combined
+import * as scenarioRepository from '../repositories/scenarioRepository.js';
 import * as answerRepository from '../repositories/answerRepository.js';
 import * as questionRepository from '../repositories/questionRepository.js';
 
@@ -16,18 +16,15 @@ export async function getAssessment(userId, assessmentId) {
 }
 
 export const submitAssessment = async (assessmentId, answers) => {
-    // Process the submitted answers
     const processedAnswers = answers.map((scenarioAnswer, scenarioIndex) => {
         const scenario = ALL_SCENARIOS[scenarioIndex];
         return scenario.questions.map((question, questionIndex) => {
             const selectedOptions = scenarioAnswer.find(a => a.questionIndex === questionIndex)?.selectedOptions || [];
-            const selectedOption = selectedOptions[0]; // Get the first selected option
+            const selectedOption = selectedOptions[0];
             
-            // Update the question in the mock data
             question.answered = true;
             question.selected_option = selectedOption;
 
-            // Determine if the answer is correct (mock logic - you can implement your own scoring)
             const isCorrect = selectedOption === question.correct_option_id;
 
             return {
@@ -38,11 +35,9 @@ export const submitAssessment = async (assessmentId, answers) => {
         });
     }).flat();
 
-    // Calculate scores
     const totalScore = processedAnswers.filter(answer => answer.is_correct).length;
     const typeScores = {};
     
-    // Group scores by scenario type
     ALL_SCENARIOS.forEach((scenario, index) => {
         const scenarioAnswers = processedAnswers.filter(answer => 
             scenario.questions.some(q => q.question_id === answer.question_id)
@@ -51,7 +46,6 @@ export const submitAssessment = async (assessmentId, answers) => {
         typeScores[scenario.type] = (typeScores[scenario.type] || 0) + scenarioScore;
     });
 
-    // Return the assessment results
     return {
         totalScore,
         typeScores,
@@ -67,24 +61,20 @@ export const submitScenario = async (assessmentId, scenarioIndex, answers) => {
     try {
         await client.query('BEGIN');
 
-        // 1. Validate the assessment and scenario
         const scenarioDetails = await assessmentRepository.findScenarioDetailsByIndex(client, assessmentId, scenarioIndex);
         if (!scenarioDetails) {
             throw new Error(`Scenario at index ${scenarioIndex} not found for assessment ${assessmentId}`);
         }
 
-        // 2. Get questions for this scenario to validate answers
         const questions = await questionRepository.findByScenarioId(client, scenarioDetails.scenario_id);
         if (!questions || questions.length === 0) {
             throw new Error('No questions found for this scenario');
         }
 
-        // 3. Validate answers match questions
         if (answers.length !== questions.length) {
             throw new Error(`Expected ${questions.length} answers, got ${answers.length}`);
         }
 
-        // 4. Process and store each answer
         const processedAnswers = [];
         for (const answer of answers) {
             const question = questions.find(q => q.question_id === answer.question_id);
@@ -92,31 +82,27 @@ export const submitScenario = async (assessmentId, scenarioIndex, answers) => {
                 throw new Error(`Question ID ${answer.question_id} not found in this scenario`);
             }
 
-            // Store the answer in the database
             const storedAnswer = await answerRepository.storeUserAnswer(client, {
                 assessment_id: assessmentId,
                 question_id: answer.question_id,
                 selected_option_id: answer.selected_option_id,
-                user_id: scenarioDetails.user_id // Assuming this comes from the scenario details
+                user_id: scenarioDetails.user_id 
             });
 
             processedAnswers.push({
                 question_id: answer.question_id,
                 selected_option_id: answer.selected_option_id,
-                is_correct: storedAnswer.is_correct // This would come from the database
+                is_correct: storedAnswer.is_correct 
             });
         }
 
-        // 5. Calculate scores
         const correctAnswers = processedAnswers.filter(a => a.is_correct).length;
         const totalQuestions = questions.length;
         const scorePercentage = (correctAnswers / totalQuestions) * 100;
 
-        // 6. Get total scenarios and completed scenarios
         const totalScenarios = await assessmentRepository.getTotalScenarios(client, assessmentId);
         const completedScenarios = await assessmentRepository.getCompletedScenarios(client, assessmentId);
 
-        // 7. Check if this was the last scenario
         const isComplete = completedScenarios === totalScenarios;
 
         await client.query('COMMIT');
@@ -160,22 +146,18 @@ export async function createAssessmentWithRandomScenarios(userId, numberOfScenar
   try {
     await client.query('BEGIN');
 
-    // Step 1: Create new assessment record using the repository
     const newAssessment = await assessmentRepository.createAssessment(client, {
       userId,
       assessmentStatusId: initialStatusId,
     });
     const assessmentId = newAssessment.assessment_id;
 
-    // Step 2: Pick random scenarios using the repository
     const scenarios = await scenarioRepository.findRandom(client, numberOfScenarios);
 
     if (scenarios.length === 0 && numberOfScenarios > 0) {
-      // Or if scenarios.length < numberOfScenarios and that's a critical issue for your use case
       throw new Error(`No scenarios found to assign. Requested ${numberOfScenarios}, found ${scenarios.length}.`);
     }
 
-    // Step 3: Insert into assessment_scenarios using the repository
     if (scenarios.length > 0) {
       await assessmentRepository.linkScenariosBatch(client, assessmentId, scenarios);
     }
@@ -184,13 +166,11 @@ export async function createAssessmentWithRandomScenarios(userId, numberOfScenar
     return {
       assessmentId,
       message: `Assessment created successfully with ${scenarios.length} scenarios.`,
-      // You might want to return more details about the assessment or scenarios if needed
     };
 
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error in AssessmentService creating assessment with scenarios:', error);
-    // Re-throw the error for the controller/caller to handle
     throw error;
   } finally {
     client.release();
@@ -214,20 +194,15 @@ export async function getScenarioForDisplay(assessmentId, scenarioIndex) {
       return null;
     }
 
-    // Get total number of scenarios for this assessment
     const totalScenarios = await assessmentRepository.getTotalScenarios(client, assessmentId);
 
-    // Get all questions for this scenario
     const questions = await questionRepository.findByScenarioId(client, scenarioDetails.scenario_id);
 
-    // Get existing answers for this assessment
     const existingAnswers = await answerRepository.findByAssessmentId(client, assessmentId);
     const answeredQuestionIds = new Set(existingAnswers.map(a => a.question_id));
 
-    // Filter out questions that have already been answered
     const unansweredQuestions = questions.filter(q => !answeredQuestionIds.has(q.question_id));
 
-    // If all questions are answered, return the scenario with an empty questions array
     if (unansweredQuestions.length === 0) {
       return {
         assessment_id: assessmentId,
@@ -247,7 +222,6 @@ export async function getScenarioForDisplay(assessmentId, scenarioIndex) {
     const options = questionIds.length > 0 ?
       await answerRepository.findByQuestionIdsForAssessment(client, questionIds) : [];
 
-    // Structure the data for the single scenario
     const optionsByQuestionId = options.reduce((acc, o) => {
       (acc[o.question_id] = acc[o.question_id] || []).push(o);
       return acc;
@@ -291,11 +265,9 @@ export async function getScenarioForDisplay(assessmentId, scenarioIndex) {
 export async function getOrCreateActiveAssessment(googleId) {
     const client = await pool.connect();
     try {
-        // First try to get an active assessment
         const activeAssessment = await assessmentRepository.getActiveAssessment(client, googleId);
         
         if (activeAssessment) {
-            // If there's an active assessment, get its first scenario
             const firstScenario = await getScenarioForDisplay(activeAssessment.assessment_id, 1);
             return {
                 ...activeAssessment,
@@ -303,7 +275,6 @@ export async function getOrCreateActiveAssessment(googleId) {
             };
         }
 
-        // If no active assessment exists, create a new one
         const newAssessment = await createAssessmentWithRandomScenarios(googleId);
         const firstScenario = await getScenarioForDisplay(newAssessment.assessmentId, 1);
         
@@ -315,7 +286,3 @@ export async function getOrCreateActiveAssessment(googleId) {
         client.release();
     }
 }
-
-// ... other assessment service functions
-
-

@@ -1,9 +1,5 @@
 import db from '../database.js';
 
-// assessmentRepository.js
-// Assume 'db' or a similar utility is used for actual query execution if not directly using client.query
-// For these examples, we'll assume dbClient is an active PostgreSQL client (e.g., from pool.connect())
-
 /**
  * Inserts a new assessment record.
  * @param {object} dbClient - The active database client.
@@ -17,7 +13,7 @@ async function createAssessment(dbClient, { userId, assessmentStatusId }) {
         `INSERT INTO assessments (user_id, score, result_summary, assessment_status_id)
          VALUES ((select user_id from users where google_id = $1), 0, '', $2)
          RETURNING assessment_id, user_id, assessment_status_id`,
-        [userId, assessmentStatusId] // $1 is userId (interpreted as google_id), $2 is assessmentStatusId
+        [userId, assessmentStatusId] 
       );
       return result.rows[0];
   }
@@ -30,24 +26,20 @@ async function createAssessment(dbClient, { userId, assessmentStatusId }) {
    * @returns {Promise<void>}
    */
   export async function linkScenariosBatch(dbClient, assessmentId, scenarios) {
-    // Ensure scenarios is an array and not empty
     if (!Array.isArray(scenarios) || scenarios.length === 0) {
-      return; // Or throw an error if scenarios are mandatory
+      return; 
     }
   
     const insertPromises = scenarios.map((scenario, index) => {
       return dbClient.query(
         `INSERT INTO assessment_scenarios (assessment_id, scenario_id, scenario_index)
          VALUES ($1, $2, $3)`,
-        [assessmentId, scenario.scenario_id, index + 1] // 1-based index
+        [assessmentId, scenario.scenario_id, index + 1] 
       );
     });
     await Promise.all(insertPromises);
   }
   
-  // ... other assessment repository functions like getById, update, etc.
-  // e.g., export async function getById(dbClient, assessmentId) { ... }
-
 const getAssessmentById = async (assessmentId) => {
     const result = await db.query(
         `

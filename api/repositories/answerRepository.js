@@ -29,46 +29,6 @@ import db from '../database.js';
     return result.rows[0];
 };
 
-// // BELOW MAY BE OUTDATED
-// const getUserAnswer = async ({ answerId }) => {
-//     const result = await db.query(
-//         `
-//         SELECT ua.assessment_id, ua.question_id, ua.option_id, qo.is_correct
-//         FROM user_answers ua
-//         JOIN question_options qo ON ua.option_id = qo.question_option_id
-//         WHERE ua.user_answer_id = $1
-//         `,
-//         [answerId]
-//     );
-
-//     if (result.rows.length === 0) {
-//         return null;
-//     };
-
-//     return result.rows[0];
-// };
-
-// // BELOW MAY BE OUTDATED
-// const getAssessmentUserAnswers = async ({ assessmentId, userId }) => {
-//     const result = await db.query(
-//         `
-//         SELECT 
-//             ua.user_answer_id,
-//             ua.assessment_id,
-//             ua.question_id,
-//             ua.option_id,
-//             qo.is_correct
-//         FROM user_answers ua
-//         JOIN question_options qo ON ua.option_id = qo.question_option_id
-//         JOIN assessments a ON ua.assessment_id = a.assessment_id
-//         WHERE ua.assessment_id = $1 AND a.user_id = $2
-//         `,
-//         [assessmentId, userId]
-//     );
-
-//     return result.rows;
-// };
-
 /**
  * Finds all options for a given list of question IDs.
  * IMPORTANT: This version omits 'is_correct' and 'answer_note' for active assessments.
@@ -106,7 +66,6 @@ import db from '../database.js';
  * @returns {Promise<object>} The stored answer with correctness information.
  */
  async function storeUserAnswer(dbClient, { assessment_id, question_id, selected_option_id, user_id }) {
-    // First, check if an answer already exists for this question in this assessment
     const existingAnswer = await dbClient.query(
         `SELECT user_answer_id FROM user_answers 
          WHERE assessment_id = $1 AND question_id = $2`,
@@ -115,7 +74,6 @@ import db from '../database.js';
 
     let result;
     if (existingAnswer.rows.length > 0) {
-        // Update existing answer
         result = await dbClient.query(
             `UPDATE user_answers 
              SET option_id = $3
@@ -124,7 +82,6 @@ import db from '../database.js';
             [assessment_id, question_id, selected_option_id]
         );
     } else {
-        // Insert new answer
         result = await dbClient.query(
             `INSERT INTO user_answers (assessment_id, question_id, option_id)
              VALUES ($1, $2, $3)
@@ -133,7 +90,6 @@ import db from '../database.js';
         );
     }
 
-    // Get the correctness information
     const correctnessResult = await dbClient.query(
         `SELECT qo.is_correct
          FROM question_options qo

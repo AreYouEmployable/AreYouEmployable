@@ -72,7 +72,7 @@ const verifyCreateOrFetchUser = async (req, res) => {
     const name = payload.name;
     const picture = payload.picture;
 
-    const user = await findOrCreateUser(googleUserId, email, name, picture);
+    await findOrCreateUser(googleUserId, email, name, picture);
 
 
     const clientUrl =  process.env.CLIENT_URI;
@@ -81,7 +81,6 @@ const verifyCreateOrFetchUser = async (req, res) => {
       redirectUrl += `&state=${encodeURIComponent(state)}`;
     }
     
-    console.log('Redirecting to client with Google ID token.');
     res.redirect(redirectUrl);
 
   } catch (error) {

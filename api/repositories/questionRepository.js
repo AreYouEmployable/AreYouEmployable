@@ -1,5 +1,11 @@
 import db from '../database.js';
 
+/**
+ * Retrieves a single question by its ID, including its text, type, difficulty, 
+ * the scenario it belongs to, and all of its options.
+ * @param {number} questionId - The ID of the question to retrieve.
+ * @returns {Promise<object>} The structured question object, or null if not found.
+ */
 const getQuestionById = async (questionId) => {
     const result = await db.query(
         `

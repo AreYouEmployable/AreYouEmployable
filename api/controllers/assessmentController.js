@@ -10,14 +10,8 @@ const createAssessment = async (req, res) => {
           return res.status(400).json({ error: 'User ID is required' });
         }
     
-        // Define how many scenarios and the initial status if not using defaults
-        // const numScenarios = 4;
-        // const initialStatus = 1; // e.g., 'Not Started'
-    
         const result = await assessmentService.createAssessmentWithRandomScenarios(
             userId
-            // numScenarios, // Optionally pass if different from default
-            // initialStatus  // Optionally pass if different from default
         );
         
         res.status(201).json(result);
@@ -32,10 +26,8 @@ const createAssessment = async (req, res) => {
 
 const getAssessment = async (req, res) => {
     try {
-        // const userId = req.user.id; LOGGED IN USER
         const userId = 1;
         const assessmentId = parseInt(req.params.id, 10);
-        console.log(userId, assessmentId);
         const assessment = await assessmentService.getAssessment(userId, assessmentId);
         res.status(200).json(assessment);
     } catch (err) {
@@ -55,7 +47,7 @@ const getAssessments = async (req, res) => {
             });
         }
         const userId = req.user.sub;
-        const assessment = await assessmentService.getAssessment(userId, 1); // Using mock data
+        const assessment = await assessmentService.getAssessment(userId, 1); 
         res.status(200).json([assessment]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -80,7 +72,6 @@ const submitAssessmentHandler = async (req, res) => {
 
 const submitScenarioHandler = async (req, res) => {
     try {
-        console.log(req.body);
         const assessmentId = parseInt(req.body.assessmentId,);
         const scenarioIndex = parseInt(req.body.scenarioIndex,);
         const answers = req.body.answers;
@@ -100,8 +91,7 @@ async function getAssessmentScenarioByIndex(req, res) {
       const assessmentId = parseInt(req.params.id, 10);
       const scenarioIndex = parseInt(req.params.scenarioIndex, 10);
   
-      // Basic validation for IDs/Indexes
-      if (isNaN(assessmentId) || isNaN(scenarioIndex) || scenarioIndex <= 0) { // Assuming 1-based index
+      if (isNaN(assessmentId) || isNaN(scenarioIndex) || scenarioIndex <= 0) { 
         return res.status(400).json({ error: 'Valid assessment ID and positive scenario index are required.' });
       }
   
@@ -113,7 +103,6 @@ async function getAssessmentScenarioByIndex(req, res) {
   
       res.json(scenarioData);
     } catch (error) {
-      // The service should log more detailed errors
       res.status(500).json({ error: 'Failed to retrieve scenario details.' });
     }
   }
