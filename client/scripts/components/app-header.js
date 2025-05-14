@@ -60,7 +60,7 @@ class AppHeader extends HTMLElement {
       <link rel="stylesheet" href="/styles/components/app-header.css">
       <header>
         <section class="header-content">
-          <a href="/" class="logo" data-link>Are You Employable?</a>
+          <a href="/" class="logo">Employability Assessment</a>
           <button class="hamburger" id="hamburger">
             <span></span>
             <span></span>
@@ -68,9 +68,8 @@ class AppHeader extends HTMLElement {
           </button>
           <section class="nav-links">
             ${isAuthenticated ? `
-              <a href="/assessment" class="assessment-link" data-link>Assessment</a>
-              <a href="/results" data-link>Results</a>
-              <a href="/contact" data-link>Contact</a>
+              <a href="/assessment" class="assessment-page">Assessment</a>
+              <a href="/results">Results</a>
               <section class="user-info">
                 ${pictureUrl ? `
                   <img src="${pictureUrl}" alt="${user?.name || 'User image'}" class="user-avatar" 

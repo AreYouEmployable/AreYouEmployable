@@ -11,30 +11,33 @@ const createAssessment = async (req, res) => {
                 message: 'You must be authenticated to create an assessment'
             });
         }
-        // TODO const assessment = assessmentService.createAssessment();
-        res.status(201).json("assessment")
+        const userId = req.user.sub;
+        const assessment = await assessmentService.createAssessment(userId);
+        res.status(201).json({ 
+            assessmentId: assessment.id,
+            scenario: assessment.scenario
+        });
     } catch (err) {
+        console.error('Error creating assessment:', err);
         res.status(400).json({ error: err.message });
     }
 };
 
 const getAssessment = async (req, res) => {
     try {
-        if (!req.user || !req.user.sub) {
-            return res.status(403).json({ 
-                error: 'forbidden',
-                message: 'You must be authenticated to view assessments'
-            });
-        }
-        const userId = req.user.sub;
+        // const userId = req.user.id; LOGGED IN USER
+        const userId = 1;
         const assessmentId = parseInt(req.params.id, 10);
         const assessment = await assessmentService.getAssessment(userId, assessmentId);
         res.status(200).json(assessment);
     } catch (err) {
         res.status(400).json({ error: err.message });
-    };
+    }
 };
 
+/**
+ * Fetches and returns all the user's completed assessments
+ */
 const getAssessments = async (req, res) => {
     try {
         if (!req.user || !req.user.sub) {
@@ -43,8 +46,9 @@ const getAssessments = async (req, res) => {
                 message: 'You must be authenticated to view assessments'
             });
         }
-        // TODO const assessment = assessmentService.getAssessments(id);
-        res.status(201).json("assessment")
+        const userId = req.user.sub;
+        const assessment = await assessmentService.getAssessment(userId, 1); // Using mock data
+        res.status(200).json([assessment]);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
@@ -52,7 +56,13 @@ const getAssessments = async (req, res) => {
 
 const submitAssessmentHandler = async (req, res) => {
     try {
-        const assessmentId = 1;
+        if (!req.user || !req.user.sub) {
+            return res.status(403).json({ 
+                error: 'forbidden',
+                message: 'You must be authenticated to submit an assessment'
+            });
+        }
+        const assessmentId = parseInt(req.params.id, 10);
         const result = await assessmentService.submitAssessment(assessmentId);
         res.json(result);
     } catch (err) {
@@ -60,4 +70,17 @@ const submitAssessmentHandler = async (req, res) => {
     }
 };
 
-export { createAssessment, getAssessment, getAssessments, submitAssessmentHandler };
+const submitScenarioHandler = async (req, res) => {
+    try {
+        console.log(req.body);
+        const assessmentId = parseInt(req.body.assessmentId,);
+        const scenarioIndex = parseInt(req.body.scenarioIndex,);
+        const answers = req.body.answers;
+        const result = await assessmentService.submitScenario(assessmentId, scenarioIndex, answers);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+export { createAssessment, getAssessment, getAssessments, submitAssessmentHandler ,submitScenarioHandler};

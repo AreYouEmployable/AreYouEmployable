@@ -1,97 +1,86 @@
-const barTemplate = document.createElement("template");
-barTemplate.innerHTML = `
-    <style>
-      progress {
-        appearance: none;
-        width: 100%;
-        height: 8px;
-        border: none;
-        border-radius: 4px;
-        background-color: #e5e7eb;
-        overflow: hidden;
-      }
-
-      progress::-webkit-progress-bar {
-        background-color: #e5e7eb;
-        border-radius: 4px;
-      }
-
-      progress::-webkit-progress-value {
-        background-color: #2563eb;
-        border-radius: 4px;
-        transition: width 0.3s ease;
-      }
-
-      progress::-moz-progress-bar {
-        background-color: #2563eb;
-        transition: width 0.3s ease;
-      }
-    </style>
-    <progress id="bar" value="0" max="1"></progress>
-  `;
+const template = document.createElement('template');
+template.innerHTML = `
+  <link rel="stylesheet" href="/styles/components/progress-bar.css">
+  <section class="progress-container">
+    <progress class="progress-bar" id="bar" value="0" max="100">0%</progress>
+    <output class="progress-text-end" id="label">0%</output>
+  </section>`;
 
 class ProgressBar extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: "open" });
-    this.shadowRoot.appendChild(barTemplate.content.cloneNode(true));
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.current = 0;
-    this.total = 1;
+    this.total = parseInt(this.getAttribute('total')) || 5;
+    this.textPosition = this.getAttribute('text-position') || 'start';
   }
 
   static get observedAttributes() {
-    return ["total", "current", "color"];
+    return ['total', 'text-position'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'total' && oldValue !== newValue) {
+      this.total = parseInt(newValue) || 5;
+      this.updateBar();
+    } else if (name === 'text-position' && oldValue !== newValue) {
+      this.textPosition = newValue;
+      this.updateBar();
+    }
   }
 
   connectedCallback() {
-    this.total = parseInt(this.getAttribute("total")) || 1;
-    this.current = parseInt(this.getAttribute("current")) || 0;
     this.updateBar();
   }
 
-  attributeChangedCallback(name, oldVal, newVal) {
-    if (["total", "current", "color"].includes(name)) {
-      this[name] = name === "color" ? newVal : parseInt(newVal);
+  nextStep() {
+    if (this.current < this.total) {
+      this.current++;
+      this.updateBar();
+    }
+  }
+
+  previousStep() {
+    if (this.current > 0) {
+      this.current--;
       this.updateBar();
     }
   }
 
   updateBar() {
-    const bar = this.shadowRoot.getElementById("bar");
-    const color = this.getAttribute("color") || "#2563eb";
+    const percent = Math.round((this.current / this.total) * 100);
+    const bar = this.shadowRoot.getElementById('bar');
+    const textEnd = this.shadowRoot.querySelector('.progress-text-end');
 
-    bar.value = this.current;
-    bar.max = this.total;
+    bar.value = percent;
 
-    const style = this.shadowRoot.querySelector("style");
-    style.textContent = `
-        progress {
-          appearance: none;
-          width: 100%;
-          height: 8px;
-          border: none;
-          border-radius: 4px;
-          background-color: #e5e7eb;
-          overflow: hidden;
-        }
+    if (this.textPosition === 'end') {
+      bar.textContent = ''; 
+      textEnd.textContent = `${percent}%`;
+      textEnd.style.display = 'block';
+    } else {
+      bar.textContent = `${percent}%`;
+      textEnd.style.display = 'none';
+    }
 
-        progress::-webkit-progress-bar {
-          background-color: #e5e7eb;
-          border-radius: 4px;
-        }
+    this.dispatchEvent(new CustomEvent('progress-update', {
+      detail: { current: this.current, total: this.total, percent },
+      bubbles: true,
+      composed: true
+    }));
 
-        progress::-webkit-progress-value {
-          background-color: ${color};
-          border-radius: 4px;
-          transition: width 0.3s ease;
-        }
+    this.togglePulseAnimation(percent);
+  }
 
-        progress::-moz-progress-bar {
-          background-color: ${color};
-          transition: width 0.3s ease;
-        }
-      `;
+  togglePulseAnimation(percent) {
+    const progressBarElement = this.shadowRoot.querySelector('.progress-bar');
+    if (percent === 0) {
+      progressBarElement.style.animation = 'none';
+    } else if (!progressBarElement.style.animation) {
+      progressBarElement.style.animation = 'progress-pulse 1s ease-out';
+    }
   }
 }
 
-customElements.define("progress-bar", ProgressBar);
+customElements.define('progress-bar', ProgressBar);

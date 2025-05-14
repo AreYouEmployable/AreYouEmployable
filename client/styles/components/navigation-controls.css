@@ -1,6 +1,7 @@
 .navigation-controls {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1.5rem;
 }
@@ -13,6 +14,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
+  min-width: 10rem;
 }
 
 .nav-button:disabled {
@@ -36,4 +38,11 @@
 
 .next-button:hover:not(:disabled) {
   background-color: #38a169;
-} 
+}
+
+@media (max-width: 480px) {
+  .navigation-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

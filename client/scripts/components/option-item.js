@@ -1,8 +1,9 @@
 const template = document.createElement('template');
 template.innerHTML = `
+<link rel="stylesheet" href="/styles/components/option-item.css">
   <label class="flex items-center space-x-2">
     <input type="checkbox" name="answer" class="form-checkbox text-blue-600" />
-    <span></span>
+    <slot></slot>
   </label>
 `;
 
@@ -17,7 +18,7 @@ class OptionItem extends HTMLElement {
     const label = this.getAttribute('label');
     const id = this.getAttribute('data-id');
 
-    this.shadowRoot.querySelector('span').textContent = label;
+    this.shadowRoot.querySelector('slot').textContent = label;
     const checkbox = this.shadowRoot.querySelector('input[type="checkbox"]');
     checkbox.value = id;
   }

@@ -1,0 +1,53 @@
+.labels-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 0.4rem 1%;
+  padding: 0;
+  list-style: none;
+}
+
+.label {
+  display: inline-block;
+  background-color: #f8f9fa;
+  color: #727a83;
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.label.scenario-type {}
+
+.label.technical {
+  background-color: #ead5f1;
+  color: #b779f1;
+}
+
+.label.culture-fit {
+  background-color: #a7d1eb;
+  color: #3486ba;
+}
+
+.label.easy {
+  background-color: #bffaa8;
+  color: #25ad25;
+}
+
+.label.medium {
+  background-color: #faf4b7;
+  color: #e2ab34;
+}
+
+.label.hard {
+  background-color: #ffc5c4;
+  color: #e24e4e;
+}
+
+@media (max-width: 480px) {
+  .label {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}

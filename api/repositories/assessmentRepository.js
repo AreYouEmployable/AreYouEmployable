@@ -74,4 +74,20 @@ const updateAssessmentResult = async (assessmentId, score, resultSummary) => {
   `, [score, resultSummary, assessmentId]);
 };
 
+/**
+ * Creates a new assessment for a user
+ * @param {string} userId - The ID of the user
+ * @returns {object} The created assessment
+ */
+// export const createAssessment = async (userId) => {
+//     const query = `
+//         INSERT INTO assessments (user_id, status, created_at)
+//         VALUES ($1, 'in_progress', NOW())
+//         RETURNING id, user_id, status, created_at
+//     `;
+    
+//     const result = await db.query(query, [userId]);
+//     return result.rows[0];
+// };
+
 export { createAssessment, getAssessmentById, completeAssessment, getUserAnswersWithCorrectness, updateAssessmentResult};

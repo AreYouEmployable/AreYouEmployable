@@ -1,38 +1,34 @@
 import './progress-bar.js';
+import './question-header.js';
+import './question-block.js';
 import './navigation-controls.js';
 import './answer-option.js';
 import './submit-button.js';
+import './labels-indicator.js';
+import './complexity-level-bar.js';
+import { ApiService } from '../services/api.js';
+import { AuthService } from '../services/auth.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/assessment-page.css">
   <section class="container">
-    <!-- Header Section -->
-    <header class="text-center mb-8">
-      <h2 class="scenario-title" id="scenario-title">Loading scenario title...</h2>
-      <p class="scenario-description" id="scenario-description">Loading scenario description...</p>
-    </header>
+    <span class="progress-text">ASSESSMENT PROGRESS</span>
+    <progress-bar total="2" class="progress-bar mb-6"></progress-bar>
 
-    <!-- Progress Bar Component -->
-    <progress-bar total="5" class="mb-6"></progress-bar>
-
-    <!-- Question Block (Container for each question) -->
-    <article class="question-block">
-      <!-- Question Header -->
-      <header class="question-header">
-        <h3 class="question-title" id="question-title">Loading question...</h3>
-        <p class="complexity-text">Complexity: <span id="complexity-level">-</span></p>
+    <article class="scenario-card">
+      <header class="scenario-header">
+        <h2 class="scenario-title" id="scenario-title">Loading scenario title...</h2>
+        <p class="scenario-description" id="scenario-description"></p>
+        <labels-indicator class="scenario-labels"></labels-indicator>
       </header>
 
-      <!-- Option List (Dynamic options added here) -->
-      <form id="assessment-form">
-        <div id="options-list" class="options-list"></div>
-
-        <!-- Navigation Controls -->
-        <navigation-controls></navigation-controls>
-      </form>
+      <article class="question-block mt-8" id="scenario-questions">
+      </article>
     </article>
-  </section>
+
+    <navigation-controls></navigation-controls>
+  </main>
 `;
 
 class AssessmentPage extends HTMLElement {
@@ -40,119 +36,184 @@ class AssessmentPage extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
-    this.currentQuestion = 0;
-    this.totalQuestions = 5;
+    this.currentScenario = 0;
+    this.totalScenarios = 0;
     this.answers = new Map();
-    
-    // Sample questions data - replace with actual data source
-    this.questions = [
-      {
-        title: "Debugging Challenge",
-        description: "You've been tasked with fixing a critical bug in production. How do you approach the situation?",
-        complexity: "Medium",
-        options: [
-          "Immediately deploy a hotfix without testing",
-          "Analyze the error logs and reproduce the issue locally",
-          "Ask the team for help without investigating",
-          "Document the issue and wait for the next sprint"
-        ]
-      },
-      // Add more questions here
-    ];
+    this.submittedCurrentScenario = false;
+    this.assessmentComplete = false;
+    this.scenarioQuestionsContainer = null;
+    this.scenarios = [];
+    this.assessment = null;
   }
 
-  connectedCallback() {
-    const form = this.shadowRoot.querySelector('#assessment-form');
-    form.addEventListener('submit', this.handleSubmit.bind(this));
-    
-    // Initialize progress bar
-    const progressBar = this.shadowRoot.querySelector('progress-bar');
-    progressBar.setAttribute('total', this.totalQuestions.toString());
-    
-    // Initialize navigation controls
+  async connectedCallback() {
     const navControls = this.shadowRoot.querySelector('navigation-controls');
     navControls.addEventListener('navigate', this.handleNavigation.bind(this));
+
+    const progressBar = this.shadowRoot.querySelector('progress-bar');
+    this.scenarioQuestionsContainer = this.shadowRoot.querySelector('#scenario-questions');
     
-    // Load first question
-    this.loadQuestion(this.currentQuestion);
+    try {
+      const response = await ApiService.post('/api/assessment/create');
+      if (response) {
+        this.assessment= response;
+        this.scenarios = response.scenario;
+        this.totalScenarios = this.scenarios.length;
+        progressBar.setAttribute('total', this.totalScenarios.toString());
+        this.loadScenario(this.currentScenario);
+      } else {
+        console.error('Failed to fetch scenarios:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching scenarios:', error);
+    }
+    
     this.updateNavigationState();
   }
 
-  handleSubmit(e) {
+  async handleScenarioSubmit(e) {
     e.preventDefault();
-    
-    // Get selected options
-    const selectedOptions = Array.from(this.shadowRoot.querySelectorAll('answer-option'))
-      .map((option, index) => option.selected ? index : null)
-      .filter(index => index !== null);
-    
-    // Save answer for current question
-    this.answers.set(this.currentQuestion, {
-      selectedOptions,
-      questionId: this.currentQuestion
+
+    const currentScenarioQuestions = this.shadowRoot.querySelectorAll('.question-item');
+    const scenarioAnswers = [];
+
+    currentScenarioQuestions.forEach((questionElement, index) => {
+      const selectedOptions = Array.from(questionElement.querySelectorAll('answer-option'))
+        .map((option, optionIndex) => option.selected ? optionIndex : null)
+        .filter(index => index !== null);
+      scenarioAnswers.push({ questionIndex: index, selectedOptions });
     });
-    
-    // Update progress
-    const progressBar = this.shadowRoot.querySelector('progress-bar');
-    progressBar.nextStep();
-    
-    // Update navigation state
-    this.updateNavigationState();
-    
-    console.log('Answer submitted:', this.answers.get(this.currentQuestion));
+    console.log(this.scenarios);
+    try {
+      // Submit the current scenario's answers
+      const response = await ApiService.post('/api/assessment/submit-scenario', {
+        scenarioIndex: this.currentScenario,
+        answers: scenarioAnswers,
+        assessmentId: this.assessment.assessmentId
+      });
+
+      console.log('Scenario submitted successfully:', response);
+      
+      // Store the answers locally
+      this.answers.set(this.currentScenario, scenarioAnswers);
+      this.submittedCurrentScenario = true;
+      this.updateNavigationState();
+
+      // If this was the last scenario, mark assessment as complete
+      if (response.isComplete) {
+        this.assessmentComplete = true;
+        this.updateNavigationState();
+      }
+    } catch (error) {
+      console.error('Error submitting scenario:', error);
+    }
   }
 
   handleNavigation(e) {
     const { direction } = e.detail;
-    if (direction === 'prev' && this.currentQuestion > 0) {
-      this.currentQuestion--;
-    } else if (direction === 'next' && this.currentQuestion < this.totalQuestions - 1) {
-      this.currentQuestion++;
+    if (direction === 'prev' && this.currentScenario > 0) {
+      this.currentScenario--;
+      this.submittedCurrentScenario = this.answers.has(this.currentScenario);
+      this.assessmentComplete = false;
+    } else if (direction === 'next' && this.submittedCurrentScenario) {
+      if (this.currentScenario < this.totalScenarios - 1) {
+        this.currentScenario++;
+        this.submittedCurrentScenario = false;
+      } else if (this.assessmentComplete) {
+        this.finishAssessment();
+      }
     }
-    
-    // Load question data for the new current question
-    this.loadQuestion(this.currentQuestion);
+
+    this.loadScenario(this.currentScenario);
     this.updateNavigationState();
+    this.updateProgressBarText();
+    this.updateProgressBarValue(); 
   }
 
   updateNavigationState() {
     const navControls = this.shadowRoot.querySelector('navigation-controls');
-    navControls.canGoBack = this.currentQuestion > 0;
-    navControls.canGoForward = this.currentQuestion < this.totalQuestions - 1 && this.answers.has(this.currentQuestion);
+    navControls.canGoBack = this.currentScenario > 0;
+    navControls.canGoForward = this.submittedCurrentScenario;
+    navControls.isLastScenario = this.currentScenario === this.totalScenarios - 1;
   }
 
-  loadQuestion(questionIndex) {
-    const question = this.questions[questionIndex];
-    if (!question) return;
+  loadScenario(index) {
+    if (!this.scenarios || !this.scenarios[index]) return;
 
-    // Update question title and description
-    const questionTitle = this.shadowRoot.querySelector('#question-title');
-    const complexityLevel = this.shadowRoot.querySelector('#complexity-level');
+    const currentScenario = this.scenarios[index];
     const scenarioTitle = this.shadowRoot.querySelector('#scenario-title');
     const scenarioDescription = this.shadowRoot.querySelector('#scenario-description');
+    const labelsIndicator = this.shadowRoot.querySelector('.scenario-labels');
     
-    questionTitle.textContent = question.title;
-    complexityLevel.textContent = question.complexity;
-    scenarioTitle.textContent = `Scenario ${questionIndex + 1}`;
-    scenarioDescription.textContent = question.description;
+    scenarioTitle.textContent = currentScenario.scenario_title;
+    scenarioDescription.textContent = currentScenario.scenario_description;
     
-    // Create answer options
-    const optionsList = this.shadowRoot.querySelector('#options-list');
-    optionsList.innerHTML = '';
+    // Set labels once for the entire scenario
+    labelsIndicator.setAttribute('labels', JSON.stringify([currentScenario.type, currentScenario.difficulty]));
+    labelsIndicator.setAttribute('difficulty', currentScenario.difficulty.toLowerCase());
+
+    this.scenarioQuestionsContainer.innerHTML = '';
     
-    question.options.forEach((optionText, index) => {
-      const option = document.createElement('answer-option');
-      option.text = optionText;
+    currentScenario.questions.forEach((question, questionIndex) => {
+      const questionElement = document.createElement('div');
+      questionElement.className = 'question-item';
       
-      // Restore saved answer if exists
-      const savedAnswer = this.answers.get(questionIndex);
-      if (savedAnswer && savedAnswer.selectedOptions.includes(index)) {
-        option.selected = true;
-      }
+      const questionHeader = document.createElement('question-header');
+      questionHeader.setAttribute('title', question.question_text);
       
-      optionsList.appendChild(option);
+      const optionsList = document.createElement('div');
+      optionsList.className = 'options-list';
+      
+      question.options.forEach((option) => {
+        const answerOption = document.createElement('answer-option');
+        answerOption.text = option.value;
+        answerOption.setAttribute('option-id', option.option_id);
+        
+        // Check if this option was previously selected
+        const savedAnswers = this.answers.get(index);
+        if (savedAnswers) {
+          const questionAnswer = savedAnswers.find(a => a.questionIndex === questionIndex);
+          if (questionAnswer && questionAnswer.selectedOptions.includes(option.option_id)) {
+            answerOption.selected = true;
+          }
+        }
+        
+        optionsList.appendChild(answerOption);
+      });
+      
+      questionElement.appendChild(questionHeader);
+      questionElement.appendChild(optionsList);
+      this.scenarioQuestionsContainer.appendChild(questionElement);
     });
+
+    const submitButton = document.createElement('submit-button');
+    submitButton.id = 'submit-scenario';
+    submitButton.classList.add('mt-4');
+    submitButton.addEventListener('click', this.handleScenarioSubmit.bind(this));
+    this.scenarioQuestionsContainer.appendChild(submitButton);
+
+    this.submittedCurrentScenario = this.answers.has(index);
+    this.updateNavigationState();
+  }
+
+  updateProgressBarText() {
+    const progressBar = this.shadowRoot.querySelector('progress-bar');
+    progressBar.setAttribute('total', this.totalScenarios.toString());
+    progressBar.setAttribute('current', (this.currentScenario + 1).toString());
+    if (progressBar) {
+      progressBar.setAttribute('text-position', 'end');
+    }
+  }
+
+  updateProgressBarValue() {
+    if (this.progressBar) {
+      this.progressBar.setAttribute('value', (this.currentScenario + (this.submittedCurrentScenario ? 1 : 0)).toString());
+    }
+  }
+
+  finishAssessment() {
+    window.location.href = '/assessment-results';
   }
 }
 
-customElements.define('assessment-page', AssessmentPage); 
+customElements.define('assessment-page', AssessmentPage);
