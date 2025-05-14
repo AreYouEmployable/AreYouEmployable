@@ -250,14 +250,12 @@ export class CdkStack extends cdk.Stack {
 
     const apiDistribution = new cloudfront.Distribution(this, 'AreYouEmployableApiDistribution', {
       defaultBehavior: {
-        origin: new origins.HttpOrigin(cdk.Fn.select(1, cdk.Fn.split('://', environment.attrEndpointUrl)), {
+        origin: new origins.HttpOrigin(environment.attrEndpointUrl, {
           protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
-          originPath: '',  
         }),
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
-
       },
       comment: 'CloudFront distribution in front of Elastic Beanstalk API'
     });
