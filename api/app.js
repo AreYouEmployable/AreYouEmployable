@@ -13,7 +13,8 @@ dotenv.config();
 // Enable CORS
 app.use(cors({
     origin: process.env.CLIENT_URI || 'http://localhost:5000',
-    credentials: true
+    credentials: true,
+    allowedHeaders: 'Content-Type,Authorization',
 }));
 
 app.use(express.json());
