@@ -77,7 +77,7 @@ class AssessmentPage extends HTMLElement {
       // if (!createResponse || !createResponse.assessmentId) {
       //   throw new Error('Failed to create assessment or assessmentId not returned.');
       // }
-      this.assessmentId = 12;
+      this.assessmentId = 13;
       console.log('AssessmentPage: Assessment created with ID:', this.assessmentId);
 
       // 2. Fetch the first scenario's data (which also includes totalScenarios)

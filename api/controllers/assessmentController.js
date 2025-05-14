@@ -95,9 +95,9 @@ const submitScenarioHandler = async (req, res) => {
 /**
  * Handles the request to get a specific scenario of an assessment.
  */
- async function getAssessmentScenarioByIndex(req, res) {
+async function getAssessmentScenarioByIndex(req, res) {
     try {
-      const assessmentId = parseInt(req.params.assessmentId, 10);
+      const assessmentId = parseInt(req.params.id, 10);
       const scenarioIndex = parseInt(req.params.scenarioIndex, 10);
   
       // Basic validation for IDs/Indexes
