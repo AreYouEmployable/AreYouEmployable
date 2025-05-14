@@ -101,7 +101,10 @@ const routes = [
   { path: '/contact', component: 'contact-page', data: { title: 'Contact Us' } },
   { path: '/assessment', component: 'assessment-page', data: { title: 'Assessment' }, protected: true },
   { path: '/forbidden', component: 'forbidden-page', data: { title: '' } },
-  { path: '*', component: 'not-found-page', data: { title: '' } }
+  { path: '*', component: 'not-found-page', data: { title: '' } },
+  { path: '/results', component: 'results-page', data: { title: 'Results' } },
+  {path: '/assessment', component: 'assessment-page', data: { title: 'Assessment' } },
+  { path: '*', component: 'not-found-page', data: { title: '404 Not Found' } }
 ];
 
 export const router = new Router(routes);

@@ -1,5 +1,6 @@
 import { store } from '../state.js'; 
 import { AuthService } from '../services/auth.js';
+import { router } from '../router.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -90,8 +91,8 @@ class AppHeader extends HTMLElement {
         <button class="close-button" id="close-menu">&times;</button>
         ${isAuthenticated ? `
           <div class="nav-links">
-            <a href="/assessment" class="assessment-link">Assessment</a>
-            <a href="/results">Results</a>
+            <a href="/assessment" class="assessment-link" data-link>Assessment</a>
+            <a href="/results" data-link>Results</a>
           </div>
           <section class="user-info">
             ${pictureUrl ? `
@@ -109,6 +110,10 @@ class AppHeader extends HTMLElement {
         `}
       </section>
     `;
+
+    this.shadowRoot.querySelectorAll('[data-link]').forEach(link => {
+      link.addEventListener('click', this.handleLinkClick.bind(this));
+    });
 
     const hamburger = this.shadowRoot.querySelector('#hamburger');
     const mobileMenu = this.shadowRoot.querySelector('#mobile-menu');
@@ -156,10 +161,7 @@ class AppHeader extends HTMLElement {
   handleLinkClick(e) {
     e.preventDefault();
     const path = e.target.getAttribute('href');
-    if (window.location.pathname !== path) {
-        window.history.pushState({}, '', path);
-    }
-    window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
+    router.navigateTo(path);
   }
 
   async renderGoogleSignIn() {

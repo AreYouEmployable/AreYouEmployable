@@ -4,6 +4,7 @@ import { router } from './router.js';
 import './components/google-sign-in.js';
 import './components/error-page.js';
 import './components/forbidden-page.js';
+import './components/results-page.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
