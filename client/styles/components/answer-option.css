@@ -4,7 +4,7 @@
   gap: 0.75rem;
   padding: 1rem;
   background-color: #f7fafc;
-  border: 2px solid #e2e8f0;
+  border: 0.125rem solid #e2e8f0; 
   border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -28,8 +28,8 @@
 }
 
 .option-box input[type="checkbox"]:focus {
-  outline: 2px solid #4299e1;
-  outline-offset: 2px;
+  outline: 0.125rem solid #4299e1;       
+  outline-offset: 0.125rem;              
 }
 
 .option-box input[type="checkbox"]:checked + #labelText {
@@ -44,7 +44,7 @@
   word-break: break-word;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 480px) { 
   .option-box {
     padding: 0.75rem;
     font-size: 0.95rem;

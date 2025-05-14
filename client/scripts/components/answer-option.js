@@ -3,7 +3,7 @@ template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/answer-option.css">
   <label class="option-box">
     <input type="checkbox" />
-    <span id="labelText">Answer option</span>
+    <output id="labelText">Answer option</output>
   </label>
 `;
 

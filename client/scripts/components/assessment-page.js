@@ -6,6 +6,7 @@ import './answer-option.js';
 import './submit-button.js';
 import './labels-indicator.js';
 import './complexity-level-bar.js';
+import './timer-tag.js'; 
 import { ApiService } from '../services/api.js';
 import { AuthService } from '../services/auth.js';
 
@@ -13,7 +14,7 @@ const template = document.createElement('template');
 template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/assessment-page.css">
   <section class="container">
-    <span class="progress-text">ASSESSMENT PROGRESS</span>
+    <p class="progress-text">ASSESSMENT PROGRESS</p>
     <progress-bar total="2" class="progress-bar mb-6"></progress-bar>
 
     <article class="scenario-card">
@@ -22,6 +23,8 @@ template.innerHTML = `
         <p class="scenario-description" id="scenario-description"></p>
         <labels-indicator class="scenario-labels"></labels-indicator>
       </header>
+
+      <timer-tag id="timer-tag" duration="300" label="5 minutes remaining"></timer-tag>
 
       <article class="question-block mt-8" id="scenario-questions">
       </article>
@@ -85,7 +88,7 @@ class AssessmentPage extends HTMLElement {
     });
     console.log(this.scenarios);
     try {
-      // Submit the current scenario's answers
+      
       const response = await ApiService.post('/api/assessment/submit-scenario', {
         scenarioIndex: this.currentScenario,
         answers: scenarioAnswers,
@@ -94,12 +97,12 @@ class AssessmentPage extends HTMLElement {
 
       console.log('Scenario submitted successfully:', response);
       
-      // Store the answers locally
+      
       this.answers.set(this.currentScenario, scenarioAnswers);
       this.submittedCurrentScenario = true;
       this.updateNavigationState();
 
-      // If this was the last scenario, mark assessment as complete
+      
       if (response.isComplete) {
         this.assessmentComplete = true;
         this.updateNavigationState();
@@ -111,11 +114,8 @@ class AssessmentPage extends HTMLElement {
 
   handleNavigation(e) {
     const { direction } = e.detail;
-    if (direction === 'prev' && this.currentScenario > 0) {
-      this.currentScenario--;
-      this.submittedCurrentScenario = this.answers.has(this.currentScenario);
-      this.assessmentComplete = false;
-    } else if (direction === 'next' && this.submittedCurrentScenario) {
+  
+    if (direction === 'next' && this.submittedCurrentScenario) {
       if (this.currentScenario < this.totalScenarios - 1) {
         this.currentScenario++;
         this.submittedCurrentScenario = false;
@@ -123,19 +123,20 @@ class AssessmentPage extends HTMLElement {
         this.finishAssessment();
       }
     }
-
+  
     this.loadScenario(this.currentScenario);
     this.updateNavigationState();
     this.updateProgressBarText();
     this.updateProgressBarValue(); 
   }
+  
 
   updateNavigationState() {
     const navControls = this.shadowRoot.querySelector('navigation-controls');
-    navControls.canGoBack = this.currentScenario > 0;
     navControls.canGoForward = this.submittedCurrentScenario;
     navControls.isLastScenario = this.currentScenario === this.totalScenarios - 1;
   }
+  
 
   loadScenario(index) {
     if (!this.scenarios || !this.scenarios[index]) return;
@@ -148,20 +149,20 @@ class AssessmentPage extends HTMLElement {
     scenarioTitle.textContent = currentScenario.scenario_title;
     scenarioDescription.textContent = currentScenario.scenario_description;
     
-    // Set labels once for the entire scenario
+    
     labelsIndicator.setAttribute('labels', JSON.stringify([currentScenario.type, currentScenario.difficulty]));
     labelsIndicator.setAttribute('difficulty', currentScenario.difficulty.toLowerCase());
 
     this.scenarioQuestionsContainer.innerHTML = '';
     
     currentScenario.questions.forEach((question, questionIndex) => {
-      const questionElement = document.createElement('div');
+      const questionElement = document.createElement('section');
       questionElement.className = 'question-item';
       
       const questionHeader = document.createElement('question-header');
       questionHeader.setAttribute('title', question.question_text);
       
-      const optionsList = document.createElement('div');
+      const optionsList = document.createElement('li');
       optionsList.className = 'options-list';
       
       question.options.forEach((option) => {
@@ -169,7 +170,7 @@ class AssessmentPage extends HTMLElement {
         answerOption.text = option.value;
         answerOption.setAttribute('option-id', option.option_id);
         
-        // Check if this option was previously selected
+        
         const savedAnswers = this.answers.get(index);
         if (savedAnswers) {
           const questionAnswer = savedAnswers.find(a => a.questionIndex === questionIndex);
