@@ -3,6 +3,7 @@ import * as assessmentRepository from '../repositories/assessmentRepository.js';
 import * as scenarioRepository from '../repositories/scenarioRepository.js';
 import * as answerRepository from '../repositories/answerRepository.js';
 import * as questionRepository from '../repositories/questionRepository.js';
+import { generateAssessmentResultSummary } from './openAiService.js';
 
 /**
  * Fetches a specific assessment for a user
@@ -15,45 +16,34 @@ export async function getAssessment(userId, assessmentId) {
     return getScenarioForDisplay(assessmentId, 1)
 }
 
-export const submitAssessment = async (assessmentId, answers) => {
-    const processedAnswers = answers.map((scenarioAnswer, scenarioIndex) => {
-        const scenario = ALL_SCENARIOS[scenarioIndex];
-        return scenario.questions.map((question, questionIndex) => {
-            const selectedOptions = scenarioAnswer.find(a => a.questionIndex === questionIndex)?.selectedOptions || [];
-            const selectedOption = selectedOptions[0];
-            
-            question.answered = true;
-            question.selected_option = selectedOption;
+/**
+ * Submits an assessment:
+ * - Calculates score
+ * - Generates result summary
+ * - Marks it as complete in the database
+ * 
+ * @param {number} assessmentId 
+ */
+export const submitAssessment = async (assessmentId) => {
+    if (!assessmentId) {
+        throw new Error("assessmentId is required");
+    }
 
-            const isCorrect = selectedOption === question.correct_option_id;
+    // Get user answers
+    const answers = await answerRepository.getAssessmentUserAnswers(assessmentId);
+    const total = answers.length;
+    const correct = answers.filter(a => a.is_correct).length;
+    const score = total > 0 ? Math.round((correct / total) * 100) : 0;
 
-            return {
-                question_id: question.question_id,
-                selected_option: selectedOption,
-                is_correct: isCorrect
-            };
-        });
-    }).flat();
+    // Generate result summary
+    const resultSummary = await generateAssessmentResultSummary(assessmentId);
 
-    const totalScore = processedAnswers.filter(answer => answer.is_correct).length;
-    const typeScores = {};
-    
-    ALL_SCENARIOS.forEach((scenario, index) => {
-        const scenarioAnswers = processedAnswers.filter(answer => 
-            scenario.questions.some(q => q.question_id === answer.question_id)
-        );
-        const scenarioScore = scenarioAnswers.filter(answer => answer.is_correct).length;
-        typeScores[scenario.type] = (typeScores[scenario.type] || 0) + scenarioScore;
+    // Update assessment with score, summary, and status
+    await assessmentRepository.updateAssessmentResult({
+        assessmentId,
+        score,
+        resultSummary,
     });
-
-    return {
-        totalScore,
-        typeScores,
-        resultSummary: `Total: ${totalScore} (${Object.entries(typeScores)
-            .map(([type, score]) => `${type}: ${score}`)
-            .join(', ')})`,
-        answers: processedAnswers
-    };
 };
 
 export const submitScenario = async (assessmentId, scenarioIndex, answers) => {
