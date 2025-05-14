@@ -252,4 +252,34 @@ export async function getTotalScenarios(dbClient, assessmentId) {
     return parseInt(result.rows[0].completed, 10);
 }
 
-export { createAssessment, getAssessmentById, completeAssessment, getUserAnswersWithCorrectness, updateAssessmentResult,getCompletedScenarios};
+/**
+ * Gets the user's active assessment (not completed)
+ * @param {object} dbClient - The active database client
+ * @param {string} googleId - The user's Google ID
+ * @returns {Promise<object|null>} The active assessment or null if none exists
+ */
+ async function getActiveAssessment(dbClient, googleId) {
+    const query = `
+        SELECT 
+            a.assessment_id,
+            a.user_id,
+            a.score,
+            a.result_summary,
+            a.assessment_status_id,
+            s.name AS assessment_status_name,
+            a.created_at,
+            a.started_at,
+            a.completed_at
+        FROM assessments a
+        JOIN assessment_status s ON a.assessment_status_id = s.assessment_status_id
+        JOIN users u ON a.user_id = u.user_id
+        WHERE u.google_id = $1 
+        AND s.name != 'Completed'
+        ORDER BY a.created_at DESC
+        LIMIT 1;
+    `;
+    const result = await dbClient.query(query, [googleId]);
+    return result.rows[0] || null;
+}
+
+export { createAssessment, getAssessmentById, completeAssessment, getUserAnswersWithCorrectness, updateAssessmentResult,getCompletedScenarios, getActiveAssessment };

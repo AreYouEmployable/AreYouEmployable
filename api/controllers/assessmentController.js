@@ -118,11 +118,36 @@ async function getAssessmentScenarioByIndex(req, res) {
     }
   }
 
+/**
+ * Gets the user's active assessment or creates a new one
+ */
+const getOrCreateActiveAssessment = async (req, res) => {
+    try {
+        if (!req.user || !req.user.sub) {
+            return res.status(403).json({ 
+                error: 'forbidden',
+                message: 'You must be authenticated to access assessments'
+            });
+        }
+
+        const googleId = req.user.sub;
+        const assessment = await assessmentService.getOrCreateActiveAssessment(googleId);
+        res.status(200).json(assessment);
+    } catch (error) {
+        console.error('Error in getOrCreateActiveAssessment:', error);
+        res.status(500).json({ 
+            error: 'Failed to get or create assessment',
+            message: error.message 
+        });
+    }
+};
+
 export { 
     createAssessment, 
     getAssessment, 
     getAssessments, 
     submitAssessmentHandler,
     submitScenarioHandler,
-    getAssessmentScenarioByIndex 
+    getAssessmentScenarioByIndex,
+    getOrCreateActiveAssessment 
 };

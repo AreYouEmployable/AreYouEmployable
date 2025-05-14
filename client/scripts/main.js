@@ -1,5 +1,6 @@
 import { store, actions } from './state.js';
 import { AuthService } from './services/auth.js';
+import { router } from './router.js';
 import './components/google-sign-in.js';
 import './components/error-page.js';
 import './components/forbidden-page.js';
@@ -35,6 +36,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             token: AuthService.getToken()
         }));
     }
+
+    // Initialize router
+    router.handleRouting();
 
     document.addEventListener('start-assessment', () => {
         router.navigateTo('/assessment');

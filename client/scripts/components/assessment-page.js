@@ -72,12 +72,12 @@ class AssessmentPage extends HTMLElement {
       const userIdForApi = user.id; 
 
       // 1. Create Assessment
-      // const createResponse = await ApiService.post('/api/assessment/create', { userId: userIdForApi });
+      const createResponse = await ApiService.post('/api/assessment/create', { userId: userIdForApi });
 
-      // if (!createResponse || !createResponse.assessmentId) {
-      //   throw new Error('Failed to create assessment or assessmentId not returned.');
-      // }
-      this.assessmentId = 13;
+      if (!createResponse || !createResponse.assessmentId) {
+        throw new Error('Failed to create assessment or assessmentId not returned.');
+      }
+      this.assessmentId = createResponse.assessmentId;
       console.log('AssessmentPage: Assessment created with ID:', this.assessmentId);
 
       // 2. Fetch the first scenario's data (which also includes totalScenarios)
@@ -92,8 +92,12 @@ class AssessmentPage extends HTMLElement {
       this.currentScenario = firstScenarioAndSummaryData.index - 1; 
       this.currentScenarioData = firstScenarioAndSummaryData;
 
-      this.progressBarElement.setAttribute('total', this.totalScenarios.toString());
-      this.updateProgressBarText(); 
+      // Initialize progress bar
+      if (this.progressBarElement) {
+        this.progressBarElement.setAttribute('total', this.totalScenarios.toString());
+        this.progressBarElement.setAttribute('current', (this.currentScenario + 1).toString());
+        this.progressBarElement.setAttribute('value', (this.currentScenario + 1).toString());
+      }
 
       if (this.totalScenarios > 0) {
         this.scenarioTitleElement.textContent = this.currentScenarioData.title || `Scenario ${this.currentScenario + 1}`;
@@ -105,7 +109,6 @@ class AssessmentPage extends HTMLElement {
         this.renderQuestionsAndSubmit(); 
         this.submittedCurrentScenario = this.answers.has(this.currentScenario); 
         this.updateNavigationState();
-        this.updateProgressBarValue(); 
       } else {
         this.scenarioTitleElement.textContent = 'Assessment Ready';
         this.scenarioDescriptionElement.textContent = 'No scenarios are available for this assessment.';
@@ -283,47 +286,39 @@ class AssessmentPage extends HTMLElement {
         console.log("AssessmentPage: No questions to submit for this scenario.");
         this.submittedCurrentScenario = true;
         this.updateNavigationState();
-        if (this.currentScenario === this.totalScenarios - 1) {
-            this.assessmentComplete = true;
-            this.updateNavigationState(); 
-        }
         return;
     }
     
     console.log("AssessmentPage: All questions answered. Proceeding to submit payload:", scenarioAnswersPayload);
     try {
-      const scenarioIndexForAPI = this.currentScenario + 1; 
-      const response = await ApiService.post('/api/assessment/submit-scenario', {
-        assessmentId: this.assessmentId,
-        scenarioIndex: scenarioIndexForAPI,
-        answers: scenarioAnswersPayload,
-      });
+        const scenarioIndexForAPI = this.currentScenario + 1; 
+        const response = await ApiService.post('/api/assessment/submit-scenario', {
+            assessmentId: this.assessmentId,
+            scenarioIndex: scenarioIndexForAPI,
+            answers: scenarioAnswersPayload,
+        });
 
-      console.log(`AssessmentPage: Scenario ${scenarioIndexForAPI} submitted successfully:`, response);
-      
-      this.answers.set(this.currentScenario, scenarioAnswersPayload); 
-      this.submittedCurrentScenario = true;
-      
-      const submitBtn = this.shadowRoot.querySelector('#submit-scenario');
-      if(submitBtn) {
-        submitBtn.setAttribute('disabled', 'true');
-        submitBtn.textContent = 'Answers Submitted';
-      }
+        console.log(`AssessmentPage: Scenario ${scenarioIndexForAPI} submitted successfully:`, response);
+        
+        this.answers.set(this.currentScenario, scenarioAnswersPayload); 
+        this.submittedCurrentScenario = true;
+        
+        const submitBtn = this.shadowRoot.querySelector('#submit-scenario');
+        if(submitBtn) {
+            submitBtn.setAttribute('disabled', 'true');
+            submitBtn.textContent = 'Answers Submitted';
+        }
 
-      if (response.isComplete) { 
-        this.assessmentComplete = true;
-      }
-      
-      this.updateNavigationState(); 
+        this.updateNavigationState();
 
     } catch (error) {
-      console.error('AssessmentPage: Error submitting scenario:', error);
-      const errorP = document.createElement('p');
-      errorP.style.color = 'red';
-      errorP.textContent = `Error submitting answers: ${error.message}`;
-      if (this.scenarioQuestionsContainer.lastChild.nodeName !== 'P') { 
-        this.scenarioQuestionsContainer.appendChild(errorP);
-      }
+        console.error('AssessmentPage: Error submitting scenario:', error);
+        const errorP = document.createElement('p');
+        errorP.style.color = 'red';
+        errorP.textContent = `Error submitting answers: ${error.message}`;
+        if (this.scenarioQuestionsContainer.lastChild.nodeName !== 'P') { 
+            this.scenarioQuestionsContainer.appendChild(errorP);
+        }
     }
   }
 
@@ -331,27 +326,26 @@ class AssessmentPage extends HTMLElement {
     const { direction } = e.detail;
     console.log(`AssessmentPage: Navigation event - ${direction}`);
     if (direction === 'prev' && this.currentScenario > 0) {
-      this.currentScenario--;
-      this.assessmentComplete = false; 
-      this.loadScenario(this.currentScenario);
+        this.currentScenario--;
+        this.assessmentComplete = false; 
+        this.loadScenario(this.currentScenario);
     } else if (direction === 'next') {
-      const canProceed = this.submittedCurrentScenario || 
+        const canProceed = this.submittedCurrentScenario || 
                          (this.currentScenarioData && (!this.currentScenarioData.questions || this.currentScenarioData.questions.length === 0));
 
-      if (!canProceed) {
-        console.log("AssessmentPage: Cannot navigate next. Current scenario not submitted.");
-        alert("Please submit your answers for the current scenario before proceeding.");
-        return;
-      }
+        if (!canProceed) {
+            console.log("AssessmentPage: Cannot navigate next. Current scenario not submitted.");
+            alert("Please submit your answers for the current scenario before proceeding.");
+            return;
+        }
 
-      if (this.currentScenario < this.totalScenarios - 1) {
-        this.currentScenario++;
-        this.loadScenario(this.currentScenario);
-      } else if (this.currentScenario === this.totalScenarios - 1 && canProceed) {
-        console.log("AssessmentPage: Last scenario submitted. Finishing assessment.");
-        this.assessmentComplete = true; 
-        this.finishAssessment();
-      }
+        if (this.currentScenario < this.totalScenarios - 1) {
+            this.currentScenario++;
+            this.loadScenario(this.currentScenario);
+        } else if (this.currentScenario === this.totalScenarios - 1 && canProceed) {
+            console.log("AssessmentPage: Last scenario submitted. Finishing assessment.");
+            this.finishAssessment();
+        }
     }
   }
 
@@ -375,20 +369,19 @@ class AssessmentPage extends HTMLElement {
                                           this.totalScenarios > 0 && 
                                           this.currentScenario < this.totalScenarios;
     
-    // Set last scenario flag for "Finish" button text
+    // Set last scenario flag for "Complete Assessment" button text
     if (this.currentScenario === this.totalScenarios - 1 && 
         canProceedFromCurrent && 
         this.totalScenarios > 0) {
-        this.navControlsElement.isLastScenarioAndSubmitted = true;
+        this.navControlsElement.isLastScenario = true;
     } else {
-        this.navControlsElement.isLastScenarioAndSubmitted = false;
+        this.navControlsElement.isLastScenario = false;
     }
 
-    // Hide navigation if assessment is complete and on last scenario
-    this.navControlsElement.style.display = 
-        (this.assessmentComplete && this.currentScenario === this.totalScenarios - 1) ? 'none' : '';
+    // Hide navigation if assessment is complete
+    this.navControlsElement.style.display = this.assessmentComplete ? 'none' : '';
     
-    console.log(`AssessmentPage: Updated navigation state - canGoBack: ${this.navControlsElement.canGoBack}, canGoForward: ${this.navControlsElement.canGoForward}, isLast: ${this.navControlsElement.isLastScenarioAndSubmitted}`);
+    console.log(`AssessmentPage: Updated navigation state - canGoBack: ${this.navControlsElement.canGoBack}, canGoForward: ${this.navControlsElement.canGoForward}, isLast: ${this.navControlsElement.isLastScenario}`);
   }
 
   updateProgressBarText() {

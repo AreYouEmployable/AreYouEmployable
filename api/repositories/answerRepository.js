@@ -118,7 +118,7 @@ import db from '../database.js';
         // Update existing answer
         result = await dbClient.query(
             `UPDATE user_answers 
-             SET option_id = $3,
+             SET option_id = $3
              WHERE assessment_id = $1 AND question_id = $2
              RETURNING *`,
             [assessment_id, question_id, selected_option_id]
@@ -147,4 +147,28 @@ import db from '../database.js';
     };
 }
 
-export { createUserAnswer, getUserAnswerDetails, findByQuestionIdsForAssessment, storeUserAnswer };
+/**
+ * Gets all answers for a specific assessment
+ * @param {object} dbClient - The active database client
+ * @param {number} assessmentId - The ID of the assessment
+ * @returns {Promise<Array<object>>} Array of answer objects
+ */
+async function findByAssessmentId(dbClient, assessmentId) {
+    const query = `
+        SELECT 
+            ua.question_id,
+            ua.option_id as selected_option_id
+        FROM user_answers ua
+        WHERE ua.assessment_id = $1
+    `;
+    const result = await dbClient.query(query, [assessmentId]);
+    return result.rows;
+}
+
+export { 
+    createUserAnswer, 
+    getUserAnswerDetails, 
+    findByQuestionIdsForAssessment, 
+    storeUserAnswer,
+    findByAssessmentId 
+};

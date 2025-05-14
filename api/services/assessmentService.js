@@ -154,7 +154,7 @@ export const submitScenario = async (assessmentId, scenarioIndex, answers) => {
  * @returns {Promise<object>} An object containing the assessmentId and a success message.
  * @throws {Error} Throws an error if the creation process fails (e.g., no scenarios found).
  */
-export async function createAssessmentWithRandomScenarios(userId, numberOfScenarios = 2, initialStatusId = 1) {
+export async function createAssessmentWithRandomScenarios(userId, numberOfScenarios = 4, initialStatusId = 1) {
   const client = await pool.connect();
 
   try {
@@ -211,14 +211,39 @@ export async function getScenarioForDisplay(assessmentId, scenarioIndex) {
     const scenarioDetails = await assessmentRepository.findScenarioDetailsByIndex(client, assessmentId, scenarioIndex);
 
     if (!scenarioDetails) {
-      // Scenario at this index not found for this assessment, or assessment itself might not exist.
-      // To be more specific, you could first check if the assessment exists.
       return null;
     }
 
+    // Get total number of scenarios for this assessment
+    const totalScenarios = await assessmentRepository.getTotalScenarios(client, assessmentId);
+
+    // Get all questions for this scenario
     const questions = await questionRepository.findByScenarioId(client, scenarioDetails.scenario_id);
 
-    const questionIds = questions.map(q => q.question_id);
+    // Get existing answers for this assessment
+    const existingAnswers = await answerRepository.findByAssessmentId(client, assessmentId);
+    const answeredQuestionIds = new Set(existingAnswers.map(a => a.question_id));
+
+    // Filter out questions that have already been answered
+    const unansweredQuestions = questions.filter(q => !answeredQuestionIds.has(q.question_id));
+
+    // If all questions are answered, return the scenario with an empty questions array
+    if (unansweredQuestions.length === 0) {
+      return {
+        assessment_id: assessmentId,
+        scenario_id: scenarioDetails.scenario_id,
+        title: scenarioDetails.scenario_title,
+        description: scenarioDetails.scenario_description,
+        type: scenarioDetails.scenario_type_name,
+        difficulty: scenarioDetails.scenario_difficulty_name,
+        index: scenarioDetails.scenario_index,
+        totalScenarios,
+        questions: [],
+        allQuestionsAnswered: true
+      };
+    }
+
+    const questionIds = unansweredQuestions.map(q => q.question_id);
     const options = questionIds.length > 0 ?
       await answerRepository.findByQuestionIdsForAssessment(client, questionIds) : [];
 
@@ -229,20 +254,17 @@ export async function getScenarioForDisplay(assessmentId, scenarioIndex) {
     }, {});
 
     const scenarioResult = {
-      assessment_id: assessmentId, // Good to include for context
+      assessment_id: assessmentId,
       scenario_id: scenarioDetails.scenario_id,
       title: scenarioDetails.scenario_title,
       description: scenarioDetails.scenario_description,
       type: scenarioDetails.scenario_type_name,
       difficulty: scenarioDetails.scenario_difficulty_name,
       index: scenarioDetails.scenario_index,
-      totalScenarios:2,
-      questions: questions.map(q => ({
+      totalScenarios,
+      questions: unansweredQuestions.map(q => ({
         question_id: q.question_id,
         question_text: q.question_text,
-        // explanation: q.explanation, // Decide if/when to send this.
-        // answered: false, // These would come from user_answers table if displaying progress
-        // selected_option: null, // These would come from user_answers table
         options: (optionsByQuestionId[q.question_id] || []).map(opt => ({
           option_id: opt.question_option_id,
           label: opt.label,
@@ -260,6 +282,40 @@ export async function getScenarioForDisplay(assessmentId, scenarioIndex) {
     client.release();
   }
 }
+
+/**
+ * Gets the user's active assessment or creates a new one if none exists
+ * @param {string} googleId - The user's Google ID
+ * @returns {Promise<object>} The active assessment
+ */
+export async function getOrCreateActiveAssessment(googleId) {
+    const client = await pool.connect();
+    try {
+        // First try to get an active assessment
+        const activeAssessment = await assessmentRepository.getActiveAssessment(client, googleId);
+        
+        if (activeAssessment) {
+            // If there's an active assessment, get its first scenario
+            const firstScenario = await getScenarioForDisplay(activeAssessment.assessment_id, 1);
+            return {
+                ...activeAssessment,
+                ...firstScenario
+            };
+        }
+
+        // If no active assessment exists, create a new one
+        const newAssessment = await createAssessmentWithRandomScenarios(googleId);
+        const firstScenario = await getScenarioForDisplay(newAssessment.assessmentId, 1);
+        
+        return {
+            ...newAssessment,
+            ...firstScenario
+        };
+    } finally {
+        client.release();
+    }
+}
+
 // ... other assessment service functions
 
 
