@@ -6,12 +6,12 @@ template.innerHTML = `
   <article class="card">
     <header class="header">
         <i class="header-icon" aria-hidden="true"></i>
-        <span class="category">Category</span>
+        <label class="category">Category</label>
     </header>
 
     <section class="score-line" aria-label="Score">
-        <span class="score" id="score">0%</span>
-        <span id="score-detail">(0/0)</span>
+        <label class="score" id="score">0%</label>
+        <label id="score-detail">(0/0)</label>
     </section>
 
     <progress-bar id="progress" current="2" total="5" color="red"></progress-bar>

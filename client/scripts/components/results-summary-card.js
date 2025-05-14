@@ -3,8 +3,8 @@ template.innerHTML = `
   <link rel="stylesheet" href="/styles/components/results-summary-card.css">
   <section class="card">
     <header class="title">
-        <span class="title-icon" aria-hidden="true"></span>
-        <span class="title-text"></span>
+        <i class="title-icon" aria-hidden="true"></i>
+        <label class="title-text"></label>
     </header>
     <ul id="items-list">
         <!-- Items will be injected -->
@@ -59,11 +59,11 @@ class ResultsSummaryCard extends HTMLElement {
     items.forEach((item) => {
       const li = document.createElement("li");
       const iconHTML = itemIcon.trim()
-        ? `<span class="item-icon" style="background:${iconBg};color:${itemColor}">${itemIcon}</span>`
+        ? `<i class="item-icon" style="background:${iconBg};color:${itemColor}">${itemIcon}</i>`
         : "";
       li.innerHTML = `
             ${iconHTML}
-            <span style="color:${itemColor}">${item.trim()}</span>
+            <label style="color:${itemColor}">${item.trim()}</label>
         `;
       list.appendChild(li);
     });
