@@ -31,7 +31,7 @@ export class CdkStack extends cdk.Stack {
         },
       ],
     });
-    
+
 
     // Create S3 bucket to store application versions
     const areYouEmployableBucketName = `are-you-employable-${props.environmentName}-bucket`;
@@ -50,7 +50,7 @@ export class CdkStack extends cdk.Stack {
     const distribution = new cloudfront.Distribution(this, 'are-you-employable-distribution', {
       defaultBehavior: {
         origin: origins.S3BucketOrigin.withOriginAccessControl(areYouEmployable, {
-          originAccessLevels: [cloudfront.AccessLevel.READ], 
+          originAccessLevels: [cloudfront.AccessLevel.READ],
         }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       },
@@ -221,14 +221,14 @@ export class CdkStack extends cdk.Stack {
           value: areYouEmployableDbName,
         },
         {
-          namespace: 'aws:elasticbeanstalk:application:environment',        
-          optionName: 'DB_USERNAME',        
-          value: database.secret?.secretValueFromJson('username').unsafeUnwrap() || '',        
-        },        
+          namespace: 'aws:elasticbeanstalk:application:environment',
+          optionName: 'DB_USERNAME',
+          value: database.secret?.secretValueFromJson('username').unsafeUnwrap() || '',
+        },
         {
-          namespace: 'aws:elasticbeanstalk:application:environment',        
-          optionName: 'DB_PASSWORD',        
-          value: database.secret?.secretValueFromJson('password').unsafeUnwrap() || '',        
+          namespace: 'aws:elasticbeanstalk:application:environment',
+          optionName: 'DB_PASSWORD',
+          value: database.secret?.secretValueFromJson('password').unsafeUnwrap() || '',
         },
         {
           namespace: 'aws:ec2:vpc',
@@ -248,6 +248,20 @@ export class CdkStack extends cdk.Stack {
       ],
     });
 
+    const apiDistribution = new cloudfront.Distribution(this, 'AreYouEmployableApiDistribution', {
+      defaultBehavior: {
+        origin: new origins.HttpOrigin(cdk.Fn.select(1, cdk.Fn.split('://', environment.attrEndpointUrl)), {
+          protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+          originPath: '',  
+        }),
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+
+      },
+      comment: 'CloudFront distribution in front of Elastic Beanstalk API'
+    });
+
     // Create outputs
     new cdk.CfnOutput(this, 'ApplicationURL', {
       value: `http://${environment.attrEndpointUrl}`,
@@ -257,6 +271,11 @@ export class CdkStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'DatabaseEndpoint', {
       value: database.instanceEndpoint.hostname,
       description: 'Database endpoint',
+    });
+
+    new cdk.CfnOutput(this, 'ApiCloudFrontUrl', {
+      value: `https://${apiDistribution.distributionDomainName}`,
+      description: 'CloudFront HTTPS URL for Beanstalk API'
     });
   }
 }
