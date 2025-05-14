@@ -14,7 +14,8 @@ INSERT INTO question_difficulty (question_difficulty_id, name) VALUES
 -- Insert Constant Assessment Statuses
 INSERT INTO assessment_status (assessment_status_id, name) VALUES
     (1, 'In Progress'),
-    (2, 'Completed');
+    (2, 'Completed'),
+    (3, 'Discarded');
 
 -- Insert Scenario
 INSERT INTO scenarios (scenario_id, title, description, type_id, difficulty_id)
@@ -28,8 +29,9 @@ VALUES (
 
 -- Insert Questions
 INSERT INTO questions (question_id, scenario_id, question_text, explanation) VALUES
-    (1, 1, 'The production website is showing a blank page. What''s your first step?', 'When debugging production issues, collecting data through logs and trying to reproduce the problem are critical first steps.'),
-    (2, 1, 'You found that a third-party API is down. How do you handle this?', NULL);
+    (1, 1, 'The production website is showing a blank page. What''s your first step?', 'When debugging production issues, collecting data through logs and trying to reproduce the problem are critical first steps.');
+INSERT INTO questions (question_id, scenario_id, question_text) VALUES 
+    (2, 1, 'You found that a third-party API is down. How do you handle this?');
 
 -- Insert Question Options for Question 1
 INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES
@@ -56,8 +58,8 @@ VALUES (
 );
 
 -- Insert Question for Scenario 2
-INSERT INTO questions (question_id, scenario_id, question_text, explanation) VALUES
-    (3, 2, 'You notice inefficient code that works but could be improved. What do you do?', NULL);
+INSERT INTO questions (question_id, scenario_id, question_text) VALUES
+    (3, 2, 'You notice inefficient code that works but could be improved. What do you do?');
 
 -- Insert Question Options for Question 3
 INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES
@@ -77,8 +79,8 @@ VALUES (
 );
 
 -- Insert Question for Scenario 3
-INSERT INTO questions (question_id, scenario_id, question_text, explanation) VALUES
-    (4, 3, 'What''s your first step when designing a new system?', NULL);
+INSERT INTO questions (question_id, scenario_id, question_text) VALUES
+    (4, 3, 'What''s your first step when designing a new system?');
 
 -- Insert Question Options for Question 4
 INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES
@@ -98,8 +100,8 @@ VALUES (
 );
 
 -- Insert Question for Scenario 4
-INSERT INTO questions (question_id, scenario_id, question_text, explanation) VALUES
-    (5, 4, 'Two senior developers disagree on architecture. How do you help resolve this?', NULL);
+INSERT INTO questions (question_id, scenario_id, question_text) VALUES
+    (5, 4, 'Two senior developers disagree on architecture. How do you help resolve this?');
 
 -- Insert Question Options for Question 5
 INSERT INTO question_options (question_option_id, question_id, label, value, is_correct, answer_note) VALUES

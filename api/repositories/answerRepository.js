@@ -172,3 +172,19 @@ export {
     storeUserAnswer,
     findByAssessmentId 
 };
+
+export const getAssessmentUserAnswers = async (assessmentId) => {
+    const result = await db.query(
+        `
+        SELECT 
+            q.question_text,
+            qo.is_correct
+        FROM user_answers ua
+        JOIN questions q ON ua.question_id = q.question_id
+        JOIN question_options qo ON ua.option_id = qo.question_option_id
+        WHERE ua.assessment_id = $1;
+        `,
+        [assessmentId]
+    );
+    return result.rows;
+};
