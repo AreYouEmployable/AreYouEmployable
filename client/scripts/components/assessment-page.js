@@ -154,7 +154,7 @@ class AssessmentPage extends HTMLElement {
     this.submittedCurrentScenario = this.answers.has(index); 
 
     try {
-      const scenarioIndexForAPI = index + 1; 
+      const scenarioIndexForAPI = index + 1; // Convert to 1-based index for API
       console.log(`AssessmentPage: Loading scenario ${scenarioIndexForAPI} (index ${index}) for assessment ${this.assessmentId}`);
       const scenarioData = await ApiService.get(`/api/assessment/${this.assessmentId}/scenarios/${scenarioIndexForAPI}`);
 
@@ -293,28 +293,26 @@ class AssessmentPage extends HTMLElement {
     console.log("AssessmentPage: All questions answered. Proceeding to submit payload:", scenarioAnswersPayload);
     try {
       const scenarioIndexForAPI = this.currentScenario + 1; 
-      // const response = 
-      // await ApiService.post('/api/assessment/submit-scenario', {
-      //   assessmentId: this.assessmentId,
-      //   scenarioIndex: scenarioIndexForAPI,
-      //   answers: scenarioAnswersPayload,
-      // });
+      const response = await ApiService.post('/api/assessment/submit-scenario', {
+        assessmentId: this.assessmentId,
+        scenarioIndex: scenarioIndexForAPI,
+        answers: scenarioAnswersPayload,
+      });
 
-      // console.log(`AssessmentPage: Scenario ${scenarioIndexForAPI} submitted successfully:`, response);
+      console.log(`AssessmentPage: Scenario ${scenarioIndexForAPI} submitted successfully:`, response);
       
-      // this.answers.set(this.currentScenario, scenarioAnswersPayload); 
-      // this.submittedCurrentScenario = true;
-      
-      // const submitBtn = this.shadowRoot.querySelector('#submit-scenario');
-      // if(submitBtn) {
-      //   submitBtn.setAttribute('disabled', 'true');
-      //   submitBtn.textContent = 'Answers Submitted';
-      // }
-
-      // if (response.isComplete) { 
-      //   this.assessmentComplete = true;
-      // }
+      this.answers.set(this.currentScenario, scenarioAnswersPayload); 
       this.submittedCurrentScenario = true;
+      
+      const submitBtn = this.shadowRoot.querySelector('#submit-scenario');
+      if(submitBtn) {
+        submitBtn.setAttribute('disabled', 'true');
+        submitBtn.textContent = 'Answers Submitted';
+      }
+
+      if (response.isComplete) { 
+        this.assessmentComplete = true;
+      }
       
       this.updateNavigationState(); 
 
@@ -358,22 +356,38 @@ class AssessmentPage extends HTMLElement {
   }
 
   updateNavigationState() {
-    // if (!this.navControlsElement) return;
-    // this.navControlsElement.canGoBack = this.currentScenario > 0 && !this.assessmentComplete;
-
-    // const currentScenarioHasQuestions = this.currentScenarioData && this.currentScenarioData.questions && this.currentScenarioData.questions.length > 0;
-    // const canProceedFromCurrent = this.submittedCurrentScenario || !currentScenarioHasQuestions;
-
-    // this.navControlsElement.canGoForward = canProceedFromCurrent && !this.assessmentComplete && this.totalScenarios > 0 && this.currentScenario < this.totalScenarios; // Check currentScenario < totalScenarios
+    if (!this.navControlsElement) return;
     
-    // if (this.currentScenario === this.totalScenarios - 1 && canProceedFromCurrent && this.totalScenarios > 0) {
-    //     this.navControlsElement.isLastScenarioAndSubmitted = true; // For "Finish" button text
-    // } else {
-    //     this.navControlsElement.isLastScenarioAndSubmitted = false;
-    // }
-    this.navControlsElement.canGoForward = true;
+    // Can go back if not on first scenario and assessment not complete
+    this.navControlsElement.canGoBack = this.currentScenario > 0 && !this.assessmentComplete;
+
+    // Can go forward if:
+    // 1. Current scenario is submitted or has no questions
+    // 2. Assessment is not complete
+    // 3. Not on last scenario
+    const currentScenarioHasQuestions = this.currentScenarioData && 
+                                      this.currentScenarioData.questions && 
+                                      this.currentScenarioData.questions.length > 0;
+    const canProceedFromCurrent = this.submittedCurrentScenario || !currentScenarioHasQuestions;
+
+    this.navControlsElement.canGoForward = canProceedFromCurrent && 
+                                          !this.assessmentComplete && 
+                                          this.totalScenarios > 0 && 
+                                          this.currentScenario < this.totalScenarios;
     
-    this.navControlsElement.style.display = this.assessmentComplete && (this.currentScenario === this.totalScenarios -1) ? 'none' : '';
+    // Set last scenario flag for "Finish" button text
+    if (this.currentScenario === this.totalScenarios - 1 && 
+        canProceedFromCurrent && 
+        this.totalScenarios > 0) {
+        this.navControlsElement.isLastScenarioAndSubmitted = true;
+    } else {
+        this.navControlsElement.isLastScenarioAndSubmitted = false;
+    }
+
+    // Hide navigation if assessment is complete and on last scenario
+    this.navControlsElement.style.display = 
+        (this.assessmentComplete && this.currentScenario === this.totalScenarios - 1) ? 'none' : '';
+    
     console.log(`AssessmentPage: Updated navigation state - canGoBack: ${this.navControlsElement.canGoBack}, canGoForward: ${this.navControlsElement.canGoForward}, isLast: ${this.navControlsElement.isLastScenarioAndSubmitted}`);
   }
 

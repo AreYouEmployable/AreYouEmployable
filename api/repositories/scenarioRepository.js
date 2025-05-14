@@ -87,3 +87,24 @@ export const getScenarioInfo = async (assessmentId, scenarioId) => {
 
     return result.rows[0];
 };
+
+// scenarioRepository.js
+
+/**
+ * Fetches a specified number of random scenarios from the database.
+ * @param {object} dbClient - The active database client.
+ * @param {number} count - The number of random scenarios to fetch.
+ * @returns {Promise<Array<object>>} An array of scenario objects (e.g., [{ scenario_id }, ...]).
+ */
+export async function findRandom(dbClient, count) {
+    if (count <= 0) {
+      return [];
+    }
+    const result = await dbClient.query(
+      `SELECT scenario_id FROM scenarios ORDER BY RANDOM() LIMIT $1`,
+      [count]
+    );
+    return result.rows;
+  }
+  
+  // ... other scenario repository functions
