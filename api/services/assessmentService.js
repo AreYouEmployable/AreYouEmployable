@@ -36,7 +36,8 @@ export const submitAssessment = async (assessmentId) => {
     const score = total > 0 ? Math.round((correct / total) * 100) : 0;
 
     // Generate result summary
-    const resultSummary = await generateAssessmentResultSummary(assessmentId);
+    // const resultSummary = await generateAssessmentResultSummary(assessmentId);
+    const resultSummary = "Well done! You have completed the assessment. Your score is " + score + "%.";
 
     // Update assessment with score, summary, and status
     await assessmentRepository.updateAssessmentResult({
