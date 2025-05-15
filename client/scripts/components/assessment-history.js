@@ -108,8 +108,10 @@ class AssessmentHistory extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
 
-    const styleElement = createHtmlElement('style', { text: styles });
-    this.shadowRoot.appendChild(styleElement);
+    const linkEl = document.createElement('link');
+    linkEl.setAttribute('rel', 'stylesheet');
+    linkEl.setAttribute('href', '/styles/components/assessment-history.css'); 
+    this.shadowRoot.appendChild(linkEl);
 
     const main = createHtmlElement('main');
 
