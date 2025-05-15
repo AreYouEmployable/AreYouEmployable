@@ -1,5 +1,5 @@
 export const config = {
-    GOOGLE_CLIENT_ID:'509502634606-59ifco7766fs7th7l1nuso9hd9rnh9da.apps.googleusercontent.com',
-    API_URL:  'http://localhost:3000',
-    CLIENT_URI: 'http://localhost:5500'
-}; 
+    GOOGLE_CLIENT_ID:'1047120062293-jcm5flp9qbopj3evdec9a0mg5e4jbln4.apps.googleusercontent.com',
+    API_URL:  'https://d1wfor6gee9yae.cloudfront.net',
+    CLIENT_URI: 'https://d206hmm3gakidp.cloudfront.net'
+};

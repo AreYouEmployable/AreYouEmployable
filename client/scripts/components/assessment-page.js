@@ -437,8 +437,7 @@ class AssessmentPage extends HTMLElement {
     }
 
     try {
-      await ApiService.post(`/api/assessment/${this.assessmentId}/finalize`); 
-      console.log("Assessment finalized successfully on the server.");
+        await ApiService.post(`/api/assessment/submit/${this.assessmentId}`);
     } catch (finalizationError) {
       console.error("AssessmentPage: Error during final assessment finalization call:", finalizationError);
     }
