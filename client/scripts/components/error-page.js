@@ -1,20 +1,46 @@
-import { store } from '../state.js';
 import { AuthService } from '../services/auth.js';
 
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/error-page.css">
-  <article class="error-container">
-    <summary class="error-content">
-      <h1 class="error-title">Access Denied</h1>
-      <p class="error-message">You do not have permission to access this resource.</p>
-      <section class="error-actions">
-        <button id="goHomeBtn" class="primary-button">Go to Home</button>
-        <button id="signOutBtn" class="secondary-button">Sign Out</button>
-      </section>
-    </summary>
-  </article>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/error-page.css');
+template.content.appendChild(stylesheetLink);
+
+const articleElement = document.createElement('article');
+articleElement.classList.add('error-container');
+
+const summaryElement = document.createElement('summary');
+summaryElement.classList.add('error-content');
+
+const h1Element = document.createElement('h1');
+h1Element.classList.add('error-title');
+h1Element.textContent = 'Access Denied';
+summaryElement.appendChild(h1Element);
+
+const pElement = document.createElement('p');
+pElement.classList.add('error-message');
+pElement.textContent = 'You do not have permission to access this resource.';
+summaryElement.appendChild(pElement);
+
+const sectionActionsElement = document.createElement('section');
+sectionActionsElement.classList.add('error-actions');
+
+const goHomeButton = document.createElement('button');
+goHomeButton.id = 'goHomeBtn';
+goHomeButton.classList.add('primary-button');
+goHomeButton.textContent = 'Go to Home';
+sectionActionsElement.appendChild(goHomeButton);
+
+const signOutButton = document.createElement('button');
+signOutButton.id = 'signOutBtn';
+signOutButton.classList.add('secondary-button');
+signOutButton.textContent = 'Sign Out';
+sectionActionsElement.appendChild(signOutButton);
+
+summaryElement.appendChild(sectionActionsElement);
+articleElement.appendChild(summaryElement);
+template.content.appendChild(articleElement);
 
 class ErrorPage extends HTMLElement {
   constructor() {

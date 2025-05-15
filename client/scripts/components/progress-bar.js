@@ -1,10 +1,27 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/progress-bar.css">
-  <section class="progress-container">
-    <progress class="progress-bar" id="bar" value="0" max="100"></progress>
-    <div class="progress-text" id="progress-text">0%</div>
-  </section>`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/progress-bar.css');
+template.content.appendChild(stylesheetLink);
+
+const progressContainerSection = document.createElement('section');
+progressContainerSection.classList.add('progress-container');
+
+const progressBarElement = document.createElement('progress');
+progressBarElement.classList.add('progress-bar');
+progressBarElement.id = 'bar';
+progressBarElement.setAttribute('value', '0');
+progressBarElement.setAttribute('max', '100');
+progressContainerSection.appendChild(progressBarElement);
+
+const progressTextSection = document.createElement('section');
+progressTextSection.classList.add('progress-text');
+progressTextSection.id = 'progress-text';
+progressTextSection.textContent = '0%';
+progressContainerSection.appendChild(progressTextSection);
+
+template.content.appendChild(progressContainerSection);
 
 class ProgressBar extends HTMLElement {
   constructor() {

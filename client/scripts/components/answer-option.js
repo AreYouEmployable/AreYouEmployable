@@ -1,9 +1,25 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/answer-option.css"> <label class="option-box">
-    <input type="radio" name="answer-group" /> <span id="labelText" class="label-text">Answer option</span>
-    </label>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/answer-option.css');
+template.content.appendChild(stylesheetLink);
+
+const labelElement = document.createElement('label');
+labelElement.classList.add('option-box');
+
+const inputRadioElement = document.createElement('input');
+inputRadioElement.setAttribute('type', 'radio');
+inputRadioElement.setAttribute('name', 'answer-group');
+labelElement.appendChild(inputRadioElement);
+
+const spanElement = document.createElement('span');
+spanElement.id = 'labelText';
+spanElement.classList.add('label-text');
+spanElement.textContent = 'Answer option';
+labelElement.appendChild(spanElement);
+
+template.content.appendChild(labelElement);
 
 class AnswerOption extends HTMLElement {
   constructor() {

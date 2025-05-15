@@ -1,25 +1,63 @@
 const template = document.createElement("template");
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/results-summary-card.css">
-  <section class="card">
-    <header class="title">
-        <i class="title-icon" aria-hidden="true"></i>
-        <label class="title-text"></label>
-    </header>
-    <ul id="items-list">
-        <!-- Items will be injected -->
-    </ul>
-  </section>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/results-summary-card.css');
+template.content.appendChild(stylesheetLink);
+
+const cardSection = document.createElement('section');
+cardSection.classList.add('card');
+
+const headerElement = document.createElement('header');
+headerElement.classList.add('title');
+
+const titleIconElement = document.createElement('i');
+titleIconElement.classList.add('title-icon');
+titleIconElement.setAttribute('aria-hidden', 'true');
+headerElement.appendChild(titleIconElement);
+
+const titleTextLabel = document.createElement('label');
+titleTextLabel.classList.add('title-text');
+headerElement.appendChild(titleTextLabel);
+
+cardSection.appendChild(headerElement);
+
+const ulElement = document.createElement('ul');
+ulElement.id = 'items-list';
+cardSection.appendChild(ulElement);
+
+template.content.appendChild(cardSection);
 
 class ResultsSummaryCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this.cardElement = this.shadowRoot.querySelector(".card");
+    this.titleTextElement = this.shadowRoot.querySelector(".title-text");
+    this.titleIconElement = this.shadowRoot.querySelector(".title-icon");
+    this.titleDivElement = this.shadowRoot.querySelector(".title");
+    this.itemsListElement = this.shadowRoot.getElementById("items-list");
+  }
+
+  static get observedAttributes() {
+    return ['items', 'title', 'background', 'title-color', 'item-color', 'title-icon', 'item-icon', 'icon-bg'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      this.render();
+    }
   }
 
   connectedCallback() {
+    if (!this.hasRendered) {
+        this.render();
+        this.hasRendered = true;
+    }
+  }
+
+  render() {
     const items = this.getAttribute("items")?.split("|") || [];
     const title = this.getAttribute("title") || "Summary";
     const background = this.getAttribute("background") || "#fffcf5";
@@ -29,44 +67,52 @@ class ResultsSummaryCard extends HTMLElement {
     const itemIcon = this.getAttribute("item-icon") || "";
     const iconBg = this.getAttribute("icon-bg") || "transparent";
 
-    // Set elements
-    const card = this.shadowRoot.querySelector(".card");
-    const titleSpan = this.shadowRoot.querySelector(".title-text");
-    const titleIconSpan = this.shadowRoot.querySelector(".title-icon");
-    const titleDiv = this.shadowRoot.querySelector(".title");
-    const list = this.shadowRoot.getElementById("items-list");
-
-    // dynamic styles and content
-    card.style.backgroundColor = background;
-    titleDiv.style.color = titleColor;
-    titleIconSpan.textContent = titleIcon;
-    titleIconSpan.style.backgroundColor = iconBg;
-    titleIconSpan.style.color = itemColor;
-    titleSpan.textContent = title;
-
-    if (titleIcon.trim()) {
-      titleIconSpan.textContent = titleIcon;
-      titleIconSpan.style.backgroundColor = iconBg;
-      titleIconSpan.style.color = titleColor;
-      titleIconSpan.style.display = "inline-flex";
-    } else {
-      titleIconSpan.style.display = "none";
+    if (this.cardElement) {
+        this.cardElement.style.backgroundColor = background;
+    }
+    if (this.titleDivElement) {
+        this.titleDivElement.style.color = titleColor;
+    }
+    if (this.titleTextElement) {
+        this.titleTextElement.textContent = title;
     }
 
-    // Clear old items in case of re-render
-    list.innerHTML = "";
+    if (this.titleIconElement) {
+        if (titleIcon.trim()) {
+            this.titleIconElement.textContent = titleIcon;
+            this.titleIconElement.style.backgroundColor = iconBg;
+            this.titleIconElement.style.color = titleColor;
+            this.titleIconElement.style.display = "inline-flex";
+        } else {
+            this.titleIconElement.style.display = "none";
+        }
+    }
 
-    items.forEach((item) => {
-      const li = document.createElement("li");
-      const iconHTML = itemIcon.trim()
-        ? `<i class="item-icon" style="background:${iconBg};color:${itemColor}">${itemIcon}</i>`
-        : "";
-      li.innerHTML = `
-            ${iconHTML}
-            <label style="color:${itemColor}">${item.trim()}</label>
-        `;
-      list.appendChild(li);
-    });
+    if (this.itemsListElement) {
+        while (this.itemsListElement.firstChild) {
+            this.itemsListElement.removeChild(this.itemsListElement.firstChild);
+        }
+
+        items.forEach((itemText) => {
+            const li = document.createElement("li");
+            
+            if (itemIcon.trim()) {
+                const itemIconElement = document.createElement("i");
+                itemIconElement.classList.add("item-icon");
+                itemIconElement.style.backgroundColor = iconBg;
+                itemIconElement.style.color = itemColor;
+                itemIconElement.textContent = itemIcon;
+                li.appendChild(itemIconElement);
+            }
+            
+            const itemLabel = document.createElement("label");
+            itemLabel.style.color = itemColor;
+            itemLabel.textContent = itemText.trim();
+            li.appendChild(itemLabel);
+            
+            this.itemsListElement.appendChild(li);
+        });
+    }
   }
 }
 

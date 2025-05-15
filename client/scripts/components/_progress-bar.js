@@ -1,10 +1,23 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/_progress-bar.css">
-  <section class="progress-container">
-    <div class="progress-bar" id="bar">0%</div>
-  </section>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/_progress-bar.css');
+template.content.appendChild(stylesheetLink);
+
+const progressContainerSection = document.createElement('section');
+progressContainerSection.classList.add('progress-container');
+
+const progressBarSection = document.createElement('section');
+progressBarSection.classList.add('progress-bar');
+progressBarSection.id = 'bar';
+progressBarSection.textContent = '0%';
+progressContainerSection.appendChild(progressBarSection);
+
+template.content.appendChild(progressContainerSection);
+
+const tempContainer = document.createElement('section');
+tempContainer.appendChild(template.content.cloneNode(true));
 
 class ProgressBar extends HTMLElement {
   constructor() {
@@ -50,7 +63,6 @@ class ProgressBar extends HTMLElement {
     bar.style.width = `${percent}%`;
     bar.textContent = `${percent}%`;
     
-    // Dispatch event for progress update
     this.dispatchEvent(new CustomEvent('progress-update', {
       detail: { current: this.current, total: this.total, percent },
       bubbles: true,
