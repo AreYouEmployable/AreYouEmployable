@@ -115,8 +115,8 @@ class AppHeader extends HTMLElement {
         navLinks.push({ href: '/', text: 'Home' });
       }
       navLinks.push(
-        { href: '/history', text: 'Assessment History' },
-        { href: '/contact', text: 'Contact' },
+        { href: '/history', text: 'Assessment history' }
+        
       );
       navLinks.push({ element: userInfo });
 
@@ -140,10 +140,7 @@ class AppHeader extends HTMLElement {
             this.createElement('a', { href: '/', 'data-link': '' }, ['Home'])
           ]),
           this.createElement('li', {}, [
-            this.createElement('a', { href: '/history', 'data-link': '' }, ['Assignment History'])
-          ]),
-          this.createElement('li', {}, [
-            this.createElement('a', { href: '/contact', 'data-link': '' }, ['Contact'])
+            this.createElement('a', { href: '/history', 'data-link': '' }, ['Assignment history'])
           ]),
         ])
       ]);
