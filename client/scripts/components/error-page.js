@@ -15,7 +15,7 @@ summaryElement.classList.add('error-content');
 
 const h1Element = document.createElement('h1');
 h1Element.classList.add('error-title');
-h1Element.textContent = 'Access Denied';
+h1Element.textContent = 'Forbidden';
 summaryElement.appendChild(h1Element);
 
 const pElement = document.createElement('p');
