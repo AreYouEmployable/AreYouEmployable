@@ -121,7 +121,7 @@ class AssessmentPage extends HTMLElement {
 
       this.totalScenarios = firstScenarioAndSummaryData.totalScenarios;
       this.currentScenario = firstScenarioAndSummaryData.index - 1;
-      this.currentScenarioData = firstScenarioAndSummaryData; 
+      this.currentScenarioData = firstScenarioAndSummaryData;
 
       if (this.progressBarElement) {
         this.progressBarElement.setAttribute('total', this.totalScenarios.toString());
@@ -137,12 +137,16 @@ class AssessmentPage extends HTMLElement {
           this.labelsIndicatorElement.setAttribute('difficulty', (this.currentScenarioData.difficulty).toLowerCase());
         }
         this.renderQuestionsAndSubmit();
-        this.submittedCurrentScenario = this.answers.has(this.currentScenario); 
+        this.submittedCurrentScenario = this.answers.has(this.currentScenario);
         this.updateNavigationState();
       } else {
         this.scenarioTitleElement.textContent = 'Assessment Ready';
         this.scenarioDescriptionElement.textContent = 'No scenarios are available for this assessment.';
-        this.scenarioQuestionsContainer.innerHTML = '';
+        if (this.scenarioQuestionsContainer) {
+            while (this.scenarioQuestionsContainer.firstChild) {
+                this.scenarioQuestionsContainer.removeChild(this.scenarioQuestionsContainer.firstChild);
+            }
+        }
         this.assessmentComplete = true;
         this.updateNavigationState();
       }
@@ -154,7 +158,16 @@ class AssessmentPage extends HTMLElement {
   displayError(message) {
     if (this.scenarioTitleElement) this.scenarioTitleElement.textContent = 'Error';
     if (this.scenarioDescriptionElement) this.scenarioDescriptionElement.textContent = '';
-    if (this.scenarioQuestionsContainer) this.scenarioQuestionsContainer.innerHTML = `<p style="color:red; font-weight:bold;">${message}</p>`;
+    if (this.scenarioQuestionsContainer) {
+        while (this.scenarioQuestionsContainer.firstChild) {
+            this.scenarioQuestionsContainer.removeChild(this.scenarioQuestionsContainer.firstChild);
+        }
+        const p = document.createElement('p');
+        p.style.color = 'red';
+        p.style.fontWeight = 'bold';
+        p.textContent = message;
+        this.scenarioQuestionsContainer.appendChild(p);
+    }
     if (this.navControlsElement) {
       this.navControlsElement.canGoForward = false;
       this.navControlsElement.canGoBack = false;
@@ -182,11 +195,22 @@ class AssessmentPage extends HTMLElement {
       this.updateNavigationState();
       if(this.scenarioTitleElement) this.scenarioTitleElement.textContent = 'Assessment Ended';
       if(this.scenarioDescriptionElement) this.scenarioDescriptionElement.textContent = 'There are no more scenarios.';
-      if(this.scenarioQuestionsContainer) this.scenarioQuestionsContainer.innerHTML = '';
+      if(this.scenarioQuestionsContainer) {
+        while (this.scenarioQuestionsContainer.firstChild) {
+            this.scenarioQuestionsContainer.removeChild(this.scenarioQuestionsContainer.firstChild);
+        }
+      }
       return;
     }
 
-    if(this.scenarioQuestionsContainer) this.scenarioQuestionsContainer.innerHTML = '<p>Loading scenario content...</p>';
+    if(this.scenarioQuestionsContainer) {
+        while (this.scenarioQuestionsContainer.firstChild) {
+            this.scenarioQuestionsContainer.removeChild(this.scenarioQuestionsContainer.firstChild);
+        }
+        const p = document.createElement('p');
+        p.textContent = 'Loading scenario content...';
+        this.scenarioQuestionsContainer.appendChild(p);
+    }
     this.currentScenarioData = null;
     this.submittedCurrentScenario = this.answers.has(index);
 
@@ -220,21 +244,25 @@ class AssessmentPage extends HTMLElement {
 
   renderQuestionsAndSubmit() {
     if (!this.scenarioQuestionsContainer) return;
-    this.scenarioQuestionsContainer.innerHTML = '';
+    while (this.scenarioQuestionsContainer.firstChild) {
+        this.scenarioQuestionsContainer.removeChild(this.scenarioQuestionsContainer.firstChild);
+    }
 
     if (!this.currentScenarioData || !this.currentScenarioData.questions || this.currentScenarioData.questions.length === 0) {
-      this.scenarioQuestionsContainer.innerHTML = '<p>This scenario has no questions. You can proceed to the next scenario.</p>';
-      this.submittedCurrentScenario = true; 
+      const p = document.createElement('p');
+      p.textContent = 'This scenario has no questions. You can proceed to the next scenario.';
+      this.scenarioQuestionsContainer.appendChild(p);
+      this.submittedCurrentScenario = true;
     } else {
-      this.currentScenarioData.questions.forEach((question, questionIndex) => {
-        const questionElement = document.createElement('section');
-        questionElement.className = 'question-item mb-4 p-4 border border-gray-200 rounded-lg shadow-sm'; // Added some basic styling classes
+      this.currentScenarioData.questions.forEach((question) => { // Removed unused questionIndex
+        const questionElement = document.createElement('section'); // Changed div to section for semantic grouping
+        questionElement.className = 'question-item mb-4 p-4 border border-gray-200 rounded-lg shadow-sm';
 
         const questionHeader = document.createElement('question-header');
         questionHeader.setAttribute('title', question.question_text);
 
-        const optionsList = document.createElement('section');
-        optionsList.className = 'options-list mt-2'; 
+        const optionsList = document.createElement('section'); // Changed div to section
+        optionsList.className = 'options-list mt-2';
 
         question.options.forEach((option) => {
           const answerOption = document.createElement('answer-option');
@@ -320,7 +348,7 @@ class AssessmentPage extends HTMLElement {
 
     try {
       const scenarioIndexForAPI = this.currentScenario + 1;
-      await ApiService.post('/api/assessment/submit-scenario', { 
+      await ApiService.post('/api/assessment/submit-scenario', {
         assessmentId: this.assessmentId,
         scenarioIndex: scenarioIndexForAPI,
         answers: scenarioAnswersPayload,
@@ -352,7 +380,7 @@ class AssessmentPage extends HTMLElement {
         submitBtn.parentNode.replaceChild(errorP, submitBtn.nextSibling);
       } else if (submitBtn) {
         submitBtn.parentNode.insertBefore(errorP, submitBtn.nextSibling);
-      } else {
+      } else if (this.scenarioQuestionsContainer){
         this.scenarioQuestionsContainer.appendChild(errorP);
       }
     }
@@ -362,7 +390,7 @@ class AssessmentPage extends HTMLElement {
     const { direction } = e.detail;
     if (direction === 'prev' && this.currentScenario > 0) {
       this.currentScenario--;
-      this.assessmentComplete = false; 
+      this.assessmentComplete = false;
       this.loadScenario(this.currentScenario);
     } else if (direction === 'next') {
       const canProceed = this.submittedCurrentScenario ||
@@ -413,7 +441,7 @@ class AssessmentPage extends HTMLElement {
 
   updateProgressBarText() {
     if (!this.progressBarElement) return;
-    
+
     this.progressBarElement.setAttribute('current', this.answers.size.toString());
     this.progressBarElement.setAttribute('value', this.answers.size.toString());
   }
@@ -429,7 +457,22 @@ class AssessmentPage extends HTMLElement {
     if(this.scenarioTitleElement) this.scenarioTitleElement.textContent = "Assessment Complete!";
     if(this.scenarioDescriptionElement) this.scenarioDescriptionElement.textContent = "Thank you for completing the assessment.";
     if(this.scenarioQuestionsContainer) {
-        this.scenarioQuestionsContainer.innerHTML = `<p class="text-lg text-gray-700">You will be redirected to the results page shortly.</p><p class="mt-2"><a href="/assessment-results?assessmentId=${this.assessmentId}" class="text-blue-600 hover:underline">View Results Now</a></p>`;
+        while (this.scenarioQuestionsContainer.firstChild) {
+            this.scenarioQuestionsContainer.removeChild(this.scenarioQuestionsContainer.firstChild);
+        }
+        const p1 = document.createElement('p');
+        p1.className = 'text-lg text-gray-700';
+        p1.textContent = 'You will be redirected to the results page shortly.';
+        this.scenarioQuestionsContainer.appendChild(p1);
+
+        const p2 = document.createElement('p');
+        p2.className = 'mt-2';
+        const link = document.createElement('a');
+        link.href = `/assessment-results?assessmentId=${this.assessmentId}`;
+        link.className = 'text-blue-600 hover:underline';
+        link.textContent = 'View Results Now';
+        p2.appendChild(link);
+        this.scenarioQuestionsContainer.appendChild(p2);
     }
     if (this.progressBarElement) {
         this.progressBarElement.setAttribute('current', this.totalScenarios.toString());
@@ -437,13 +480,14 @@ class AssessmentPage extends HTMLElement {
     }
 
     try {
-        await ApiService.post(`/api/assessment/submit/${this.assessmentId}`);
+        // Assuming the API endpoint is to finalize or mark completion
+        await ApiService.post(`/api/assessment/submit/${this.assessmentId}`); // Or a more appropriate endpoint like /finalize
     } catch (finalizationError) {
       console.error("AssessmentPage: Error during final assessment finalization call:", finalizationError);
     }
 
     setTimeout(() => {
-      if (this.assessmentId) { 
+      if (this.assessmentId) {
         window.location.href = `/assessment-results?assessmentId=${this.assessmentId}`;
       } else {
         console.error("AssessmentPage: Cannot redirect, assessmentId is missing.");

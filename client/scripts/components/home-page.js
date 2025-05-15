@@ -16,7 +16,13 @@ homePageHeader.className = 'home-page__header';
 
 const h1Title = document.createElement('h1');
 h1Title.className = 'home-page__title';
-h1Title.innerHTML = 'ARE <span class="home-page__title-highlight">You</span> Employable?';
+// Constructing the H1 title with DOM methods
+h1Title.appendChild(document.createTextNode('ARE '));
+const spanHighlight = document.createElement('span');
+spanHighlight.className = 'home-page__title-highlight';
+spanHighlight.textContent = 'You';
+h1Title.appendChild(spanHighlight);
+h1Title.appendChild(document.createTextNode(' Employable?'));
 homePageHeader.appendChild(h1Title);
 
 const pSubtitle = document.createElement('p');
@@ -125,7 +131,7 @@ discoveryItems.forEach(item => {
   const iconWrapper = document.createElement('section');
   iconWrapper.className = `home-page__discovery-item-icon-wrapper ${item.iconClass}`;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('class', `home-page__discovery-item-icon ${item.iconClass.replace('-wrapper', '')}`); // Assuming icon class matches wrapper
+  svg.setAttribute('class', `home-page__discovery-item-icon ${item.iconClass.replace('-wrapper', '')}`);
   svg.setAttribute('fill', 'none');
   svg.setAttribute('stroke', 'currentColor');
   svg.setAttribute('viewBox', '0 0 24 24');
@@ -235,8 +241,12 @@ class HomePage extends HTMLElement {
       }
     };
 
-    startBtn.addEventListener('click', handleClick);
-    mainBtn.addEventListener('click', handleClick);
+    if (startBtn) {
+        startBtn.addEventListener('click', handleClick);
+    }
+    if (mainBtn) {
+        mainBtn.addEventListener('click', handleClick);
+    }
   }
 }
 

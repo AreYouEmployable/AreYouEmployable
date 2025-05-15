@@ -24,7 +24,6 @@ cardSection.appendChild(headerElement);
 
 const ulElement = document.createElement('ul');
 ulElement.id = 'items-list';
-
 cardSection.appendChild(ulElement);
 
 template.content.appendChild(cardSection);
@@ -34,9 +33,31 @@ class ResultsSummaryCard extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
+    this.cardElement = this.shadowRoot.querySelector(".card");
+    this.titleTextElement = this.shadowRoot.querySelector(".title-text");
+    this.titleIconElement = this.shadowRoot.querySelector(".title-icon");
+    this.titleDivElement = this.shadowRoot.querySelector(".title");
+    this.itemsListElement = this.shadowRoot.getElementById("items-list");
+  }
+
+  static get observedAttributes() {
+    return ['items', 'title', 'background', 'title-color', 'item-color', 'title-icon', 'item-icon', 'icon-bg'];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      this.render();
+    }
   }
 
   connectedCallback() {
+    if (!this.hasRendered) {
+        this.render();
+        this.hasRendered = true;
+    }
+  }
+
+  render() {
     const items = this.getAttribute("items")?.split("|") || [];
     const title = this.getAttribute("title") || "Summary";
     const background = this.getAttribute("background") || "#fffcf5";
@@ -46,42 +67,38 @@ class ResultsSummaryCard extends HTMLElement {
     const itemIcon = this.getAttribute("item-icon") || "";
     const iconBg = this.getAttribute("icon-bg") || "transparent";
 
-    const card = this.shadowRoot.querySelector(".card");
-    const titleSpan = this.shadowRoot.querySelector(".title-text");
-    const titleIconSpan = this.shadowRoot.querySelector(".title-icon");
-    const titleContainer = this.shadowRoot.querySelector(".title"); 
-    const list = this.shadowRoot.getElementById("items-list");
-
-    if (card) {
-        card.style.backgroundColor = background;
+    if (this.cardElement) {
+        this.cardElement.style.backgroundColor = background;
     }
-    if (titleContainer) {
-        titleContainer.style.color = titleColor;
+    if (this.titleDivElement) {
+        this.titleDivElement.style.color = titleColor;
     }
-    if (titleSpan) {
-        titleSpan.textContent = title;
+    if (this.titleTextElement) {
+        this.titleTextElement.textContent = title;
     }
 
-    if (titleIconSpan) {
+    if (this.titleIconElement) {
         if (titleIcon.trim()) {
-            titleIconSpan.textContent = titleIcon;
-            titleIconSpan.style.backgroundColor = iconBg;
-            titleIconSpan.style.color = titleColor;
-            titleIconSpan.style.display = "inline-flex";
+            this.titleIconElement.textContent = titleIcon;
+            this.titleIconElement.style.backgroundColor = iconBg;
+            this.titleIconElement.style.color = titleColor;
+            this.titleIconElement.style.display = "inline-flex";
         } else {
-            titleIconSpan.style.display = "none";
+            this.titleIconElement.style.display = "none";
         }
     }
-    
-    if (list) {
-        list.innerHTML = "";
+
+    if (this.itemsListElement) {
+        while (this.itemsListElement.firstChild) {
+            this.itemsListElement.removeChild(this.itemsListElement.firstChild);
+        }
 
         items.forEach((itemText) => {
             const li = document.createElement("li");
             
             if (itemIcon.trim()) {
                 const itemIconElement = document.createElement("i");
-                itemIconElement.classList.add("item-icon"); 
+                itemIconElement.classList.add("item-icon");
                 itemIconElement.style.backgroundColor = iconBg;
                 itemIconElement.style.color = itemColor;
                 itemIconElement.textContent = itemIcon;
@@ -89,11 +106,11 @@ class ResultsSummaryCard extends HTMLElement {
             }
             
             const itemLabel = document.createElement("label");
-            itemLabel.style.color = itemColor; 
+            itemLabel.style.color = itemColor;
             itemLabel.textContent = itemText.trim();
             li.appendChild(itemLabel);
             
-            list.appendChild(li);
+            this.itemsListElement.appendChild(li);
         });
     }
   }

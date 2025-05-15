@@ -1,6 +1,9 @@
 import { store } from '../state.js';
 import { AuthService } from '../services/auth.js';
 import { router } from '../router.js';
+// Assuming google-sign-in is imported if AppHeader creates it,
+// but it seems to be used as a tag <google-sign-in> directly.
+// If it's a custom element, its definition should be imported somewhere globally or in app.js.
 
 const template = document.createElement('template');
 
@@ -72,7 +75,9 @@ class AppHeader extends HTMLElement {
     const { isAuthenticated, user } = this.state.auth;
     const pictureUrl = user?.picture;
 
-    this.shadowRoot.innerHTML = '';
+    while (this.shadowRoot.firstChild) {
+        this.shadowRoot.removeChild(this.shadowRoot.firstChild);
+    }
 
     const stylesheetLink = document.createElement('link');
     stylesheetLink.setAttribute('rel', 'stylesheet');
@@ -169,7 +174,7 @@ class AppHeader extends HTMLElement {
     const closeButton = document.createElement('button');
     closeButton.className = 'close-button';
     closeButton.id = 'close-menu';
-    closeButton.innerHTML = '&times;';
+    closeButton.textContent = '\u00D7';
     mobileMenuSection.appendChild(closeButton);
 
     const mobileNavLinksContainer = document.createElement('nav');

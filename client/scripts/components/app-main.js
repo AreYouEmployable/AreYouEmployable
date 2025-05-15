@@ -21,7 +21,7 @@ class AppMain extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'data-component' && newValue !== oldValue) {
+    if ((name === 'data-component' && newValue !== oldValue) || (name === 'data-props' && newValue !== oldValue)) {
       this.loadComponent();
     }
   }
@@ -32,8 +32,11 @@ class AppMain extends HTMLElement {
     let props = {};
 
     if (!componentName) {
-        console.warn('AppMain: data-component attribute is missing. Cannot load component.');
-        return;
+      console.warn('AppMain: data-component attribute is missing. Cannot load component.');
+      while (this.mainElement.firstChild) {
+        this.mainElement.removeChild(this.mainElement.firstChild);
+      }
+      return;
     }
 
     try {
@@ -47,24 +50,34 @@ class AppMain extends HTMLElement {
         'Error:', e
       );
     }
-    
-    this.mainElement.innerHTML = '';
-    
+
+    while (this.mainElement.firstChild) {
+      this.mainElement.removeChild(this.mainElement.firstChild);
+    }
+
     try {
       const component = document.createElement(componentName);
-      this.mainElement.appendChild(component);
+
+      if (typeof props === 'object' && props !== null) {
+        Object.entries(props).forEach(([key, value]) => {
+          if (typeof value === 'object') {
+            component.setAttribute(key, JSON.stringify(value));
+          } else if (typeof value === 'boolean') {
+            component.setAttribute(key, String(value));
+          } else {
+            component.setAttribute(key, value);
+          }
+        });
+      }
       
-      // Set attributes after the element is in the DOM
-      Object.entries(props).forEach(([key, value]) => {
-        if (typeof value === 'object' || typeof value === 'boolean') {
-          component.setAttribute(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
-        } else {
-          component.setAttribute(key, value);
-        }
-      });
+      this.mainElement.appendChild(component);
+
     } catch (error) {
-      console.error('AppMain: Error creating component:', error);
-      this.mainElement.innerHTML = `<section class="error">Failed to load component: ${componentName}</section>`;
+      console.error('AppMain: Error creating component:', componentName, error);
+      const errorSection = document.createElement('section');
+      errorSection.classList.add('error');
+      errorSection.textContent = `Failed to load component: ${componentName}`;
+      this.mainElement.appendChild(errorSection);
     }
   }
 }
