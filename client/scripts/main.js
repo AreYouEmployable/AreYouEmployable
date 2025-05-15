@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }));
     }
 
-    // Initialize router
     router.handleRouting();
 
     document.addEventListener('start-assessment', () => {

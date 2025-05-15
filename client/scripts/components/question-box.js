@@ -1,20 +1,21 @@
+import { createElementAndAppend } from '../utils.js';
+
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', 'styles/components/question-box.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: 'styles/components/question-box.css' }
+});
 
-const articleElement = document.createElement('article');
-articleElement.classList.add('question-box');
+const articleElement = createElementAndAppend(template.content, 'article', {
+  classList: ['question-box']
+});
 
-const pElement = document.createElement('p');
-pElement.id = 'questionText';
-pElement.textContent = 'The production website is showing a blank page. What\'s your first step?';
-articleElement.appendChild(pElement);
-
-template.content.appendChild(articleElement);
-
+createElementAndAppend(articleElement, 'p', {
+  props: {
+    id: 'questionText',
+    textContent: 'The production website is showing a blank page. What\'s your first step?'
+  }
+});
 
 class QuestionBox extends HTMLElement {
   constructor() {
@@ -23,7 +24,10 @@ class QuestionBox extends HTMLElement {
   }
 
   set questionText(text) {
-    this.shadowRoot.querySelector('#questionText').textContent = text;
+    const questionTextElement = this.shadowRoot.querySelector('#questionText');
+    if (questionTextElement) {
+        questionTextElement.textContent = text;
+    }
   }
 }
 
