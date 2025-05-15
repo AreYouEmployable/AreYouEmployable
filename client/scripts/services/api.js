@@ -32,14 +32,12 @@ export class ApiService {
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 
-                // Handle token expiration
                 if (errorData.error === 'token_expired' || response.status === 401) {
                     AuthService.clearToken();
                     window.location.href = '/forbidden';
                     throw new Error('Token expired');
                 }
                 
-                // Handle forbidden access
                 if (response.status === 403) {
                     window.location.href = '/forbidden';
                     throw new Error('forbidden');

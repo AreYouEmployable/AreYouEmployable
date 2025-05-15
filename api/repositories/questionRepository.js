@@ -1,5 +1,11 @@
 import db from '../database.js';
 
+/**
+ * Retrieves a single question by its ID, including its text, type, difficulty, 
+ * the scenario it belongs to, and all of its options.
+ * @param {number} questionId - The ID of the question to retrieve.
+ * @returns {Promise<object>} The structured question object, or null if not found.
+ */
 const getQuestionById = async (questionId) => {
     const result = await db.query(
         `
@@ -30,4 +36,54 @@ const getQuestionById = async (questionId) => {
     return result.rows[0];
 };
 
-export { getQuestionById };
+
+/**
+ * Finds all questions for a given list of scenario IDs.
+ * @param {object} dbClient - The active database client.
+ * @param {Array<number>} scenarioIds - An array of scenario IDs.
+ * @returns {Promise<Array<object>>} An array of question objects.
+ */
+async function findByScenarioIds(dbClient, scenarioIds) {
+    if (!scenarioIds || scenarioIds.length === 0) {
+      return [];
+    }
+    const query = `
+      SELECT
+          question_id,
+          scenario_id,
+          question_text,
+          explanation -- Be cautious about when to display this to the user
+      FROM questions
+      WHERE scenario_id = ANY($1::int[])
+      ORDER BY question_id ASC; -- Or by a specific order within a scenario if available
+    `;
+    const result = await dbClient.query(query, [scenarioIds]);
+    return result.rows;
+  }
+
+
+/**
+ * Finds all questions for a single scenario ID.
+ * @param {object} dbClient - The active database client.
+ * @param {number} scenarioId - The ID of the scenario.
+ * @returns {Promise<Array<object>>} An array of question objects.
+ */
+export async function findByScenarioId(dbClient, scenarioId) {
+    if (!scenarioId) { // Ensure scenarioId is valid
+      return [];
+    }
+    const query = `
+      SELECT
+          question_id,
+          scenario_id,
+          question_text,
+          explanation
+      FROM questions
+      WHERE scenario_id = $1
+      ORDER BY question_id ASC;
+    `;
+    const result = await dbClient.query(query, [scenarioId]);
+    return result.rows;
+  }
+
+export { getQuestionById,findByScenarioIds };

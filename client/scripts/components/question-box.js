@@ -1,10 +1,20 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="styles/components/question-box.css">
-  <article class="question-box">
-    <p id="questionText">The production website is showing a blank page. What's your first step?</p>
-  </article>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', 'styles/components/question-box.css');
+template.content.appendChild(stylesheetLink);
+
+const articleElement = document.createElement('article');
+articleElement.classList.add('question-box');
+
+const pElement = document.createElement('p');
+pElement.id = 'questionText';
+pElement.textContent = 'The production website is showing a blank page. What\'s your first step?';
+articleElement.appendChild(pElement);
+
+template.content.appendChild(articleElement);
+
 
 class QuestionBox extends HTMLElement {
   constructor() {

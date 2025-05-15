@@ -1,8 +1,14 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="styles/components/submit-button.css">
-  <button class="submit-button">Submit Answer</button>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', 'styles/components/submit-button.css');
+template.content.appendChild(stylesheetLink);
+
+const buttonElement = document.createElement('button');
+buttonElement.classList.add('submit-button');
+buttonElement.textContent = 'Submit Answer';
+template.content.appendChild(buttonElement);
 
 class SubmitButton extends HTMLElement {
   constructor() {

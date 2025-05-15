@@ -55,7 +55,6 @@ export class AuthService {
         }
 
         if (googleIdToken) {
-            console.log('Found Google ID token in URL');
             this.setToken(googleIdToken);
             const user = await this.getUserInfo();
             return user;

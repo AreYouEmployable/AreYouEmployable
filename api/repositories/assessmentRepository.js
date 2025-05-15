@@ -1,18 +1,45 @@
 import db from '../database.js';
 
-const createAssessment = async ({ userId, scenarioId, assessmentStatusId }) => {
-    const result = await db.query(
-        `
-        INSERT INTO assessments (user_id, scenario_id, started_at, assessment_status_id)
-        VALUES ($1, $2, NOW(), $3)
-        RETURNING *
-        `,
-        [userId, scenarioId, assessmentStatusId]
-    );
-
-    return result.rows[0];
-};
-
+/**
+ * Inserts a new assessment record.
+ * @param {object} dbClient - The active database client.
+ * @param {object} assessmentData - Data for the new assessment.
+ * @param {number|string} assessmentData.userId - The user's ID.
+ * @param {number} assessmentData.assessmentStatusId - The initial status ID.
+ * @returns {Promise<object>} The newly created assessment record (e.g., { assessment_id }).
+ */
+async function createAssessment(dbClient, { userId, assessmentStatusId }) {
+    const result = await dbClient.query(
+        `INSERT INTO assessments (user_id, score, result_summary, assessment_status_id)
+         VALUES ((select user_id from users where google_id = $1), 0, '', $2)
+         RETURNING assessment_id, user_id, assessment_status_id`,
+        [userId, assessmentStatusId] 
+      );
+      return result.rows[0];
+  }
+  
+  /**
+   * Links multiple scenarios to an assessment in a batch.
+   * @param {object} dbClient - The active database client.
+   * @param {number} assessmentId - The ID of the assessment.
+   * @param {Array<object>} scenarios - An array of scenario objects, each with a 'scenario_id'.
+   * @returns {Promise<void>}
+   */
+  export async function linkScenariosBatch(dbClient, assessmentId, scenarios) {
+    if (!Array.isArray(scenarios) || scenarios.length === 0) {
+      return; 
+    }
+  
+    const insertPromises = scenarios.map((scenario, index) => {
+      return dbClient.query(
+        `INSERT INTO assessment_scenarios (assessment_id, scenario_id, scenario_index)
+         VALUES ($1, $2, $3)`,
+        [assessmentId, scenario.scenario_id, index + 1] 
+      );
+    });
+    await Promise.all(insertPromises);
+  }
+  
 const getAssessmentById = async (assessmentId) => {
     const result = await db.query(
         `
@@ -66,28 +93,202 @@ const updateAssessmentResult = async (assessmentId, score, resultSummary) => {
     UPDATE assessments
     SET score = $1,
         result_summary = $2,
-        completed_at = NOW(),
-        assessment_status_id = (
-            SELECT assessment_status_id FROM assessment_status WHERE name = 'Completed'
-        )
+        assessment_status_id = 2
     WHERE assessment_id = $3
   `, [score, resultSummary, assessmentId]);
 };
 
 /**
- * Creates a new assessment for a user
- * @param {string} userId - The ID of the user
- * @returns {object} The created assessment
+ * Finds a basic assessment record by its ID, including the status name.
+ * @param {object} dbClient - The active database client.
+ * @param {number} assessmentId - The ID of the assessment.
+ * @returns {Promise<object|null>} The assessment object or null if not found.
  */
-// export const createAssessment = async (userId) => {
-//     const query = `
-//         INSERT INTO assessments (user_id, status, created_at)
-//         VALUES ($1, 'in_progress', NOW())
-//         RETURNING id, user_id, status, created_at
-//     `;
-    
-//     const result = await db.query(query, [userId]);
-//     return result.rows[0];
-// };
+export async function findById(dbClient, assessmentId) {
+    const query = `
+      SELECT
+          a.assessment_id,
+          a.user_id,
+          a.score,
+          a.result_summary,
+          a.assessment_status_id,
+          s.name AS assessment_status_name
+          -- If you've added created_at, started_at, completed_at to your assessments table, select them here
+      FROM assessments a
+      JOIN assessment_status s ON a.assessment_status_id = s.assessment_status_id
+      WHERE a.assessment_id = $1;
+    `;
+    const result = await dbClient.query(query, [assessmentId]);
+    return result.rows[0] || null;
+  }
+  
+  /**
+   * Finds all scenarios linked to a given assessment, including their details and order.
+   * @param {object} dbClient - The active database client.
+   * @param {number} assessmentId - The ID of the assessment.
+   * @returns {Promise<Array<object>>} An array of scenario objects.
+   */
+  export async function findScenariosByAssessmentId(dbClient, assessmentId) {
+    const query = `
+      SELECT
+          sc.scenario_id,
+          sc.title AS scenario_title,
+          sc.description AS scenario_description,
+          qt.name AS scenario_type_name,
+          qd.name AS scenario_difficulty_name,
+          ascen.scenario_index
+      FROM assessment_scenarios ascen
+      JOIN scenarios sc ON ascen.scenario_id = sc.scenario_id
+      JOIN question_type qt ON sc.type_id = qt.question_type_id
+      JOIN question_difficulty qd ON sc.difficulty_id = qd.question_difficulty_id
+      WHERE ascen.assessment_id = $1
+      ORDER BY ascen.scenario_index ASC;
+    `;
+    const result = await dbClient.query(query, [assessmentId]);
+    return result.rows;
+  }
+  /**
+ * Finds details for a specific scenario within an assessment by its index.
+ * @param {object} dbClient - The active database client.
+ * @param {number} assessmentId - The ID of the assessment.
+ * @param {number} scenarioIndex - The 1-based index of the scenario within the assessment.
+ * @returns {Promise<object|null>} Scenario details object or null if not found.
+ */
+export async function findScenarioDetailsByIndex(dbClient, assessmentId, scenarioIndex) {
+    const query = `
+      SELECT
+          sc.scenario_id,
+          sc.title AS scenario_title,
+          sc.description AS scenario_description,
+          qt.name AS scenario_type_name,
+          qd.name AS scenario_difficulty_name,
+          ascen.scenario_index  -- The actual index from the DB
+      FROM assessment_scenarios ascen
+      JOIN scenarios sc ON ascen.scenario_id = sc.scenario_id
+      JOIN question_type qt ON sc.type_id = qt.question_type_id
+      JOIN question_difficulty qd ON sc.difficulty_id = qd.question_difficulty_id
+      WHERE ascen.assessment_id = $1 AND ascen.scenario_index = $2;
+    `;
+    const result = await dbClient.query(query, [assessmentId, scenarioIndex]);
+    return result.rows[0] || null;
+  }
+  
+  /**
+   * Gets the total number of scenarios (or max index) for an assessment.
+   * Useful for knowing when the assessment ends.
+   * @param {object} dbClient - The active database client.
+   * @param {number} assessmentId - The ID of the assessment.
+   * @returns {Promise<number>} The maximum scenario index, or 0 if no scenarios.
+   */
+  export async function getMaxScenarioIndex(dbClient, assessmentId) {
+      const query = `SELECT MAX(scenario_index) as max_index FROM assessment_scenarios WHERE assessment_id = $1;`;
+      const result = await dbClient.query(query, [assessmentId]);
+      return result.rows[0]?.max_index || 0;
+  }
 
-export { createAssessment, getAssessmentById, completeAssessment, getUserAnswersWithCorrectness, updateAssessmentResult};
+/**
+ * Gets the total number of scenarios for an assessment.
+ * @param {object} dbClient - The active database client.
+ * @param {number} assessmentId - The ID of the assessment.
+ * @returns {Promise<number>} The total number of scenarios.
+ */
+export async function getTotalScenarios(dbClient, assessmentId) {
+    const query = `
+        SELECT COUNT(*) as total
+        FROM assessment_scenarios
+        WHERE assessment_id = $1;
+    `;
+    const result = await dbClient.query(query, [assessmentId]);
+    return parseInt(result.rows[0].total, 10);
+}
+
+/**
+ * Gets the number of completed scenarios for an assessment.
+ * A scenario is considered complete when all its questions have been answered.
+ * @param {object} dbClient - The active database client.
+ * @param {number} assessmentId - The ID of the assessment.
+ * @returns {Promise<number>} The number of completed scenarios.
+ */
+ async function getCompletedScenarios(dbClient, assessmentId) {
+    const query = `
+        WITH scenario_questions AS (
+            SELECT 
+                as2.scenario_id,
+                COUNT(q.question_id) as total_questions
+            FROM assessment_scenarios as2
+            JOIN scenarios s ON as2.scenario_id = s.scenario_id
+            JOIN questions q ON s.scenario_id = q.scenario_id
+            WHERE as2.assessment_id = $1
+            GROUP BY as2.scenario_id
+        ),
+        answered_questions AS (
+            SELECT 
+                as2.scenario_id,
+                COUNT(DISTINCT ua.question_id) as answered_questions
+            FROM assessment_scenarios as2
+            JOIN scenarios s ON as2.scenario_id = s.scenario_id
+            JOIN questions q ON s.scenario_id = q.scenario_id
+            JOIN user_answers ua ON q.question_id = ua.question_id
+            WHERE as2.assessment_id = $1
+            GROUP BY as2.scenario_id
+        )
+        SELECT COUNT(*) as completed
+        FROM scenario_questions sq
+        JOIN answered_questions aq ON sq.scenario_id = aq.scenario_id
+        WHERE sq.total_questions = aq.answered_questions;
+    `;
+    const result = await dbClient.query(query, [assessmentId]);
+    return parseInt(result.rows[0].completed, 10);
+}
+
+/**
+ * Gets the user's active assessment (not completed)
+ * @param {object} dbClient - The active database client
+ * @param {string} googleId - The user's Google ID
+ * @returns {Promise<object|null>} The active assessment or null if none exists
+ */
+ async function getActiveAssessment(dbClient, googleId) {
+    const query = `
+        SELECT 
+            a.assessment_id,
+            a.user_id,
+            a.score,
+            a.result_summary,
+            a.assessment_status_id,
+            s.name AS assessment_status_name,
+            a.created_at,
+            a.started_at,
+            a.completed_at
+        FROM assessments a
+        JOIN assessment_status s ON a.assessment_status_id = s.assessment_status_id
+        JOIN users u ON a.user_id = u.user_id
+        WHERE u.google_id = $1 
+        AND s.name != 'Completed'
+        ORDER BY a.created_at DESC
+        LIMIT 1;
+    `;
+    const result = await dbClient.query(query, [googleId]);
+    return result.rows[0] || null;
+}
+
+const checkAssessmentOwnership = async (googleId, assessmentId) => {
+    const query = `
+        SELECT a.assessment_id
+        FROM assessments a
+        JOIN users u ON a.user_id = u.user_id
+        WHERE u.google_id = $1 AND a.assessment_id = $2;
+    `;
+    const result = await db.query(query, [googleId, assessmentId]);
+    return result.rows.length > 0;
+};
+
+export { 
+  createAssessment, 
+  getAssessmentById, 
+  completeAssessment, 
+  getUserAnswersWithCorrectness, 
+  updateAssessmentResult,
+  getCompletedScenarios, 
+  getActiveAssessment,
+  checkAssessmentOwnership
+};

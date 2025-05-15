@@ -1,12 +1,22 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="styles/components/question-header.css">
-  <header class="question-header">
-    <h2 id="question-title"></h2>
-    <p id="question-description"></p>
-  </header>
-`;
 
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', 'styles/components/question-header.css');
+template.content.appendChild(stylesheetLink);
+
+const headerElement = document.createElement('header');
+headerElement.classList.add('question-header');
+
+const h2Element = document.createElement('h2');
+h2Element.id = 'question-title';
+headerElement.appendChild(h2Element);
+
+const pElement = document.createElement('p');
+pElement.id = 'question-description';
+headerElement.appendChild(pElement);
+
+template.content.appendChild(headerElement);
 class QuestionHeader extends HTMLElement {
   constructor() {
     super();

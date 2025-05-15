@@ -1,11 +1,15 @@
-// scripts/components/google-sign-in.js
 import { AuthService } from '../services/auth.js';
 
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/google-sign-in.css">
-  <section id="google-sign-in"></section>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/google-sign-in.css');
+template.content.appendChild(stylesheetLink);
+
+const sectionElement = document.createElement('section');
+sectionElement.id = 'google-sign-in';
+template.content.appendChild(sectionElement);
 
 class GoogleSignIn extends HTMLElement {
     constructor() {
@@ -13,52 +17,92 @@ class GoogleSignIn extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.signInContainer = this.shadowRoot.getElementById('google-sign-in');
+        this._boundHandleOAuthMessage = this.handleOAuthMessage.bind(this);
     }
 
     async connectedCallback() {
         await this.render();
-        window.addEventListener('message', this.handleOAuthMessage.bind(this));
+        window.addEventListener('message', this._boundHandleOAuthMessage);
     }
 
     disconnectedCallback() {
-        window.removeEventListener('message', this.handleOAuthMessage.bind(this));
+        window.removeEventListener('message', this._boundHandleOAuthMessage);
     }
 
     async render() {
+        if (!this.signInContainer) return;
+
+        // Clear previous content using DOM manipulation
+        while (this.signInContainer.firstChild) {
+            this.signInContainer.removeChild(this.signInContainer.firstChild);
+        }
+
         try {
             const user = await AuthService.getUserInfo();
-            
+
             if (user && user.picture) {
-                this.signInContainer.innerHTML = `
-                    <section class="user-info" part="user-info">
-                        <img src="${user.picture}" alt="${user.name}" class="user-avatar">
-                        <button class="sign-out-button" id="sign-out">Sign Out</button>
-                    </section>
-                `;
-                this.signInContainer.querySelector('#sign-out').addEventListener('click', async () => {
+                const userInfoSection = document.createElement('section');
+                userInfoSection.className = 'user-info';
+                userInfoSection.setAttribute('part', 'user-info');
+
+                const userAvatarImg = document.createElement('img');
+                userAvatarImg.src = user.picture;
+                userAvatarImg.alt = user.name || 'User Avatar';
+                userAvatarImg.className = 'user-avatar';
+                userInfoSection.appendChild(userAvatarImg);
+
+                const signOutButton = document.createElement('button');
+                signOutButton.className = 'sign-out-button';
+                signOutButton.id = 'sign-out';
+                signOutButton.textContent = 'Sign Out';
+                signOutButton.addEventListener('click', async () => {
                     await AuthService.logout();
                     await this.render();
                 });
+                userInfoSection.appendChild(signOutButton);
+                this.signInContainer.appendChild(userInfoSection);
+
             } else {
-                this.signInContainer.innerHTML = `
-                    <button class="sign-in-button" id="sign-in" part="sign-in-button">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-icon">
-                        Sign in with Google
-                    </button>
-                `;
-                this.signInContainer.querySelector('#sign-in').addEventListener('click', () => {
+                const signInButton = document.createElement('button');
+                signInButton.className = 'sign-in-button';
+                signInButton.id = 'sign-in';
+                signInButton.setAttribute('part', 'sign-in-button');
+
+                const googleIconImg = document.createElement('img');
+                googleIconImg.src = 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg';
+                googleIconImg.alt = 'Google';
+                googleIconImg.className = 'google-icon';
+                signInButton.appendChild(googleIconImg);
+
+                signInButton.appendChild(document.createTextNode(' Sign in with Google'));
+                signInButton.addEventListener('click', () => {
                     AuthService.signInWithGoogle();
                 });
+                this.signInContainer.appendChild(signInButton);
             }
         } catch (error) {
             console.error('Error rendering GoogleSignIn:', error);
+            // Display error message using DOM manipulation
+            const errorTextNode = document.createTextNode('Error loading sign-in button.');
+            this.signInContainer.appendChild(errorTextNode);
+            // Or, for more structure/styling:
+            // const errorParagraph = document.createElement('p');
+            // errorParagraph.textContent = 'Error loading sign-in button.';
+            // errorParagraph.className = 'error-message'; // Add a class for styling
+            // this.signInContainer.appendChild(errorParagraph);
         }
     }
 
     async handleOAuthMessage(event) {
-        if (event.data.type === 'google-auth-callback') {
-            await AuthService.handleAuthCallback(event.data.code);
-            await this.render();
+        if (event && event.data && event.data.type === 'google-auth-callback' && typeof event.data.code === 'string') {
+            try {
+                await AuthService.handleAuthCallback(event.data.code);
+                await this.render();
+            } catch (error) {
+                console.error('Error handling auth callback:', error);
+            }
+        } else if (event && event.data && event.data.type === 'google-auth-callback' && event.data.error) {
+            console.error('OAuth Error:', event.data.error, event.data.error_description);
         }
     }
 }

@@ -31,7 +31,7 @@ export function createElement(tag, attributes = {}, children = []) {
   }
   
   export function showToast(message, type = 'info') {
-    const toast = document.createElement('div');
+    const toast = document.createElement('aside');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
     document.body.appendChild(toast);

@@ -1,8 +1,10 @@
 import { store, actions } from './state.js';
 import { AuthService } from './services/auth.js';
+import { router } from './router.js';
 import './components/google-sign-in.js';
 import './components/error-page.js';
 import './components/forbidden-page.js';
+import './components/results-page.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
@@ -12,10 +14,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (error) {
         console.error('Auth error:', error);
         if (error === 'forbidden_error') {
-            // Clear any existing auth state
             store.dispatch(actions.clearAuth());
-            document.body.innerHTML = '<error-page></error-page>';
-            return;
+
+            while (document.body.firstChild) {
+                document.body.removeChild(document.body.firstChild);
+            }
+
+            const errorPageComponent = document.createElement('error-page');
+            document.body.appendChild(errorPageComponent);
+            return; 
         }
         store.dispatch(actions.setAuthError('Authentication failed'));
     } else if (googleIdToken) {
@@ -35,6 +42,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             token: AuthService.getToken()
         }));
     }
+
+    // Initialize router
+    router.handleRouting();
 
     document.addEventListener('start-assessment', () => {
         router.navigateTo('/assessment');
