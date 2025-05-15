@@ -2,6 +2,7 @@ import { sendSuccess, sendError } from '../utils/response.js';
 import getAssessmentResultsService from '../services/resultsService.js';
 
 export const getAssessmentResults = async (req, res) => {
+    console.log(req.user)
   const { assessmentId } = req.params;
   try {
     const results = await getAssessmentResultsService(assessmentId);
