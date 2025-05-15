@@ -39,7 +39,7 @@ const getAssessmentResultsService = async (assessmentId) => {
       employabilityRating = "Needs Improvement";
       feedback = "Foundational knowledge present, but key areas need strengthening.";
     } else {
-      employabilityRating = "Not Yet Employable";
+      employabilityRating = "Not Employable";
       feedback = "Significant improvement required in multiple areas.";
     }
 
