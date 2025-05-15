@@ -1,26 +1,10 @@
-import { store } from '../state.js'; 
+import { store } from '../state.js';
 import { AuthService } from '../services/auth.js';
-
-const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/app-header.css">
-  <header>
-    <h1><a href="/" class="logo">Employability Assessment</a></h1>
-    <button class="hamburger" id="hamburger" aria-label="Open Menu">
-      <i></i><i></i><i></i>
-    </button>
-    <nav class="nav-links" aria-label="Main Navigation"></nav>
-  </header>
-  <aside class="mobile-menu" id="mobile-menu" aria-label="Mobile Navigation">
-    <button class="close-button" id="close-menu" aria-label="Close Menu">&times;</button>
-  </aside>
-`;
 
 class AppHeader extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.state = store.getState();
     this.unsubscribe = null;
   }
@@ -41,99 +25,206 @@ class AppHeader extends HTMLElement {
     this.render();
   }
 
+  createElement(tag, attributes = {}, children = []) {
+    const el = document.createElement(tag);
+    for (const [key, value] of Object.entries(attributes)) {
+      if (key.startsWith('on') && typeof value === 'function') {
+        el.addEventListener(key.slice(2).toLowerCase(), value);
+      } else {
+        el.setAttribute(key, value);
+      }
+    }
+    children.forEach(child => {
+      if (typeof child === 'string') {
+        el.appendChild(document.createTextNode(child));
+      } else {
+        el.appendChild(child);
+      }
+    });
+    return el;
+  }
+
   render() {
-    const { isAuthenticated, user } = this.state.auth;
-    const pictureUrl = user?.picture;
+    const shadow = this.shadowRoot;
+    shadow.innerHTML = '';
 
-    const nav = this.shadowRoot.querySelector('nav');
-    const aside = this.shadowRoot.querySelector('aside');
-    nav.innerHTML = isAuthenticated ? `
-      <ul>
-        <li><a href="/assessment" class="assessment-page">Assessment</a></li>
-        <li><a href="/results">Results</a></li>
-        <li>
-          <figure class="user-info">
-            ${pictureUrl ? `
-              <img src="${pictureUrl}" alt="${user?.name || 'User'}" class="user-avatar" 
-                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-              <figcaption class="user-avatar-placeholder" style="display: none;">${user?.name?.charAt(0)?.toUpperCase() || 'G'}</figcaption>
-            ` : `
-              <figcaption class="user-avatar-placeholder">${user?.name?.charAt(0)?.toUpperCase() || 'G'}</figcaption>
-            `}
-            <strong class="user-name">${user?.name || 'User'}</strong>
-            <button class="sign-out" type="button">Sign Out</button>
-          </figure>
-        </li>
-      </ul>
-    ` : `<section><google-sign-in></google-sign-in></section>`;
-
-    aside.innerHTML = isAuthenticated ? `
-      <nav>
-        <ul>
-          <li><a href="/assessment" class="assessment-link">Assessment</a></li>
-          <li><a href="/results">Results</a></li>
-        </ul>
-      </nav>
-      <section class="user-info">
-        ${pictureUrl ? `
-          <img src="${pictureUrl}" alt="${user?.name || 'User'}" class="user-avatar"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <figcaption class="user-avatar-placeholder" style="display: none;">${user?.name?.charAt(0)?.toUpperCase() || 'G'}</figcaption>
-        ` : `
-          <figcaption class="user-avatar-placeholder">${user?.name?.charAt(0)?.toUpperCase() || 'G'}</figcaption>
-        `}
-        <strong class="user-name">${user?.name || 'User'}</strong>
-        <button class="sign-out" type="button">Sign Out</button>
-      </section>
-    ` : `<section><google-sign-in></google-sign-in></section>`;
-
-    this.shadowRoot.querySelectorAll('.assessment-link').forEach(link => {
-      link.addEventListener('click', e => {
-        if (!isAuthenticated) {
-          e.preventDefault();
-          AuthService.signInWithGoogle();
-        }
-      });
+    const styleLink = this.createElement('link', {
+      rel: 'stylesheet',
+      href: '/styles/components/app-header.css'
     });
 
-    const signOutButton = this.shadowRoot.querySelector('.sign-out');
-    if (signOutButton) {
-      signOutButton.addEventListener('click', () => {
-        AuthService.logout();
+    const header = this.createElement('header', {}, [
+      this.createElement('h1', {}, [
+        this.createElement('a', { href: '/', class: 'logo' }, ['Employability Assessment'])
+      ]),
+      this.createElement('button', {
+        class: 'hamburger',
+        id: 'hamburger',
+        'aria-label': 'Open Menu'
+      }, [this.createElement('i'), this.createElement('i'), this.createElement('i')]),
+      this.createElement('nav', {
+        class: 'nav-links',
+        'aria-label': 'Main Navigation'
+      })
+    ]);
+
+    const aside = this.createElement('aside', {
+      class: 'mobile-menu',
+      id: 'mobile-menu',
+      'aria-label': 'Mobile Navigation'
+    }, [
+      this.createElement('button', {
+        class: 'close-button',
+        id: 'close-menu',
+        'aria-label': 'Close Menu'
+      }, ['×'])
+    ]);
+
+    shadow.append(styleLink, header, aside);
+
+    const nav = shadow.querySelector('nav');
+    const mobileMenu = shadow.querySelector('#mobile-menu');
+    const { isAuthenticated, user } = this.state.auth;
+    const pictureUrl = user?.picture;
+    const currentPath = window.location.pathname;
+
+    nav.innerHTML = '';
+    if (isAuthenticated) {
+      const avatarElement = pictureUrl
+        ? this.createElement('img', {
+            src: pictureUrl,
+            alt: user?.name || 'User',
+            class: 'user-avatar'
+          })
+        : this.createElement('figcaption', {
+            class: 'user-avatar-placeholder'
+          }, [user?.name?.charAt(0)?.toUpperCase() || 'G']);
+
+      const userInfo = this.createElement('div', { class: 'user-info' }, [
+        avatarElement,
+        this.createElement('strong', { class: 'user-name' }, [user?.name || 'User']),
+        this.createElement('button', {
+          class: 'sign-out',
+          type: 'button',
+          onclick: () => AuthService.logout()
+        }, ['Sign Out'])
+      ]);
+
+      const navLinks = [];
+      if (currentPath !== '/') {
+        navLinks.push({ href: '/', text: 'Home' });
+      }
+      navLinks.push(
+        { href: '/about', text: 'About Us' },
+        { href: '/contact', text: 'Contact' },
+        { href: '/results', text: 'Results' }
+      );
+      navLinks.push({ element: userInfo });
+
+      const navUl = this.createElement('ul', {}, navLinks.map(link => {
+        if (link.element) {
+          return this.createElement('li', {}, [link.element]);
+        }
+        return this.createElement('li', {}, [
+          this.createElement('a', { href: link.href, class: link.class, 'data-link': '' }, [link.text])
+        ]);
+      }));
+      nav.appendChild(navUl);
+
+      const asideNav = this.createElement('nav', {}, [
+        this.createElement('ul', {}, [
+          this.createElement('li', { class: 'mobile-user-info' }, [
+            this.createElement('strong', { class: 'user-name' }, [user?.name || 'User']),
+            avatarElement,
+          ]),
+          this.createElement('li', {}, [
+            this.createElement('a', { href: '/', 'data-link': '' }, ['Home'])
+          ]),
+          this.createElement('li', {}, [
+            this.createElement('a', { href: '/about', 'data-link': '' }, ['About Us'])
+          ]),
+          this.createElement('li', {}, [
+            this.createElement('a', { href: '/contact', 'data-link': '' }, ['Contact'])
+          ]),
+          this.createElement('li', {}, [
+            this.createElement('a', {
+              href: '/results',
+              'data-link': ''
+            }, ['Results'])
+          ]),
+        ])
+      ]);
+
+      const signOutButtonMobile = this.createElement('button', {
+        class: 'sign-out mobile-sign-out',
+        type: 'button',
+        onclick: () => AuthService.logout()
+      }, ['Sign Out']);
+
+      aside.append(asideNav, signOutButtonMobile);
+
+      asideNav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const clickedLink = e.target;
+          clickedLink.classList.add('clicked');
+          setTimeout(() => {
+            clickedLink.classList.remove('clicked');
+          }, 100);
+          mobileMenu.classList.remove('active');
+          document.body.style.overflow = '';
+          const path = clickedLink.getAttribute('href');
+          if (window.location.pathname !== path) {
+            window.history.pushState({}, '', path);
+          }
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        });
       });
+
+    } else {
+      nav.appendChild(this.createElement('section', {}, [
+        this.createElement('google-sign-in')
+      ]));
+
+      aside.appendChild(this.createElement('section', {}, [
+        this.createElement('google-sign-in')
+      ]));
     }
 
-    const hamburger = this.shadowRoot.querySelector('#hamburger');
-    const closeBtn = this.shadowRoot.querySelector('#close-menu');
-    const mobileMenu = this.shadowRoot.querySelector('#mobile-menu');
-
-    hamburger.addEventListener('click', () => {
+    shadow.querySelector('#hamburger').addEventListener('click', () => {
       mobileMenu.classList.add('active');
       document.body.style.overflow = 'hidden';
     });
 
-    closeBtn.addEventListener('click', () => {
+    shadow.querySelector('#close-menu').addEventListener('click', () => {
       mobileMenu.classList.remove('active');
       document.body.style.overflow = '';
     });
 
     document.addEventListener('click', e => {
-      if (mobileMenu.classList.contains('active') &&
-          !mobileMenu.contains(e.target) &&
-          !hamburger.contains(e.target)) {
+      const composedPath = e.composedPath();
+      if (
+        mobileMenu.classList.contains('active') &&
+        !composedPath.includes(mobileMenu) &&
+        !composedPath.includes(shadow.querySelector('#hamburger'))
+      ) {
         mobileMenu.classList.remove('active');
         document.body.style.overflow = '';
       }
     });
 
-    this.shadowRoot.querySelectorAll('[href][data-link]').forEach(link => {
+    shadow.querySelectorAll('[href][data-link]').forEach(link => {
       link.addEventListener('click', this.handleLinkClick.bind(this));
     });
   }
 
   handleLinkClick(e) {
     e.preventDefault();
-    const path = e.target.getAttribute('href');
+    const clickedLink = e.target;
+    clickedLink.classList.add('clicked');
+    setTimeout(() => {
+      clickedLink.classList.remove('clicked');
+    }, 100);
+    const path = clickedLink.getAttribute('href');
     if (window.location.pathname !== path) {
       window.history.pushState({}, '', path);
     }
