@@ -1,3 +1,6 @@
+import { store } from '../state.js'; // Assuming you might want to access state
+import { someApiService } from '../services/api.js'; // Import your API service
+
 const template = document.createElement('template');
 
 const stylesheetLink = document.createElement('link');
@@ -94,14 +97,30 @@ class ContactPage extends HTMLElement {
     }
   }
 
-  handleSubmit(e) {
+  async handleSubmit(e) {
     e.preventDefault();
     const formData = new FormData(this.form);
     const data = Object.fromEntries(formData.entries());
-    if (this.form) {
-        this.form.reset();
+
+    try {
+      const response = await someApiService.sendMessage(data); // Replace with your actual API call
+
+      if (response.ok) {
+        // Handle successful API response
+        console.log('Message sent successfully!');
+        alert('Message sent successfully!'); // Or display a nicer message
+        if (this.form) {
+          this.form.reset();
+        }
+      } else {
+        // Handle API error
+        console.error('Failed to send message:', response.status);
+        alert('Failed to send message. Please try again later.'); // Or display a more informative error
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('An unexpected error occurred. Please try again later.');
     }
-   
   }
 }
 

@@ -100,7 +100,7 @@ class AppHeader extends HTMLElement {
             class: 'user-avatar-placeholder'
           }, [user?.name?.charAt(0)?.toUpperCase() || 'G']);
 
-      const userInfo = this.createElement('div', { class: 'user-info' }, [
+      const userInfo = this.createElement('li', { class: 'user-info' }, [
         avatarElement,
         this.createElement('strong', { class: 'user-name' }, [user?.name || 'User']),
         this.createElement('button', {

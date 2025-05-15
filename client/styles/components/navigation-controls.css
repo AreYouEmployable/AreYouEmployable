@@ -1,6 +1,6 @@
 .navigation-controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end; 
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1.5rem;
@@ -24,7 +24,7 @@
 }
 
 .next-button {
-  background-color: #c6c6c6;
+  background-color: #799761;
   color: white;
 }
 
@@ -36,5 +36,6 @@
   .navigation-controls {
     flex-direction: column;
     align-items: stretch;
+    justify-content: flex-end; 
   }
 }
