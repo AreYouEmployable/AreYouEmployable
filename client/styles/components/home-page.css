@@ -6,7 +6,7 @@
 
 .home-page__container {
   padding-top: 6rem;
-  padding-bottom: 4rem;
+  padding-bottom: 1rem;
   padding-left: 1rem;
   padding-right: 1rem;
   margin-left: auto;
@@ -16,7 +16,7 @@
 
 .home-page__header {
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
 }
 
 .home-page__title {
@@ -60,7 +60,7 @@
 }
 
 .home-page__feature-column {
-  padding: 2rem; /* p-8 */
+  padding: 2rem; 
 }
 
 .home-page__feature-column--highlight {
@@ -113,6 +113,7 @@
   border-radius: 0.5rem; 
   font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
   transition-property: background-color, transform, box-shadow;
   transition-timing-function: ease-in-out;
   transition-duration: 200ms;
