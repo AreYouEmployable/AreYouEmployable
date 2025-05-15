@@ -9,14 +9,6 @@ const navElement = document.createElement('nav');
 navElement.classList.add('navigation-controls');
 navElement.setAttribute('aria-label', 'Scenario navigation');
 
-const prevButton = document.createElement('button');
-prevButton.id = 'prev-btn';
-prevButton.classList.add('nav-button', 'prev-button');
-prevButton.disabled = true;
-prevButton.setAttribute('type', 'button');
-prevButton.textContent = 'Previous';
-navElement.appendChild(prevButton);
-
 const nextButton = document.createElement('button');
 nextButton.id = 'next-btn';
 nextButton.classList.add('nav-button', 'next-button');
@@ -33,21 +25,11 @@ class NavigationControls extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.nextButton = this.shadowRoot.getElementById('next-btn');
-    this.prevButton = this.shadowRoot.getElementById('prev-btn');
     this._canGoForward = false;
-    this._canGoBack = false;
     this._isLastScenario = false;
   }
 
   connectedCallback() {
-    this.prevButton.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('navigate', {
-        detail: { direction: 'prev' },
-        bubbles: true,
-        composed: true
-      }));
-    });
-
     this.nextButton.addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('navigate', {
         detail: { direction: 'next' },
@@ -55,11 +37,6 @@ class NavigationControls extends HTMLElement {
         composed: true
       }));
     });
-  }
-
-  set canGoBack(value) {
-    this._canGoBack = value;
-    this.prevButton.disabled = !value;
   }
 
   set canGoForward(value) {
@@ -80,10 +57,6 @@ class NavigationControls extends HTMLElement {
 
   get canGoForward() {
     return this._canGoForward;
-  }
-
-  get canGoBack() {
-    return this._canGoBack;
   }
 
   get isLastScenario() {

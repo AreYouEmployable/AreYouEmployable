@@ -7,22 +7,16 @@ header {
   left: 0;
   right: 0;
   z-index: 1000;
-}
-.header-content {
-  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .logo {
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
   text-decoration: none;
-  outline: none;
-}
-.logo:focus {
-  outline: none;
 }
 
 .nav-links {
@@ -32,18 +26,19 @@ header {
 
 .nav-links ul {
   display: flex;
+  list-style: none;
   gap: 1rem;
   margin: 0;
   padding: 0;
   align-items: center; 
 }
+
 .nav-links a {
   color: #423e3e;
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   transition: background-color 0.2s;
-  outline: none;
 }
 
 
@@ -52,12 +47,14 @@ header {
   align-items: center;
   gap: 0.5rem;
 }
+
 .user-avatar {
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
   object-fit: cover;
 }
+
 .user-avatar-placeholder {
   width: 2rem;
   height: 2rem;
@@ -70,11 +67,15 @@ header {
   font-weight: bold;
   font-size: 1rem;
 }
+
 .user-name {
   color: #333;
   font-weight: 500;
 }
+
 .sign-out {
+  background: none;
+  border: none;
   color: #dc3545;
   cursor: pointer;
   padding: 0.5rem 1rem;
@@ -124,6 +125,7 @@ header nav.nav-links ul li .user-info button.sign-out:hover {
 .nav-links a.clicked {
   transform: translateY(2px); 
 }
+
 .hamburger {
   display: none;
   flex-direction: column;
@@ -131,11 +133,11 @@ header nav.nav-links ul li .user-info button.sign-out:hover {
   width: 2.2rem; 
   height: 1.313rem;
   cursor: pointer;
-  padding: 0;
   background: none;
   border: none;
 }
-.hamburger span {
+
+.hamburger i {
   display: block;
   width: 100%;
   height: 0.188rem;
@@ -152,7 +154,7 @@ header nav.nav-links ul li .user-info button.sign-out:hover {
   bottom: 0;
   width: 15.625rem;
   background: white;
-  box-shadow: -0.125rem 0 0.313rem rgba(0,0,0,0.1);
+  box-shadow: -0.125rem 0 0.25rem rgba(0, 0, 0, 0.1);
   padding: 2rem 1rem;
   transform: translateX(100%);
   transition: transform 0.3s ease;
@@ -160,6 +162,7 @@ header nav.nav-links ul li .user-info button.sign-out:hover {
   display: flex;
   flex-direction: column;
 }
+
 .mobile-menu.active {
   transform: translateX(0);
 }
