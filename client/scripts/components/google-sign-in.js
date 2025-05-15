@@ -1,15 +1,15 @@
-import { createElementAndAppend } from '../utils.js';
 import { AuthService } from '../services/auth.js';
 
 const template = document.createElement('template');
 
-createElementAndAppend(template.content, 'link', {
-  attrs: { rel: 'stylesheet', href: '/styles/components/google-sign-in.css' }
-});
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/google-sign-in.css');
+template.content.appendChild(stylesheetLink);
 
-createElementAndAppend(template.content, 'section', {
-  props: { id: 'google-sign-in' }
-});
+const sectionElement = document.createElement('section');
+sectionElement.id = 'google-sign-in';
+template.content.appendChild(sectionElement);
 
 class GoogleSignIn extends HTMLElement {
     constructor() {
@@ -32,6 +32,7 @@ class GoogleSignIn extends HTMLElement {
     async render() {
         if (!this.signInContainer) return;
 
+        // Clear previous content using DOM manipulation
         while (this.signInContainer.firstChild) {
             this.signInContainer.removeChild(this.signInContainer.firstChild);
         }
@@ -40,61 +41,55 @@ class GoogleSignIn extends HTMLElement {
             const user = await AuthService.getUserInfo();
 
             if (user && user.picture) {
-                const userInfoSection = createElementAndAppend(this.signInContainer, 'section', {
-                  props: { className: 'user-info' },
-                  attrs: { part: 'user-info' }
-                });
+                const userInfoSection = document.createElement('section');
+                userInfoSection.className = 'user-info';
+                userInfoSection.setAttribute('part', 'user-info');
 
-                createElementAndAppend(userInfoSection, 'img', {
-                  props: {
-                    src: user.picture,
-                    alt: user.name || 'User Avatar',
-                    className: 'user-avatar'
-                  }
-                });
+                const userAvatarImg = document.createElement('img');
+                userAvatarImg.src = user.picture;
+                userAvatarImg.alt = user.name || 'User Avatar';
+                userAvatarImg.className = 'user-avatar';
+                userInfoSection.appendChild(userAvatarImg);
 
-                createElementAndAppend(userInfoSection, 'button', {
-                  props: {
-                    className: 'sign-out-button',
-                    id: 'sign-out',
-                    textContent: 'Sign Out'
-                  },
-                  callbacks: {
-                    click: async () => {
-                        await AuthService.logout();
-                        await this.render();
-                    }
-                  }
+                const signOutButton = document.createElement('button');
+                signOutButton.className = 'sign-out-button';
+                signOutButton.id = 'sign-out';
+                signOutButton.textContent = 'Sign Out';
+                signOutButton.addEventListener('click', async () => {
+                    await AuthService.logout();
+                    await this.render();
                 });
+                userInfoSection.appendChild(signOutButton);
+                this.signInContainer.appendChild(userInfoSection);
+
             } else {
-                const signInButton = createElementAndAppend(this.signInContainer, 'button', {
-                  props: {
-                    className: 'sign-in-button',
-                    id: 'sign-in'
-                  },
-                  attrs: { part: 'sign-in-button' },
-                  callbacks: {
-                    click: () => {
-                        AuthService.signInWithGoogle();
-                    }
-                  }
-                });
+                const signInButton = document.createElement('button');
+                signInButton.className = 'sign-in-button';
+                signInButton.id = 'sign-in';
+                signInButton.setAttribute('part', 'sign-in-button');
 
-                createElementAndAppend(signInButton, 'img', {
-                  props: {
-                    src: 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-                    alt: 'Google',
-                    className: 'google-icon'
-                  }
-                });
+                const googleIconImg = document.createElement('img');
+                googleIconImg.src = 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg';
+                googleIconImg.alt = 'Google';
+                googleIconImg.className = 'google-icon';
+                signInButton.appendChild(googleIconImg);
+
                 signInButton.appendChild(document.createTextNode(' Sign in with Google'));
+                signInButton.addEventListener('click', () => {
+                    AuthService.signInWithGoogle();
+                });
+                this.signInContainer.appendChild(signInButton);
             }
         } catch (error) {
             console.error('Error rendering GoogleSignIn:', error);
-            createElementAndAppend(this.signInContainer, 'p', {
-                props: { textContent: 'Error loading sign-in button.'},
-                classList: ['error-message']
-            });
+            // Display error message using DOM manipulation
+            const errorTextNode = document.createTextNode('Error loading sign-in button.');
+            this.signInContainer.appendChild(errorTextNode);
+            // Or, for more structure/styling:
+            // const errorParagraph = document.createElement('p');
+            // errorParagraph.textContent = 'Error loading sign-in button.';
+            // errorParagraph.className = 'error-message'; // Add a class for styling
+            // this.signInContainer.appendChild(errorParagraph);
         }
     }
 

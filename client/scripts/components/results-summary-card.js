@@ -1,31 +1,32 @@
-import { createElementAndAppend } from '../utils.js';
-
 const template = document.createElement("template");
 
-createElementAndAppend(template.content, 'link', {
-  attrs: { rel: 'stylesheet', href: '/styles/components/results-summary-card.css' }
-});
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/results-summary-card.css');
+template.content.appendChild(stylesheetLink);
 
-const cardSection = createElementAndAppend(template.content, 'section', {
-  classList: ['card']
-});
+const cardSection = document.createElement('section');
+cardSection.classList.add('card');
 
-const headerElement = createElementAndAppend(cardSection, 'header', {
-  classList: ['title']
-});
+const headerElement = document.createElement('header');
+headerElement.classList.add('title');
 
-createElementAndAppend(headerElement, 'i', {
-  classList: ['title-icon'],
-  attrs: { 'aria-hidden': 'true' }
-});
+const titleIconElement = document.createElement('i');
+titleIconElement.classList.add('title-icon');
+titleIconElement.setAttribute('aria-hidden', 'true');
+headerElement.appendChild(titleIconElement);
 
-createElementAndAppend(headerElement, 'label', {
-  classList: ['title-text']
-});
+const titleTextLabel = document.createElement('label');
+titleTextLabel.classList.add('title-text');
+headerElement.appendChild(titleTextLabel);
 
-createElementAndAppend(cardSection, 'ul', {
-  props: { id: 'items-list' }
-});
+cardSection.appendChild(headerElement);
+
+const ulElement = document.createElement('ul');
+ulElement.id = 'items-list';
+cardSection.appendChild(ulElement);
+
+template.content.appendChild(cardSection);
 
 class ResultsSummaryCard extends HTMLElement {
   constructor() {
@@ -35,9 +36,8 @@ class ResultsSummaryCard extends HTMLElement {
     this.cardElement = this.shadowRoot.querySelector(".card");
     this.titleTextElement = this.shadowRoot.querySelector(".title-text");
     this.titleIconElement = this.shadowRoot.querySelector(".title-icon");
-    this.titleContainerElement = this.shadowRoot.querySelector(".title"); 
+    this.titleDivElement = this.shadowRoot.querySelector(".title");
     this.itemsListElement = this.shadowRoot.getElementById("items-list");
-    this.hasRendered = false;
   }
 
   static get observedAttributes() {
@@ -46,9 +46,7 @@ class ResultsSummaryCard extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue) {
-      if (this.isConnected) {
-        this.render();
-      }
+      this.render();
     }
   }
 
@@ -72,12 +70,11 @@ class ResultsSummaryCard extends HTMLElement {
     if (this.cardElement) {
         this.cardElement.style.backgroundColor = background;
     }
-    if (this.titleContainerElement) {
-        this.titleContainerElement.style.color = titleColor; 
+    if (this.titleDivElement) {
+        this.titleDivElement.style.color = titleColor;
     }
     if (this.titleTextElement) {
         this.titleTextElement.textContent = title;
-        this.titleTextElement.style.color = titleColor; 
     }
 
     if (this.titleIconElement) {
@@ -97,23 +94,23 @@ class ResultsSummaryCard extends HTMLElement {
         }
 
         items.forEach((itemText) => {
-            const li = createElementAndAppend(this.itemsListElement, "li");
-
+            const li = document.createElement("li");
+            
             if (itemIcon.trim()) {
-                createElementAndAppend(li, "i", {
-                    props: { textContent: itemIcon },
-                    classList: ["item-icon"],
-                    style: {
-                        backgroundColor: iconBg,
-                        color: itemColor
-                    }
-                });
+                const itemIconElement = document.createElement("i");
+                itemIconElement.classList.add("item-icon");
+                itemIconElement.style.backgroundColor = iconBg;
+                itemIconElement.style.color = itemColor;
+                itemIconElement.textContent = itemIcon;
+                li.appendChild(itemIconElement);
             }
-
-            createElementAndAppend(li, "label", {
-                props: { textContent: itemText.trim() },
-                style: { color: itemColor }
-            });
+            
+            const itemLabel = document.createElement("label");
+            itemLabel.style.color = itemColor;
+            itemLabel.textContent = itemText.trim();
+            li.appendChild(itemLabel);
+            
+            this.itemsListElement.appendChild(li);
         });
     }
   }

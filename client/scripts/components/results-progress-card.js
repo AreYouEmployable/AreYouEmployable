@@ -1,48 +1,54 @@
-import { createElementAndAppend } from '../utils.js';
 import "./progress-bar.js";
 
 const template = document.createElement("template");
 
-createElementAndAppend(template.content, 'link', {
-  attrs: { rel: 'stylesheet', href: '/styles/components/results-progress-card.css' }
-});
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/results-progress-card.css');
+template.content.appendChild(stylesheetLink);
 
-const articleElement = createElementAndAppend(template.content, 'article', {
-  classList: ['card']
-});
+const articleElement = document.createElement('article');
+articleElement.classList.add('card');
 
-const headerElement = createElementAndAppend(articleElement, 'header', {
-  classList: ['header']
-});
+const headerElement = document.createElement('header');
+headerElement.classList.add('header');
 
-createElementAndAppend(headerElement, 'i', {
-  classList: ['header-icon'],
-  attrs: { 'aria-hidden': 'true' }
-});
+const iconElement = document.createElement('i');
+iconElement.classList.add('header-icon');
+iconElement.setAttribute('aria-hidden', 'true');
+headerElement.appendChild(iconElement);
 
-createElementAndAppend(headerElement, 'label', {
-  props: { textContent: 'Category' },
-  classList: ['category']
-});
+const categoryLabel = document.createElement('label');
+categoryLabel.classList.add('category');
+categoryLabel.textContent = 'Category';
+headerElement.appendChild(categoryLabel);
+articleElement.appendChild(headerElement);
 
-const scoreLineSection = createElementAndAppend(articleElement, 'section', {
-  classList: ['score-line'],
-  attrs: { 'aria-label': 'Score' }
-});
+const scoreLineSection = document.createElement('section');
+scoreLineSection.classList.add('score-line');
+scoreLineSection.setAttribute('aria-label', 'Score');
 
-createElementAndAppend(scoreLineSection, 'label', {
-  props: { id: 'score', textContent: '0%' },
-  classList: ['score']
-});
+const scoreLabel = document.createElement('label');
+scoreLabel.classList.add('score');
+scoreLabel.id = 'score';
+scoreLabel.textContent = '0%';
+scoreLineSection.appendChild(scoreLabel);
 
-createElementAndAppend(scoreLineSection, 'label', {
-  props: { id: 'score-detail', textContent: '(0/0)' }
-});
+const scoreDetailLabel = document.createElement('label');
+scoreDetailLabel.id = 'score-detail';
+scoreDetailLabel.textContent = '(0/0)';
+scoreLineSection.appendChild(scoreDetailLabel);
+articleElement.appendChild(scoreLineSection);
 
-createElementAndAppend(articleElement, 'progress-bar', {
-  props: { id: 'progress' },
-  attrs: { current: '2', total: '5', color: 'red' } 
-});
+const progressBarElement = document.createElement('progress-bar');
+progressBarElement.id = 'progress';
+progressBarElement.setAttribute('current', '2');
+progressBarElement.setAttribute('total', '5');
+progressBarElement.setAttribute('color', 'red');
+articleElement.appendChild(progressBarElement);
+
+template.content.appendChild(articleElement);
+
 
 class ResultsProgressCard extends HTMLElement {
   constructor() {
@@ -56,42 +62,33 @@ class ResultsProgressCard extends HTMLElement {
     const total = parseInt(this.getAttribute("total") || "1");
     const category = this.getAttribute("category") || "Category";
     const icon = this.getAttribute("icon") || "";
-    const color = this.getAttribute("color") || "#10b981"; 
+    const color = this.getAttribute("color") || "#10b981";
     const scoreColor = this.getAttribute("score-color") || color;
 
-    const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+    const percent = Math.round((current / total) * 100);
     const progress = this.shadowRoot.getElementById("progress");
     const score = this.shadowRoot.getElementById("score");
     const detail = this.shadowRoot.getElementById("score-detail");
-    const categoryLabel = this.shadowRoot.querySelector(".category");
+
     const headerIcon = this.shadowRoot.querySelector(".header-icon");
+    const header = this.shadowRoot.querySelector(".header");
 
-    if (categoryLabel) {
-        categoryLabel.textContent = category;
-    }
+    this.shadowRoot.querySelector(".category").textContent = category;
 
-    if (headerIcon) {
-        if (icon.trim()) {
-          headerIcon.textContent = icon;
-          headerIcon.style.display = "inline-block";
-        } else {
-          headerIcon.style.display = "none";
-        }
+    if (icon.trim()) {
+      headerIcon.textContent = icon;
+      headerIcon.style.display = "inline-block";
+    } else {
+      headerIcon.style.display = "none";
     }
 
-    if (progress) {
-        progress.setAttribute("current", current.toString());
-        progress.setAttribute("total", total.toString());
-        progress.setAttribute("color", color);
-    }
+    progress.setAttribute("current", current);
+    progress.setAttribute("total", total);
+    progress.setAttribute("color", color);
 
-    if (score) {
-        score.textContent = `${percent}%`;
-        score.style.color = scoreColor;
-    }
-    if (detail) {
-        detail.textContent = `(${current}/${total})`;
-    }
+    score.textContent = `${percent}%`;
+    score.style.color = scoreColor;
+    detail.textContent = `(${current}/${total})`;
   }
 }
 

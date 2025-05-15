@@ -1,59 +1,54 @@
-// home-page.js
-
-import { createElementAndAppend } from '../utils.js';
 import { store } from '../state.js';
 import { AuthService } from '../services/auth.js';
 
 const template = document.createElement('template');
 
-createElementAndAppend(template.content, 'link', {
-  attrs: { rel: 'stylesheet', href: '/styles/components/home-page.css' }
-});
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/home-page.css');
+template.content.appendChild(stylesheetLink);
 
-const homePageContainer = createElementAndAppend(template.content, 'section', {
-  props: { className: 'home-page__container' }
-});
+const homePageContainer = document.createElement('section');
+homePageContainer.className = 'home-page__container';
 
-const homePageHeader = createElementAndAppend(homePageContainer, 'header', {
-  props: { className: 'home-page__header' }
-});
+const homePageHeader = document.createElement('header');
+homePageHeader.className = 'home-page__header';
 
-const h1Title = createElementAndAppend(homePageHeader, 'h1', {
-  props: { className: 'home-page__title' }
-});
+const h1Title = document.createElement('h1');
+h1Title.className = 'home-page__title';
+// Constructing the H1 title with DOM methods
 h1Title.appendChild(document.createTextNode('ARE '));
-createElementAndAppend(h1Title, 'span', {
-  props: { className: 'home-page__title-highlight', textContent: 'You' }
-});
+const spanHighlight = document.createElement('span');
+spanHighlight.className = 'home-page__title-highlight';
+spanHighlight.textContent = 'You';
+h1Title.appendChild(spanHighlight);
 h1Title.appendChild(document.createTextNode(' Employable?'));
+homePageHeader.appendChild(h1Title);
 
-createElementAndAppend(homePageHeader, 'p', {
-  props: {
-    className: 'home-page__subtitle',
-    textContent: 'An interactive, scenario-based assessment tool that evaluates whether you have what it takes to succeed as a software engineer.'
-  }
-});
+const pSubtitle = document.createElement('p');
+pSubtitle.className = 'home-page__subtitle';
+pSubtitle.textContent = 'An interactive, scenario-based assessment tool that evaluates whether you have what it takes to succeed as a software engineer.';
+homePageHeader.appendChild(pSubtitle);
+homePageContainer.appendChild(homePageHeader);
 
-const featureCardArticle = createElementAndAppend(homePageContainer, 'article', {
-  props: { className: 'home-page__feature-card' }
-});
+const featureCardArticle = document.createElement('article');
+featureCardArticle.className = 'home-page__feature-card';
 
-const featureGridSection = createElementAndAppend(featureCardArticle, 'section', {
-  props: { className: 'home-page__feature-grid' }
-});
+const featureGridSection = document.createElement('section');
+featureGridSection.className = 'home-page__feature-grid';
 
-const featureColumnHighlight = createElementAndAppend(featureGridSection, 'section', {
-  props: { className: 'home-page__feature-column home-page__feature-column--highlight' }
-});
+const featureColumnHighlight = document.createElement('section');
+featureColumnHighlight.className = 'home-page__feature-column home-page__feature-column--highlight';
 
-const highlightHeader = createElementAndAppend(featureColumnHighlight, 'header');
-createElementAndAppend(highlightHeader, 'h2', {
-  props: { className: 'home-page__feature-column-title', textContent: 'Evaluate Your Readiness' }
-});
+const highlightHeader = document.createElement('header');
+const h2EvaluateTitle = document.createElement('h2');
+h2EvaluateTitle.className = 'home-page__feature-column-title';
+h2EvaluateTitle.textContent = 'Evaluate Your Readiness';
+highlightHeader.appendChild(h2EvaluateTitle);
+featureColumnHighlight.appendChild(highlightHeader);
 
-const featureListUl = createElementAndAppend(featureColumnHighlight, 'ul', {
-  props: { className: 'home-page__feature-list' }
-});
+const featureListUl = document.createElement('ul');
+featureListUl.className = 'home-page__feature-list';
 const featureItemsText = [
   'Real-world coding scenarios',
   'Problem-solving challenges',
@@ -61,7 +56,8 @@ const featureItemsText = [
   'Communication skills evaluation'
 ];
 featureItemsText.forEach(text => {
-  const li = createElementAndAppend(featureListUl, 'li', { props: { className: 'home-page__feature-item' } });
+  const li = document.createElement('li');
+  li.className = 'home-page__feature-item';
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', 'home-page__feature-item-icon');
   svg.setAttribute('fill', 'none');
@@ -75,29 +71,32 @@ featureItemsText.forEach(text => {
   path.setAttribute('d', 'M5 13l4 4L19 7');
   svg.appendChild(path);
   li.appendChild(svg);
-  createElementAndAppend(li, 'span', { props: { textContent: text } });
+  const span = document.createElement('span');
+  span.textContent = text;
+  li.appendChild(span);
+  featureListUl.appendChild(li);
 });
+featureColumnHighlight.appendChild(featureListUl);
 
-createElementAndAppend(featureColumnHighlight, 'button', {
-  props: {
-    id: 'startAssessmentBtn',
-    className: 'home-page__button home-page__button--primary-on-dark',
-    textContent: 'Start Assessment'
-  }
-});
+const startAssessmentBtn = document.createElement('button');
+startAssessmentBtn.id = 'startAssessmentBtn';
+startAssessmentBtn.className = 'home-page__button home-page__button--primary-on-dark';
+startAssessmentBtn.textContent = 'Start Assessment';
+featureColumnHighlight.appendChild(startAssessmentBtn);
+featureGridSection.appendChild(featureColumnHighlight);
 
-const featureColumnDetails = createElementAndAppend(featureGridSection, 'section', {
-  props: { className: 'home-page__feature-column home-page__feature-column--details' }
-});
+const featureColumnDetails = document.createElement('section');
+featureColumnDetails.className = 'home-page__feature-column home-page__feature-column--details';
 
-const detailsHeader = createElementAndAppend(featureColumnDetails, 'header');
-createElementAndAppend(detailsHeader, 'h2', {
-  props: { className: 'home-page__feature-column-title', textContent: 'What You\'ll Discover' }
-});
+const detailsHeader = document.createElement('header');
+const h2DiscoverTitle = document.createElement('h2');
+h2DiscoverTitle.className = 'home-page__feature-column-title';
+h2DiscoverTitle.textContent = 'What You\'ll Discover';
+detailsHeader.appendChild(h2DiscoverTitle);
+featureColumnDetails.appendChild(detailsHeader);
 
-const discoveryListUl = createElementAndAppend(featureColumnDetails, 'ul', {
-  props: { className: 'home-page__discovery-list' }
-});
+const discoveryListUl = document.createElement('ul');
+discoveryListUl.className = 'home-page__discovery-list';
 const discoveryItems = [
   {
     iconClass: 'home-page__discovery-item-icon-wrapper--technical',
@@ -126,10 +125,11 @@ const discoveryItems = [
 ];
 
 discoveryItems.forEach(item => {
-  const li = createElementAndAppend(discoveryListUl, 'li', { props: { className: 'home-page__discovery-item' } });
-  const iconWrapper = createElementAndAppend(li, 'section', {
-    props: { className: `home-page__discovery-item-icon-wrapper ${item.iconClass}` }
-  });
+  const li = document.createElement('li');
+  li.className = 'home-page__discovery-item';
+
+  const iconWrapper = document.createElement('section');
+  iconWrapper.className = `home-page__discovery-item-icon-wrapper ${item.iconClass}`;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', `home-page__discovery-item-icon ${item.iconClass.replace('-wrapper', '')}`);
   svg.setAttribute('fill', 'none');
@@ -143,64 +143,79 @@ discoveryItems.forEach(item => {
   path.setAttribute('d', item.svgPath);
   svg.appendChild(path);
   iconWrapper.appendChild(svg);
+  li.appendChild(iconWrapper);
 
-  const contentSection = createElementAndAppend(li, 'section', {
-    props: { className: 'home-page__discovery-item-content' }
-  });
-  createElementAndAppend(contentSection, 'h3', { props: { textContent: item.title } });
-  createElementAndAppend(contentSection, 'p', { props: { textContent: item.description } });
-});
+  const contentSection = document.createElement('section');
+  contentSection.className = 'home-page__discovery-item-content';
+  const h3 = document.createElement('h3');
+  h3.textContent = item.title;
+  const p = document.createElement('p');
+  p.textContent = item.description;
+  contentSection.appendChild(h3);
+  contentSection.appendChild(p);
+  li.appendChild(contentSection);
 
-const howItWorksSection = createElementAndAppend(homePageContainer, 'section', {
-  props: { className: 'home-page__how-it-works' }
+  discoveryListUl.appendChild(li);
 });
-const howItWorksHeader = createElementAndAppend(howItWorksSection, 'header');
-createElementAndAppend(howItWorksHeader, 'h2', {
-  props: { className: 'home-page__how-it-works-title', textContent: 'How It Works' }
-});
+featureColumnDetails.appendChild(discoveryListUl);
+featureGridSection.appendChild(featureColumnDetails);
+featureCardArticle.appendChild(featureGridSection);
+homePageContainer.appendChild(featureCardArticle);
 
-const stepsGridSection = createElementAndAppend(howItWorksSection, 'section', {
-  props: { className: 'home-page__steps-grid' }
-});
+const howItWorksSection = document.createElement('section');
+howItWorksSection.className = 'home-page__how-it-works';
+const howItWorksHeader = document.createElement('header');
+const h2HowTitle = document.createElement('h2');
+h2HowTitle.className = 'home-page__how-it-works-title';
+h2HowTitle.textContent = 'How It Works';
+howItWorksHeader.appendChild(h2HowTitle);
+howItWorksSection.appendChild(howItWorksHeader);
+
+const stepsGridSection = document.createElement('section');
+stepsGridSection.className = 'home-page__steps-grid';
 const steps = [
   { number: '1', title: 'Take the Assessment', description: 'Complete our carefully designed scenarios that mirror real-world engineering challenges.' },
   { number: '2', title: 'Get Analyzed', description: 'Our algorithm evaluates your responses across technical and soft skill dimensions.' },
   { number: '3', title: 'Review Results', description: 'Receive detailed feedback on your employability with specific strengths and improvement areas.' }
 ];
 steps.forEach(step => {
-  const article = createElementAndAppend(stepsGridSection, 'article', {
-    props: { className: 'home-page__step-card' }
-  });
-  const numberWrapper = createElementAndAppend(article, 'section', {
-    props: { className: 'home-page__step-number-wrapper' }
-  });
-  createElementAndAppend(numberWrapper, 'span', {
-    props: { className: 'home-page__step-number', textContent: step.number }
-  });
-  createElementAndAppend(article, 'h3', {
-    props: { className: 'home-page__step-card-title', textContent: step.title }
-  });
-  createElementAndAppend(article, 'p', {
-    props: { className: 'home-page__step-card-description', textContent: step.description }
-  });
+  const article = document.createElement('article');
+  article.className = 'home-page__step-card';
+  const numberWrapper = document.createElement('section');
+  numberWrapper.className = 'home-page__step-number-wrapper';
+  const spanNumber = document.createElement('span');
+  spanNumber.className = 'home-page__step-number';
+  spanNumber.textContent = step.number;
+  numberWrapper.appendChild(spanNumber);
+  article.appendChild(numberWrapper);
+  const h3 = document.createElement('h3');
+  h3.className = 'home-page__step-card-title';
+  h3.textContent = step.title;
+  article.appendChild(h3);
+  const p = document.createElement('p');
+  p.className = 'home-page__step-card-description';
+  p.textContent = step.description;
+  article.appendChild(p);
+  stepsGridSection.appendChild(article);
 });
+howItWorksSection.appendChild(stepsGridSection);
+homePageContainer.appendChild(howItWorksSection);
 
-const footerCta = createElementAndAppend(homePageContainer, 'footer', {
-  props: { className: 'home-page__footer-cta' }
-});
-createElementAndAppend(footerCta, 'button', {
-  props: {
-    id: 'mainAssessmentBtn',
-    className: 'home-page__button home-page__button--main-cta',
-    textContent: 'Assess Your Employability Now'
-  }
-});
-createElementAndAppend(footerCta, 'p', {
-  props: {
-    className: 'home-page__footer-cta-caption',
-    textContent: 'Free assessment • Takes ~10 minutes • Get immediate results'
-  }
-});
+const footerCta = document.createElement('footer');
+footerCta.className = 'home-page__footer-cta';
+const mainAssessmentBtn = document.createElement('button');
+mainAssessmentBtn.id = 'mainAssessmentBtn';
+mainAssessmentBtn.className = 'home-page__button home-page__button--main-cta';
+mainAssessmentBtn.textContent = 'Assess Your Employability Now';
+footerCta.appendChild(mainAssessmentBtn);
+const pCaption = document.createElement('p');
+pCaption.className = 'home-page__footer-cta-caption';
+pCaption.textContent = 'Free assessment • Takes ~10 minutes • Get immediate results';
+footerCta.appendChild(pCaption);
+homePageContainer.appendChild(footerCta);
+
+template.content.appendChild(homePageContainer);
+
 
 class HomePage extends HTMLElement {
   constructor() {
@@ -212,7 +227,7 @@ class HomePage extends HTMLElement {
   connectedCallback() {
     const startBtn = this.shadowRoot.getElementById('startAssessmentBtn');
     const mainBtn = this.shadowRoot.getElementById('mainAssessmentBtn');
-
+    
     const handleClick = (e) => {
       const state = store.getState();
       if (!state.auth.isAuthenticated) {

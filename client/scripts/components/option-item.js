@@ -1,22 +1,23 @@
-import { createElementAndAppend } from '../utils.js';
-
 const template = document.createElement('template');
 
-createElementAndAppend(template.content, 'link', {
-  attrs: { rel: 'stylesheet', href: '/styles/components/option-item.css' }
-});
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/option-item.css');
+template.content.appendChild(stylesheetLink);
 
-const labelElement = createElementAndAppend(template.content, 'label', {
-  classList: ['flex', 'items-center', 'space-x-2']
-});
+const labelElement = document.createElement('label');
+labelElement.classList.add('flex', 'items-center', 'space-x-2');
 
-createElementAndAppend(labelElement, 'input', {
-  attrs: { type: 'checkbox', name: 'answer' },
-  classList: ['form-checkbox', 'text-blue-600']
-});
+const inputCheckboxElement = document.createElement('input');
+inputCheckboxElement.setAttribute('type', 'checkbox');
+inputCheckboxElement.setAttribute('name', 'answer');
+inputCheckboxElement.classList.add('form-checkbox', 'text-blue-600');
+labelElement.appendChild(inputCheckboxElement);
 
-createElementAndAppend(labelElement, 'slot');
+const slotElement = document.createElement('slot');
+labelElement.appendChild(slotElement);
 
+template.content.appendChild(labelElement);
 class OptionItem extends HTMLElement {
   constructor() {
     super();
@@ -28,15 +29,9 @@ class OptionItem extends HTMLElement {
     const label = this.getAttribute('label');
     const id = this.getAttribute('data-id');
 
-    const slotElement = this.shadowRoot.querySelector('slot');
-    if (slotElement) {
-        slotElement.textContent = label;
-    }
-
+    this.shadowRoot.querySelector('slot').textContent = label;
     const checkbox = this.shadowRoot.querySelector('input[type="checkbox"]');
-    if (checkbox) {
-        checkbox.value = id;
-    }
+    checkbox.value = id;
   }
 }
 

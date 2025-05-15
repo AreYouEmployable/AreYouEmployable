@@ -1,34 +1,46 @@
-import { createElementAndAppend } from '../utils.js';
 import { store } from '../state.js';
 import { store } from '../state.js';
 import { AuthService } from '../services/auth.js';
 import { router } from '../router.js';
+// Assuming google-sign-in is imported if AppHeader creates it,
+// but it seems to be used as a tag <google-sign-in> directly.
+// If it's a custom element, its definition should be imported somewhere globally or in app.js.
 
 const template = document.createElement('template');
 
-createElementAndAppend(template.content, 'link', {
-  attrs: { rel: 'stylesheet', href: '/styles/components/app-header.css' }
-});
+const initialStylesheetLink = document.createElement('link');
+initialStylesheetLink.setAttribute('rel', 'stylesheet');
+initialStylesheetLink.setAttribute('href', '/styles/components/app-header.css');
+template.content.appendChild(initialStylesheetLink);
 
-const initialHeaderElement = createElementAndAppend(template.content, 'header');
-createElementAndAppend(initialHeaderElement, 'h1', { props: { textContent: 'Employable' } });
+const initialHeaderElement = document.createElement('header');
+const initialH1Element = document.createElement('h1');
+initialH1Element.textContent = 'Employable';
+initialHeaderElement.appendChild(initialH1Element);
 
-const initialNavElement = createElementAndAppend(initialHeaderElement, 'nav');
-const initialUlElement = createElementAndAppend(initialNavElement, 'ul');
+const initialNavElement = document.createElement('nav');
+const initialUlElement = document.createElement('ul');
 const initialNavItems = [
   { href: '/', text: 'Home' },
   { href: '/about', text: 'About' },
   { href: '/contact', text: 'Contact' },
 ];
 initialNavItems.forEach(item => {
-  const liElement = createElementAndAppend(initialUlElement, 'li');
-  createElementAndAppend(liElement, 'a', {
-    attrs: { href: item.href, 'data-link': '' },
-    props: { textContent: item.text }
-  });
+  const liElement = document.createElement('li');
+  const aElement = document.createElement('a');
+  aElement.setAttribute('href', item.href);
+  aElement.setAttribute('data-link', '');
+  aElement.textContent = item.text;
+  liElement.appendChild(aElement);
+  initialUlElement.appendChild(liElement);
 });
+initialNavElement.appendChild(initialUlElement);
+initialHeaderElement.appendChild(initialNavElement);
 
-createElementAndAppend(initialHeaderElement, 'section', { props: { id: 'auth-container' } });
+const initialAuthContainerSection = document.createElement('section');
+initialAuthContainerSection.id = 'auth-container';
+initialHeaderElement.appendChild(initialAuthContainerSection);
+template.content.appendChild(initialHeaderElement);
 
 class AppHeader extends HTMLElement {
   constructor() {
@@ -126,141 +138,164 @@ class AppHeader extends HTMLElement {
         this.shadowRoot.removeChild(this.shadowRoot.firstChild);
     }
 
-    createElementAndAppend(this.shadowRoot, 'link', {
-      attrs: { rel: 'stylesheet', href: '/styles/components/app-header.css' }
-    });
+    const stylesheetLink = document.createElement('link');
+    stylesheetLink.setAttribute('rel', 'stylesheet');
+    stylesheetLink.setAttribute('href', '/styles/components/app-header.css');
+    this.shadowRoot.appendChild(stylesheetLink);
 
-    const header = createElementAndAppend(this.shadowRoot, 'header');
-    const headerContent = createElementAndAppend(header, 'section', { props: { className: 'header-content' } });
+    const header = document.createElement('header');
+    const headerContent = document.createElement('section');
+    headerContent.className = 'header-content';
 
-    createElementAndAppend(headerContent, 'a', {
-      props: { href: '/', className: 'logo', textContent: 'Employability Assessment' },
-      attrs: { 'data-link': '' }
-    });
+    const logoLink = document.createElement('a');
+    logoLink.href = '/';
+    logoLink.className = 'logo';
+    logoLink.setAttribute('data-link', '');
+    logoLink.textContent = 'Employability Assessment';
+    headerContent.appendChild(logoLink);
 
-    const hamburgerButton = createElementAndAppend(headerContent, 'button', {
-      props: { className: 'hamburger', id: 'hamburger' }
-    });
+    const hamburgerButton = document.createElement('button');
+    hamburgerButton.className = 'hamburger';
+    hamburgerButton.id = 'hamburger';
     for (let i = 0; i < 3; i++) {
-      createElementAndAppend(hamburgerButton, 'span');
+      const span = document.createElement('span');
+      hamburgerButton.appendChild(span);
     }
+    headerContent.appendChild(hamburgerButton);
 
-    const navLinksContainer = createElementAndAppend(headerContent, 'nav', { props: { className: 'nav-links' } });
+    const navLinksContainer = document.createElement('nav');
+    navLinksContainer.className = 'nav-links';
 
     if (isAuthenticated) {
-      createElementAndAppend(navLinksContainer, 'a', {
-        props: { href: '/assessment', className: 'assessment-link', textContent: 'Assessment' },
-        attrs: { 'data-link': '' }
-      });
-      createElementAndAppend(navLinksContainer, 'a', {
-        props: { href: '/results', textContent: 'Results' },
-        attrs: { 'data-link': '' }
-      });
+      const assessmentLink = document.createElement('a');
+      assessmentLink.href = '/assessment';
+      assessmentLink.className = 'assessment-link';
+      assessmentLink.setAttribute('data-link', '');
+      assessmentLink.textContent = 'Assessment';
+      navLinksContainer.appendChild(assessmentLink);
 
-      const userInfoSection = createElementAndAppend(navLinksContainer, 'section', { props: { className: 'user-info' } });
+      const resultsLink = document.createElement('a');
+      resultsLink.href = '/results';
+      resultsLink.setAttribute('data-link', '');
+      resultsLink.textContent = 'Results';
+      navLinksContainer.appendChild(resultsLink);
+
+      const userInfoSection = document.createElement('section');
+      userInfoSection.className = 'user-info';
 
       if (pictureUrl) {
-        createElementAndAppend(userInfoSection, 'img', {
-          props: {
-            src: pictureUrl,
-            alt: user?.name || 'User image',
-            className: 'user-avatar'
-          },
-          callbacks: {
-            error: function() {
-              this.style.display = 'none';
-              if (this.nextElementSibling && this.nextElementSibling.classList.contains('user-avatar-placeholder')) {
-                this.nextElementSibling.style.display = 'flex';
-              }
-            }
+        const userAvatarImg = document.createElement('img');
+        userAvatarImg.src = pictureUrl;
+        userAvatarImg.alt = user?.name || 'User image';
+        userAvatarImg.className = 'user-avatar';
+        userAvatarImg.onerror = function() {
+          this.style.display = 'none';
+          if (this.nextElementSibling && this.nextElementSibling.classList.contains('user-avatar-placeholder')) {
+            this.nextElementSibling.style.display = 'flex';
           }
-        });
-        createElementAndAppend(userInfoSection, 'p', {
-          props: {
-            className: 'user-avatar-placeholder',
-            textContent: user?.name?.charAt(0)?.toUpperCase() || 'G'
-          },
-          style: { display: 'none' }
-        });
+        };
+        userInfoSection.appendChild(userAvatarImg);
+
+        const userAvatarPlaceholderImgError = document.createElement('p');
+        userAvatarPlaceholderImgError.className = 'user-avatar-placeholder';
+        userAvatarPlaceholderImgError.style.display = 'none';
+        userAvatarPlaceholderImgError.textContent = user?.name?.charAt(0)?.toUpperCase() || 'G';
+        userInfoSection.appendChild(userAvatarPlaceholderImgError);
       } else {
-        createElementAndAppend(userInfoSection, 'p', {
-          props: {
-            className: 'user-avatar-placeholder',
-            textContent: user?.name?.charAt(0)?.toUpperCase() || 'G'
-          }
-        });
+        const userAvatarPlaceholder = document.createElement('p');
+        userAvatarPlaceholder.className = 'user-avatar-placeholder';
+        userAvatarPlaceholder.textContent = user?.name?.charAt(0)?.toUpperCase() || 'G';
+        userInfoSection.appendChild(userAvatarPlaceholder);
       }
-      createElementAndAppend(userInfoSection, 'span', {
-        props: { className: 'user-name', textContent: user?.name || 'User' }
-      });
-      createElementAndAppend(userInfoSection, 'span', {
-        props: { className: 'sign-out', textContent: 'Sign Out' }
-      });
+
+      const userNameSpan = document.createElement('span');
+      userNameSpan.className = 'user-name';
+      userNameSpan.textContent = user?.name || 'User';
+      userInfoSection.appendChild(userNameSpan);
+
+      const signOutSpan = document.createElement('span');
+      signOutSpan.className = 'sign-out';
+      signOutSpan.textContent = 'Sign Out';
+      userInfoSection.appendChild(signOutSpan);
+      navLinksContainer.appendChild(userInfoSection);
     } else {
-      createElementAndAppend(navLinksContainer, 'google-sign-in');
+      const googleSignInElement = document.createElement('google-sign-in');
+      navLinksContainer.appendChild(googleSignInElement);
     }
+    headerContent.appendChild(navLinksContainer);
+    header.appendChild(headerContent);
+    this.shadowRoot.appendChild(header);
 
-    const mobileMenuSection = createElementAndAppend(this.shadowRoot, 'section', {
-      props: { className: 'mobile-menu', id: 'mobile-menu' }
-    });
+    const mobileMenuSection = document.createElement('section');
+    mobileMenuSection.className = 'mobile-menu';
+    mobileMenuSection.id = 'mobile-menu';
 
-    createElementAndAppend(mobileMenuSection, 'button', {
-      props: { className: 'close-button', id: 'close-menu', textContent: '\u00D7' }
-    });
+    const closeButton = document.createElement('button');
+    closeButton.className = 'close-button';
+    closeButton.id = 'close-menu';
+    closeButton.textContent = '\u00D7';
+    mobileMenuSection.appendChild(closeButton);
 
-    const mobileNavLinksContainer = createElementAndAppend(mobileMenuSection, 'nav', { props: { className: 'mobile-nav-links' } });
+    const mobileNavLinksContainer = document.createElement('nav');
+    mobileNavLinksContainer.className = 'mobile-nav-links';
 
     if (isAuthenticated) {
-      createElementAndAppend(mobileNavLinksContainer, 'a', {
-        props: { href: '/assessment', className: 'assessment-link', textContent: 'Assessment' },
-        attrs: { 'data-link': '' }
-      });
-      createElementAndAppend(mobileNavLinksContainer, 'a', {
-        props: { href: '/results', textContent: 'Results' },
-        attrs: { 'data-link': '' }
-      });
+      const mobileAssessmentLink = document.createElement('a');
+      mobileAssessmentLink.href = '/assessment';
+      mobileAssessmentLink.className = 'assessment-link';
+      mobileAssessmentLink.setAttribute('data-link', '');
+      mobileAssessmentLink.textContent = 'Assessment';
+      mobileNavLinksContainer.appendChild(mobileAssessmentLink);
 
-      const mobileUserInfoSection = createElementAndAppend(mobileNavLinksContainer, 'section', { props: { className: 'user-info' } });
+      const mobileResultsLink = document.createElement('a');
+      mobileResultsLink.href = '/results';
+      mobileResultsLink.setAttribute('data-link', '');
+      mobileResultsLink.textContent = 'Results';
+      mobileNavLinksContainer.appendChild(mobileResultsLink);
+
+      const mobileUserInfoSection = document.createElement('section');
+      mobileUserInfoSection.className = 'user-info';
+
       if (pictureUrl) {
-        createElementAndAppend(mobileUserInfoSection, 'img', {
-          props: {
-            src: pictureUrl,
-            alt: user?.name || 'User',
-            className: 'user-avatar'
-          },
-          callbacks: {
-            error: function() {
-              this.style.display = 'none';
-              if (this.nextElementSibling && this.nextElementSibling.classList.contains('user-avatar-placeholder')) {
-                this.nextElementSibling.style.display = 'flex';
-              }
-            }
+        const mobileUserAvatarImg = document.createElement('img');
+        mobileUserAvatarImg.src = pictureUrl;
+        mobileUserAvatarImg.alt = user?.name || 'User';
+        mobileUserAvatarImg.className = 'user-avatar';
+        mobileUserAvatarImg.onerror = function() {
+          this.style.display = 'none';
+           if (this.nextElementSibling && this.nextElementSibling.classList.contains('user-avatar-placeholder')) {
+            this.nextElementSibling.style.display = 'flex';
           }
-        });
-        createElementAndAppend(mobileUserInfoSection, 'p', {
-          props: {
-            className: 'user-avatar-placeholder',
-            textContent: user?.name?.charAt(0)?.toUpperCase() || 'G'
-          },
-          style: { display: 'none' }
-        });
+        };
+        mobileUserInfoSection.appendChild(mobileUserAvatarImg);
+        const mobileUserAvatarPlaceholderImgError = document.createElement('p');
+        mobileUserAvatarPlaceholderImgError.className = 'user-avatar-placeholder';
+        mobileUserAvatarPlaceholderImgError.style.display = 'none';
+        mobileUserAvatarPlaceholderImgError.textContent = user?.name?.charAt(0)?.toUpperCase() || 'G';
+        mobileUserInfoSection.appendChild(mobileUserAvatarPlaceholderImgError);
       } else {
-        createElementAndAppend(mobileUserInfoSection, 'p', {
-          props: {
-            className: 'user-avatar-placeholder',
-            textContent: user?.name?.charAt(0)?.toUpperCase() || 'G'
-          }
-        });
+        const mobileUserAvatarPlaceholder = document.createElement('p');
+        mobileUserAvatarPlaceholder.className = 'user-avatar-placeholder';
+        mobileUserAvatarPlaceholder.textContent = user?.name?.charAt(0)?.toUpperCase() || 'G';
+        mobileUserInfoSection.appendChild(mobileUserAvatarPlaceholder);
       }
-      createElementAndAppend(mobileUserInfoSection, 'span', {
-        props: { className: 'user-name', textContent: user?.name || 'User' }
-      });
-      createElementAndAppend(mobileUserInfoSection, 'span', {
-        props: { className: 'sign-out', textContent: 'Sign Out' }
-      });
+
+      const mobileUserNameSpan = document.createElement('span');
+      mobileUserNameSpan.className = 'user-name';
+      mobileUserNameSpan.textContent = user?.name || 'User';
+      mobileUserInfoSection.appendChild(mobileUserNameSpan);
+
+      const mobileSignOutSpan = document.createElement('span');
+      mobileSignOutSpan.className = 'sign-out';
+      mobileSignOutSpan.textContent = 'Sign Out';
+      mobileUserInfoSection.appendChild(mobileSignOutSpan);
+      mobileNavLinksContainer.appendChild(mobileUserInfoSection);
     } else {
-      createElementAndAppend(mobileNavLinksContainer, 'google-sign-in');
+      const mobileGoogleSignInElement = document.createElement('google-sign-in');
+      mobileNavLinksContainer.appendChild(mobileGoogleSignInElement);
     }
+    mobileMenuSection.appendChild(mobileNavLinksContainer);
+    this.shadowRoot.appendChild(mobileMenuSection);
 
     this.shadowRoot.querySelectorAll('[data-link]').forEach(link => {
       link.addEventListener('click', this.handleLinkClick.bind(this));
@@ -280,7 +315,7 @@ class AppHeader extends HTMLElement {
         mobileMenu.classList.remove('active');
         document.body.style.overflow = '';
       });
-
+      
       if (this._boundHandleDocumentClickForMenu) {
         document.removeEventListener('click', this._boundHandleDocumentClickForMenu);
       }
