@@ -52,23 +52,7 @@ class AboutPage extends HTMLElement {
   }
 
   renderTeam() {
-    const team = [
-      { name: 'John Doe', role: 'CEO' },
-      { name: 'Jane Smith', role: 'CTO' },
-      { name: 'Mike Johnson', role: 'Lead Developer' }
-    ];
-
-    this.teamContainer.innerHTML = '';
     
-    team.forEach(member => {
-      const memberElement = document.createElement('div');
-      memberElement.className = 'team-member';
-      memberElement.innerHTML = `
-        <strong>${member.name}</strong>
-        <span>${member.role}</span>
-      `;
-      this.teamContainer.appendChild(memberElement);
-    });
   }
 }
 

@@ -33,9 +33,9 @@ initialNavItems.forEach(item => {
 initialNavElement.appendChild(initialUlElement);
 initialHeaderElement.appendChild(initialNavElement);
 
-const initialAuthContainerDiv = document.createElement('div');
-initialAuthContainerDiv.id = 'auth-container';
-initialHeaderElement.appendChild(initialAuthContainerDiv);
+const initialAuthContainerSection = document.createElement('section');
+initialAuthContainerSection.id = 'auth-container';
+initialHeaderElement.appendChild(initialAuthContainerSection);
 template.content.appendChild(initialHeaderElement);
 
 class AppHeader extends HTMLElement {

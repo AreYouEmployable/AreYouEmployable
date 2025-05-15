@@ -15,16 +15,13 @@ progressBarElement.setAttribute('value', '0');
 progressBarElement.setAttribute('max', '100');
 progressContainerSection.appendChild(progressBarElement);
 
-const progressTextDiv = document.createElement('div');
-progressTextDiv.classList.add('progress-text');
-progressTextDiv.id = 'progress-text';
-progressTextDiv.textContent = '0%';
-progressContainerSection.appendChild(progressTextDiv);
+const progressTextSection = document.createElement('section');
+progressTextSection.classList.add('progress-text');
+progressTextSection.id = 'progress-text';
+progressTextSection.textContent = '0%';
+progressContainerSection.appendChild(progressTextSection);
 
 template.content.appendChild(progressContainerSection);
-
-const tempDiv = document.createElement('section');
-tempDiv.appendChild(template.content.cloneNode(true));
 
 class ProgressBar extends HTMLElement {
   constructor() {

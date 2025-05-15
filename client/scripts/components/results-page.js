@@ -1,31 +1,26 @@
 import "./results-progress-card.js";
 import "./results-summary-card.js";
 import "./dynamic-button.js";
-import "./progress-bar.js"; // Assuming this is needed by one of the imported components
+import "./progress-bar.js";
 
 const template = document.createElement("template");
 
-// Link stylesheet
 const stylesheetLink = document.createElement('link');
 stylesheetLink.setAttribute('rel', 'stylesheet');
 stylesheetLink.setAttribute('href', '/styles/components/results-page.css');
 template.content.appendChild(stylesheetLink);
 
-// Main container
 const resultsContainer = document.createElement('section');
 resultsContainer.classList.add('results-container');
 
-// H1 Title
 const h1Title = document.createElement('h1');
 h1Title.textContent = 'Your Assessment Results';
 resultsContainer.appendChild(h1Title);
 
-// Rating Card
 const ratingCard = document.createElement('results-summary-card');
 ratingCard.id = 'rating-card';
 resultsContainer.appendChild(ratingCard);
 
-// Overall Score Section
 const overallScoreSection = document.createElement('section');
 overallScoreSection.classList.add('overall-score');
 const overallScoreCard = document.createElement('results-progress-card');
@@ -33,13 +28,11 @@ overallScoreCard.id = 'overall-score-card';
 overallScoreSection.appendChild(overallScoreCard);
 resultsContainer.appendChild(overallScoreSection);
 
-// Category Breakdown H4
 const h4CategoryBreakdown = document.createElement('h4');
 h4CategoryBreakdown.id = 'category-breakdown';
 h4CategoryBreakdown.textContent = 'Category Breakdown';
 resultsContainer.appendChild(h4CategoryBreakdown);
 
-// Category Grid Section
 const categoryGridSection = document.createElement('section');
 categoryGridSection.classList.add('category-grid');
 const categoryCardIds = ['technical-card', 'communication-card', 'problem-solving-card', 'soft-skills-card'];
@@ -50,7 +43,6 @@ categoryCardIds.forEach(id => {
 });
 resultsContainer.appendChild(categoryGridSection);
 
-// Summary Section
 const summarySection = document.createElement('section');
 summarySection.classList.add('summary-section');
 const strengthsCard = document.createElement('results-summary-card');
@@ -61,7 +53,6 @@ improvementsCard.id = 'improvements-card';
 summarySection.appendChild(improvementsCard);
 resultsContainer.appendChild(summarySection);
 
-// Actions Section
 const actionsSection = document.createElement('section');
 actionsSection.classList.add('actions');
 
@@ -76,11 +67,11 @@ actionsSection.appendChild(takeAssessmentAgainButton);
 
 const shareResultsButton = document.createElement('dynamic-button');
 shareResultsButton.setAttribute('text', 'Share Results');
-shareResultsButton.setAttribute('bg-color', '#F3F4F6'); // Note: CSS colors usually start with #
-shareResultsButton.setAttribute('text-color', '#384252'); // Note: CSS colors usually start with #
+shareResultsButton.setAttribute('bg-color', '#F3F4F6');
+shareResultsButton.setAttribute('text-color', '#384252');
 shareResultsButton.setAttribute('clickable', 'true');
 shareResultsButton.setAttribute('active', 'true');
-shareResultsButton.setAttribute('on-click', 'shareClicked'); // Changed from retestClicked to avoid confusion
+shareResultsButton.setAttribute('on-click', 'shareClicked');
 actionsSection.appendChild(shareResultsButton);
 
 resultsContainer.appendChild(actionsSection);

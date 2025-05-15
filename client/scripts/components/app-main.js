@@ -64,7 +64,7 @@ class AppMain extends HTMLElement {
       });
     } catch (error) {
       console.error('AppMain: Error creating component:', error);
-      this.mainElement.innerHTML = `<div class="error">Failed to load component: ${componentName}</div>`;
+      this.mainElement.innerHTML = `<section class="error">Failed to load component: ${componentName}</section>`;
     }
   }
 }

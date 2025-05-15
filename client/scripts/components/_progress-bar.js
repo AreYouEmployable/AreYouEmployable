@@ -8,11 +8,11 @@ template.content.appendChild(stylesheetLink);
 const progressContainerSection = document.createElement('section');
 progressContainerSection.classList.add('progress-container');
 
-const progressBarDiv = document.createElement('div');
-progressBarDiv.classList.add('progress-bar');
-progressBarDiv.id = 'bar';
-progressBarDiv.textContent = '0%';
-progressContainerSection.appendChild(progressBarDiv);
+const progressBarSection = document.createElement('section');
+progressBarSection.classList.add('progress-bar');
+progressBarSection.id = 'bar';
+progressBarSection.textContent = '0%';
+progressContainerSection.appendChild(progressBarSection);
 
 template.content.appendChild(progressContainerSection);
 
