@@ -24,12 +24,12 @@
 }
 
 .next-button {
-  background-color: #799761;
+  background-color: #48bb78;
   color: white;
 }
-
+ 
 .next-button:hover:not(:disabled) {
-  background-color: #cfcfcf;
+  background-color: #38a169;
 }
 
 @media (max-width: 480px) {
