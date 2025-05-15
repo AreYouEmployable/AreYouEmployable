@@ -488,7 +488,7 @@ class AssessmentPage extends HTMLElement {
 
     setTimeout(() => {
       if (this.assessmentId) {
-        window.location.href = `/assessment-results?assessmentId=${this.assessmentId}`;
+        window.location.href = `/results?assessmentId=${this.assessmentId}`;
       } else {
         console.error("AssessmentPage: Cannot redirect, assessmentId is missing.");
       }
