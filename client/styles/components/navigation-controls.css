@@ -14,7 +14,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
-  min-width: 10rem;
+  min-width: 8rem;
 }
 
 .nav-button:disabled {
@@ -23,12 +23,12 @@
 }
 
 .next-button {
-  background-color: #48bb78;
+  background-color: #bbbfba;
   color: white;
 }
 
 .next-button:hover:not(:disabled) {
-  background-color: #38a169;
+  background-color: #cbd1ce;
 }
 
 @media (max-width: 480px) {

@@ -9,14 +9,6 @@ const navElement = document.createElement('nav');
 navElement.classList.add('navigation-controls');
 navElement.setAttribute('aria-label', 'Scenario navigation');
 
-const prevButton = document.createElement('button');
-prevButton.id = 'prev-btn';
-prevButton.classList.add('nav-button', 'prev-button');
-prevButton.disabled = true;
-prevButton.setAttribute('type', 'button');
-prevButton.textContent = 'Previous';
-navElement.appendChild(prevButton);
-
 const nextButton = document.createElement('button');
 nextButton.id = 'next-btn';
 nextButton.classList.add('nav-button', 'next-button');
