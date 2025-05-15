@@ -11,6 +11,7 @@ export const getAssessmentHistoryRepository = async (googleId) => {
       JOIN assessment_status s ON a.assessment_status_id = s.assessment_status_id
       JOIN users u ON a.user_id = u.user_id
       WHERE u.google_id = $1
+      AND s.name <> 'In Progress'
       ORDER BY a.assessment_id DESC;
     `;
     const result = await pool.query(query, [googleId]);
