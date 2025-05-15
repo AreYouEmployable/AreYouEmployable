@@ -1,25 +1,23 @@
+import { createElementAndAppend } from '../utils.js';
+
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', '/styles/components/answer-option.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: '/styles/components/answer-option.css' }
+});
 
-const labelElement = document.createElement('label');
-labelElement.classList.add('option-box');
+const labelElement = createElementAndAppend(template.content, 'label', {
+  classList: ['option-box']
+});
 
-const inputRadioElement = document.createElement('input');
-inputRadioElement.setAttribute('type', 'radio');
-inputRadioElement.setAttribute('name', 'answer-group');
-labelElement.appendChild(inputRadioElement);
+const inputRadioElement = createElementAndAppend(labelElement, 'input', {
+  attrs: { type: 'radio', name: 'answer-group' }
+});
 
-const spanElement = document.createElement('span');
-spanElement.id = 'labelText';
-spanElement.classList.add('label-text');
-spanElement.textContent = 'Answer option';
-labelElement.appendChild(spanElement);
-
-template.content.appendChild(labelElement);
+const spanElement = createElementAndAppend(labelElement, 'span', {
+  props: { id: 'labelText', textContent: 'Answer option' },
+  classList: ['label-text']
+});
 
 class AnswerOption extends HTMLElement {
   constructor() {
@@ -38,17 +36,15 @@ class AnswerOption extends HTMLElement {
     if (name === 'name') {
       this._inputElement.name = newValue;
     } else if (name === 'option-id') {
-      this._inputElement.value = newValue; 
-    } else if (name === 'label' && this.text === 'Answer option') {
+      this._inputElement.value = newValue;
+    } else if (name === 'label') {
+      if (this.text === 'Answer option' || !this.hasAttribute('data-text-set-via-property')) {
+         this.text = newValue;
+      }
     } else if (name === 'selected') {
         const isSelected = newValue !== null && newValue !== 'false';
         if (this._inputElement.checked !== isSelected) {
             this._inputElement.checked = isSelected;
-        }
-        if (isSelected && !this.hasAttribute('selected')) {
-            super.setAttribute('selected', 'true');
-        } else if (!isSelected && this.hasAttribute('selected')) {
-            super.removeAttribute('selected');
         }
     }
   }
@@ -59,6 +55,7 @@ class AnswerOption extends HTMLElement {
 
   set text(val) {
     this._labelTextElement.textContent = val;
+    this.setAttribute('data-text-set-via-property', 'true');
   }
 
   get label() {
@@ -76,7 +73,7 @@ class AnswerOption extends HTMLElement {
   set optionId(val) {
     this.setAttribute('option-id', val);
   }
-  
+
   get name() {
     return this.getAttribute('name');
   }
@@ -92,9 +89,13 @@ class AnswerOption extends HTMLElement {
   set selected(val) {
     const isSelected = Boolean(val);
     if (isSelected) {
-      super.setAttribute('selected', 'true'); 
+      if (!this.hasAttribute('selected')) {
+        super.setAttribute('selected', 'true');
+      }
     } else {
-      super.removeAttribute('selected');
+      if (this.hasAttribute('selected')) {
+        super.removeAttribute('selected');
+      }
     }
     if (this._inputElement.checked !== isSelected) {
         this._inputElement.checked = isSelected;
@@ -103,35 +104,40 @@ class AnswerOption extends HTMLElement {
 
   connectedCallback() {
     this.shadowRoot.querySelector('.option-box').addEventListener('click', this._handleClick.bind(this));
-    
+
+    if (this.hasAttribute('label') && (this.text === 'Answer option' || !this.hasAttribute('data-text-set-via-property'))) {
+        this.text = this.getAttribute('label');
+    }
     if (this.hasAttribute('name')) {
         this._inputElement.name = this.getAttribute('name');
     }
     if (this.hasAttribute('option-id')) {
         this._inputElement.value = this.getAttribute('option-id');
     }
+  
     if (this.hasAttribute('selected')) {
-        this._inputElement.checked = true;
+        this.selected = true; 
+    } else {
+        this.selected = false; 
     }
   }
 
   _handleClick(event) {
-    if (event.target !== this._inputElement) {
+    if (!this._inputElement.checked) {
         this._inputElement.checked = true;
     }
 
-    if (this._inputElement.checked) {
-      this.selected = true; 
-      if (this.parentElement && this.name) {
-        const siblings = this.parentElement.querySelectorAll(`answer-option[name="${this.name}"]`);
-        siblings.forEach(sibling => {
-          if (sibling !== this) {
-            sibling.selected = false;
-          }
-        });
-      }
-      this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true, detail: { selected: true, optionId: this.optionId } }));
+    this.selected = true;
+
+    if (this.parentElement && this.name) {
+      const siblings = this.parentElement.querySelectorAll(`answer-option[name="${this.name}"]`);
+      siblings.forEach(sibling => {
+        if (sibling !== this) {
+          sibling.selected = false;
+        }
+      });
     }
+    this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true, detail: { selected: true, optionId: this.optionId } }));
   }
 }
 

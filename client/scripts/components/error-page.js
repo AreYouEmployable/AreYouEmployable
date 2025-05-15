@@ -1,46 +1,43 @@
+import { createElementAndAppend } from '../utils.js';
 import { AuthService } from '../services/auth.js';
 
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', '/styles/components/error-page.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: '/styles/components/error-page.css' }
+});
 
-const articleElement = document.createElement('article');
-articleElement.classList.add('error-container');
+const articleElement = createElementAndAppend(template.content, 'article', {
+  classList: ['error-container']
+});
 
-const summaryElement = document.createElement('summary');
-summaryElement.classList.add('error-content');
+const summaryElement = createElementAndAppend(articleElement, 'summary', {
+  classList: ['error-content']
+});
 
-const h1Element = document.createElement('h1');
-h1Element.classList.add('error-title');
-h1Element.textContent = 'Access Denied';
-summaryElement.appendChild(h1Element);
+createElementAndAppend(summaryElement, 'h1', {
+  props: { textContent: 'Access Denied' },
+  classList: ['error-title']
+});
 
-const pElement = document.createElement('p');
-pElement.classList.add('error-message');
-pElement.textContent = 'You do not have permission to access this resource.';
-summaryElement.appendChild(pElement);
+createElementAndAppend(summaryElement, 'p', {
+  props: { textContent: 'You do not have permission to access this resource.' },
+  classList: ['error-message']
+});
 
-const sectionActionsElement = document.createElement('section');
-sectionActionsElement.classList.add('error-actions');
+const sectionActionsElement = createElementAndAppend(summaryElement, 'section', {
+  classList: ['error-actions']
+});
 
-const goHomeButton = document.createElement('button');
-goHomeButton.id = 'goHomeBtn';
-goHomeButton.classList.add('primary-button');
-goHomeButton.textContent = 'Go to Home';
-sectionActionsElement.appendChild(goHomeButton);
+createElementAndAppend(sectionActionsElement, 'button', {
+  props: { id: 'goHomeBtn', textContent: 'Go to Home' },
+  classList: ['primary-button']
+});
 
-const signOutButton = document.createElement('button');
-signOutButton.id = 'signOutBtn';
-signOutButton.classList.add('secondary-button');
-signOutButton.textContent = 'Sign Out';
-sectionActionsElement.appendChild(signOutButton);
-
-summaryElement.appendChild(sectionActionsElement);
-articleElement.appendChild(summaryElement);
-template.content.appendChild(articleElement);
+createElementAndAppend(sectionActionsElement, 'button', {
+  props: { id: 'signOutBtn', textContent: 'Sign Out' },
+  classList: ['secondary-button']
+});
 
 class ErrorPage extends HTMLElement {
   constructor() {
@@ -53,15 +50,19 @@ class ErrorPage extends HTMLElement {
     const goHomeBtn = this.shadowRoot.getElementById('goHomeBtn');
     const signOutBtn = this.shadowRoot.getElementById('signOutBtn');
 
-    goHomeBtn.addEventListener('click', () => {
-      window.location.href = '/';
-    });
+    if (goHomeBtn) {
+      goHomeBtn.addEventListener('click', () => {
+        window.location.href = '/';
+      });
+    }
 
-    signOutBtn.addEventListener('click', async () => {
-      await AuthService.logout();
-      window.location.href = '/';
-    });
+    if (signOutBtn) {
+      signOutBtn.addEventListener('click', async () => {
+        await AuthService.logout();
+        window.location.href = '/';
+      });
+    }
   }
 }
 
-customElements.define('error-page', ErrorPage); 
+customElements.define('error-page', ErrorPage);

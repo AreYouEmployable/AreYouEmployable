@@ -1,27 +1,27 @@
+import { createElementAndAppend } from '../utils.js';
+
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', '/styles/components/progress-bar.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: '/styles/components/progress-bar.css' }
+});
 
-const progressContainerSection = document.createElement('section');
-progressContainerSection.classList.add('progress-container');
+const progressContainerSection = createElementAndAppend(template.content, 'section', {
+  props: { className: 'progress-container' }
+});
 
-const progressBarElement = document.createElement('progress');
-progressBarElement.classList.add('progress-bar');
-progressBarElement.id = 'bar';
-progressBarElement.setAttribute('value', '0');
-progressBarElement.setAttribute('max', '100');
-progressContainerSection.appendChild(progressBarElement);
+createElementAndAppend(progressContainerSection, 'progress', {
+  props: { className: 'progress-bar', id: 'bar' },
+  attrs: { value: '0', max: '100' }
+});
 
-const progressTextSection = document.createElement('section');
-progressTextSection.classList.add('progress-text');
-progressTextSection.id = 'progress-text';
-progressTextSection.textContent = '0%';
-progressContainerSection.appendChild(progressTextSection);
-
-template.content.appendChild(progressContainerSection);
+createElementAndAppend(progressContainerSection, 'section', {
+  props: {
+    className: 'progress-text',
+    id: 'progress-text',
+    textContent: '0%'
+  }
+});
 
 class ProgressBar extends HTMLElement {
   constructor() {
@@ -69,13 +69,17 @@ class ProgressBar extends HTMLElement {
   }
 
   updateBar() {
-    const percent = Math.round((this.current / this.total) * 100);
+    const percent = this.total > 0 ? Math.round((this.current / this.total) * 100) : 0;
     const bar = this.shadowRoot.getElementById('bar');
     const progressText = this.shadowRoot.getElementById('progress-text');
-    
-    bar.value = percent;
-    bar.max = 100;
-    progressText.textContent = `${percent}%`;
+
+    if (bar) {
+        bar.value = percent;
+        bar.max = 100;
+    }
+    if (progressText) {
+        progressText.textContent = `${percent}%`;
+    }
 
     this.dispatchEvent(new CustomEvent('progress-update', {
       detail: { current: this.current, total: this.total, percent },
@@ -88,9 +92,11 @@ class ProgressBar extends HTMLElement {
 
   togglePulseAnimation(percent) {
     const progressBarElement = this.shadowRoot.querySelector('.progress-bar');
+    if (!progressBarElement) return;
+
     if (percent === 0) {
       progressBarElement.style.animation = 'none';
-    } else if (!progressBarElement.style.animation) {
+    } else if (progressBarElement.style.animation === 'none' || !progressBarElement.style.animation) {
       progressBarElement.style.animation = 'progress-pulse 1s ease-out';
     }
   }

@@ -1,22 +1,23 @@
+import { createElementAndAppend } from '../utils.js';
+
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', 'styles/components/question-header.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: 'styles/components/question-header.css' }
+});
 
-const headerElement = document.createElement('header');
-headerElement.classList.add('question-header');
+const headerElement = createElementAndAppend(template.content, 'header', {
+  classList: ['question-header']
+});
 
-const h2Element = document.createElement('h2');
-h2Element.id = 'question-title';
-headerElement.appendChild(h2Element);
+createElementAndAppend(headerElement, 'h2', {
+  props: { id: 'question-title' }
+});
 
-const pElement = document.createElement('p');
-pElement.id = 'question-description';
-headerElement.appendChild(pElement);
+createElementAndAppend(headerElement, 'p', {
+  props: { id: 'question-description' }
+});
 
-template.content.appendChild(headerElement);
 class QuestionHeader extends HTMLElement {
   constructor() {
     super();
@@ -42,12 +43,22 @@ class QuestionHeader extends HTMLElement {
   }
 
   connectedCallback() {
+    if (this.hasAttribute('title')) {
+        this._title = this.getAttribute('title');
+    }
+    if (this.hasAttribute('description')) {
+        this._description = this.getAttribute('description');
+    }
     this.render();
   }
 
   render() {
-    this.questionTitleElement.textContent = this._title;
-    this.questionDescriptionElement.textContent = this._description;
+    if (this.questionTitleElement) {
+        this.questionTitleElement.textContent = this._title;
+    }
+    if (this.questionDescriptionElement) {
+        this.questionDescriptionElement.textContent = this._description;
+    }
   }
 
   get title() {
