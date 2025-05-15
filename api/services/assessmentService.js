@@ -29,17 +29,13 @@ export const submitAssessment = async (assessmentId) => {
         throw new Error("assessmentId is required");
     }
 
-    // Get user answers
     const answers = await answerRepository.getAssessmentUserAnswers(assessmentId);
     const total = answers.length;
     const correct = answers.filter(a => a.is_correct).length;
     const score = total > 0 ? Math.round((correct / total) * 100) : 0;
  
-    // Generate result summary
-    // const resultSummary = await generateAssessmentResultSummary(assessmentId);
-    const resultSummary = "Well done! You have completed the assessment. Your score is " + score + "%.";
+    const resultSummary = await generateAssessmentResultSummary(assessmentId);
 
-    // Update assessment with score, summary, and status
     await assessmentRepository.updateAssessmentResult(
         assessmentId,
         score,
