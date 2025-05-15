@@ -1,22 +1,54 @@
 import "./progress-bar.js";
 
 const template = document.createElement("template");
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/results-progress-card.css">
-  <article class="card">
-    <header class="header">
-        <i class="header-icon" aria-hidden="true"></i>
-        <label class="category">Category</label>
-    </header>
 
-    <section class="score-line" aria-label="Score">
-        <label class="score" id="score">0%</label>
-        <label id="score-detail">(0/0)</label>
-    </section>
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/results-progress-card.css');
+template.content.appendChild(stylesheetLink);
 
-    <progress-bar id="progress" current="2" total="5" color="red"></progress-bar>
-  </article>
-`;
+const articleElement = document.createElement('article');
+articleElement.classList.add('card');
+
+const headerElement = document.createElement('header');
+headerElement.classList.add('header');
+
+const iconElement = document.createElement('i');
+iconElement.classList.add('header-icon');
+iconElement.setAttribute('aria-hidden', 'true');
+headerElement.appendChild(iconElement);
+
+const categoryLabel = document.createElement('label');
+categoryLabel.classList.add('category');
+categoryLabel.textContent = 'Category';
+headerElement.appendChild(categoryLabel);
+articleElement.appendChild(headerElement);
+
+const scoreLineSection = document.createElement('section');
+scoreLineSection.classList.add('score-line');
+scoreLineSection.setAttribute('aria-label', 'Score');
+
+const scoreLabel = document.createElement('label');
+scoreLabel.classList.add('score');
+scoreLabel.id = 'score';
+scoreLabel.textContent = '0%';
+scoreLineSection.appendChild(scoreLabel);
+
+const scoreDetailLabel = document.createElement('label');
+scoreDetailLabel.id = 'score-detail';
+scoreDetailLabel.textContent = '(0/0)';
+scoreLineSection.appendChild(scoreDetailLabel);
+articleElement.appendChild(scoreLineSection);
+
+const progressBarElement = document.createElement('progress-bar');
+progressBarElement.id = 'progress';
+progressBarElement.setAttribute('current', '2');
+progressBarElement.setAttribute('total', '5');
+progressBarElement.setAttribute('color', 'red');
+articleElement.appendChild(progressBarElement);
+
+template.content.appendChild(articleElement);
+
 
 class ResultsProgressCard extends HTMLElement {
   constructor() {

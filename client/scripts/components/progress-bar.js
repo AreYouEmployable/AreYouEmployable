@@ -1,34 +1,27 @@
-const barTemplate = document.createElement("template");
-barTemplate.innerHTML = `
-    <style>
-      progress {
-        appearance: none;
-        width: 100%;
-        height: 8px;
-        border: none;
-        border-radius: 4px;
-        background-color: #e5e7eb;
-        overflow: hidden;
-      }
+const template = document.createElement('template');
 
-      progress::-webkit-progress-bar {
-        background-color: #e5e7eb;
-        border-radius: 4px;
-      }
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/progress-bar.css');
+template.content.appendChild(stylesheetLink);
 
-      progress::-webkit-progress-value {
-        background-color: #2563eb;
-        border-radius: 4px;
-        transition: width 0.3s ease;
-      }
+const progressContainerSection = document.createElement('section');
+progressContainerSection.classList.add('progress-container');
 
-      progress::-moz-progress-bar {
-        background-color: #2563eb;
-        transition: width 0.3s ease;
-      }
-    </style>
-    <progress id="bar" value="0" max="1"></progress>
-  `;
+const progressBarElement = document.createElement('progress');
+progressBarElement.classList.add('progress-bar');
+progressBarElement.id = 'bar';
+progressBarElement.setAttribute('value', '0');
+progressBarElement.setAttribute('max', '100');
+progressContainerSection.appendChild(progressBarElement);
+
+const progressTextSection = document.createElement('section');
+progressTextSection.classList.add('progress-text');
+progressTextSection.id = 'progress-text';
+progressTextSection.textContent = '0%';
+progressContainerSection.appendChild(progressTextSection);
+
+template.content.appendChild(progressContainerSection);
 
 class ProgressBar extends HTMLElement {
   constructor() {

@@ -56,12 +56,6 @@ const getAssessments = async (req, res) => {
 
 const submitAssessmentHandler = async (req, res) => {
     try {
-        if (!req.user || !req.user.sub) {
-            return res.status(403).json({ 
-                error: 'forbidden',
-                message: 'You must be authenticated to submit an assessment'
-            });
-        }
         const assessmentId = parseInt(req.params.id, 10);
         const result = await assessmentService.submitAssessment(assessmentId);
         res.json(result);

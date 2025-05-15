@@ -87,7 +87,7 @@ export class CdkStack extends cdk.Stack {
       securityGroups: [dbSecurityGroup],
       databaseName: areYouEmployableDbName,
       allocatedStorage: 20,
-      maxAllocatedStorage: 20,
+      maxAllocatedStorage: 40,
       allowMajorVersionUpgrade: false,
       autoMinorVersionUpgrade: true,
       deleteAutomatedBackups: true,

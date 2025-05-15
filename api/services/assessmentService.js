@@ -34,17 +34,17 @@ export const submitAssessment = async (assessmentId) => {
     const total = answers.length;
     const correct = answers.filter(a => a.is_correct).length;
     const score = total > 0 ? Math.round((correct / total) * 100) : 0;
-
+ 
     // Generate result summary
     // const resultSummary = await generateAssessmentResultSummary(assessmentId);
     const resultSummary = "Well done! You have completed the assessment. Your score is " + score + "%.";
 
     // Update assessment with score, summary, and status
-    await assessmentRepository.updateAssessmentResult({
+    await assessmentRepository.updateAssessmentResult(
         assessmentId,
         score,
         resultSummary,
-    });
+    );
 };
 
 export const submitScenario = async (assessmentId, scenarioIndex, answers) => {
@@ -277,3 +277,21 @@ export async function getOrCreateActiveAssessment(googleId) {
         client.release();
     }
 }
+
+
+/**
+ * Validates whether a given user (by Google ID) owns the specified assessment.
+ * Calls the checkAssessmentOwnership method to verify ownership.
+ *
+ * @param {string} googleId - The Google ID of the user.
+ * @param {number|string} assessmentId - The ID of the assessment to check.
+ * @returns {Promise<boolean>} True if the user owns the assessment, false otherwise.
+ */
+export async function validateAssessmentOwnership(googleId, assessmentId) {
+  console.log('Validating assessment ownership...');
+    const assessment = await assessmentRepository.checkAssessmentOwnership(googleId, assessmentId);
+    if (!assessment) {
+        return false;
+    }
+    return true;
+};

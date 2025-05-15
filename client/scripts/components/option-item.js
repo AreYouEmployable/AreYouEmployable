@@ -1,12 +1,23 @@
 const template = document.createElement('template');
-template.innerHTML = `
-<link rel="stylesheet" href="/styles/components/option-item.css">
-  <label class="flex items-center space-x-2">
-    <input type="checkbox" name="answer" class="form-checkbox text-blue-600" />
-    <slot></slot>
-  </label>
-`;
 
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/option-item.css');
+template.content.appendChild(stylesheetLink);
+
+const labelElement = document.createElement('label');
+labelElement.classList.add('flex', 'items-center', 'space-x-2');
+
+const inputCheckboxElement = document.createElement('input');
+inputCheckboxElement.setAttribute('type', 'checkbox');
+inputCheckboxElement.setAttribute('name', 'answer');
+inputCheckboxElement.classList.add('form-checkbox', 'text-blue-600');
+labelElement.appendChild(inputCheckboxElement);
+
+const slotElement = document.createElement('slot');
+labelElement.appendChild(slotElement);
+
+template.content.appendChild(labelElement);
 class OptionItem extends HTMLElement {
   constructor() {
     super();
