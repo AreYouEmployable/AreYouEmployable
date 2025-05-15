@@ -1,8 +1,12 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/app-main.css">
-  <main></main>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/app-main.css');
+template.content.appendChild(stylesheetLink);
+
+const mainElement = document.createElement('main');
+template.content.appendChild(mainElement);
 
 class AppMain extends HTMLElement {
   constructor() {

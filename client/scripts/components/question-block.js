@@ -1,11 +1,23 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/question-block.css">
-  <complexity-level-bar level="medium"></complexity-level-bar>
-  <question-container></question-container>
-  <section class="options-wrapper" id="options"></section>
-  <button id="submitBtn" class="submit-btn">Submit Answer</button>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/question-block.css');
+template.content.appendChild(stylesheetLink);
+
+const questionContainerElement = document.createElement('question-container');
+template.content.appendChild(questionContainerElement);
+
+const optionsWrapperSection = document.createElement('section');
+optionsWrapperSection.classList.add('options-wrapper');
+optionsWrapperSection.id = 'options';
+template.content.appendChild(optionsWrapperSection);
+
+const submitButton = document.createElement('button');
+submitButton.id = 'submitBtn';
+submitButton.classList.add('submit-btn');
+submitButton.textContent = 'Submit Answer';
+template.content.appendChild(submitButton);
 
 class QuestionBlock extends HTMLElement {
   constructor() {
@@ -25,10 +37,6 @@ class QuestionBlock extends HTMLElement {
 
   set questionText(text) {
     this.shadowRoot.querySelector('question-container').question = text;
-  }
-
-  set complexity(level) {
-    this.shadowRoot.querySelector('complexity-level-bar').setAttribute('level', level);
   }
 
   set options(optionTexts) {

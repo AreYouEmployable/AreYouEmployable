@@ -1,8 +1,14 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="styles/components/labels-indicator.css">
-  <ul class="labels-container" role="list"></ul>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', 'styles/components/labels-indicator.css');
+template.content.appendChild(stylesheetLink);
+
+const ulElement = document.createElement('ul');
+ulElement.classList.add('labels-container');
+ulElement.setAttribute('role', 'list');
+template.content.appendChild(ulElement);
 
 class LabelsIndicator extends HTMLElement {
   constructor() {

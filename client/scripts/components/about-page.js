@@ -1,15 +1,32 @@
 const template = document.createElement('template');
-template.innerHTML = `
-  <link rel="stylesheet" href="/styles/components/about-page.css">
-  <article>
-    <h2></h2>
-    <p>Learn more about our company and mission.</p>
-    <section>
-      <h3>Our Team</h3>
-      <section id="team-members"></section>
-    </section>
-  </article>
-`;
+
+const stylesheetLink = document.createElement('link');
+stylesheetLink.setAttribute('rel', 'stylesheet');
+stylesheetLink.setAttribute('href', '/styles/components/about-page.css');
+template.content.appendChild(stylesheetLink);
+
+const mainArticle = document.createElement('article');
+
+const h2Title = document.createElement('h2');
+mainArticle.appendChild(h2Title);
+
+const paragraph = document.createElement('p');
+paragraph.textContent = 'Learn more about our company and mission.';
+mainArticle.appendChild(paragraph);
+
+const teamSection = document.createElement('section');
+
+const h3TeamTitle = document.createElement('h3');
+h3TeamTitle.textContent = 'Our Team';
+teamSection.appendChild(h3TeamTitle);
+
+const teamMembersSection = document.createElement('section');
+teamMembersSection.id = 'team-members';
+teamSection.appendChild(teamMembersSection);
+
+mainArticle.appendChild(teamSection);
+
+template.content.appendChild(mainArticle);
 
 class AboutPage extends HTMLElement {
   constructor() {
