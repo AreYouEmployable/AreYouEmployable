@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/create', verifyGoogleIdToken, createAssessment);
 router.get('/history', verifyGoogleIdToken, getAssessments);
-router.post('/submit', verifyGoogleIdToken, submitAssessmentHandler);
+router.post('/submit/:id', submitAssessmentHandler);
 router.get('/:id', verifyGoogleIdToken, getAssessment);
 router.get('/:id/scenarios/:scenarioIndex', verifyGoogleIdToken, getAssessmentScenarioByIndex);
 router.post('/submit-scenario', verifyGoogleIdToken, submitScenarioHandler);
