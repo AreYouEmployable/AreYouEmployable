@@ -274,4 +274,24 @@ export async function getTotalScenarios(dbClient, assessmentId) {
     return result.rows[0] || null;
 }
 
-export { createAssessment, getAssessmentById, completeAssessment, getUserAnswersWithCorrectness, updateAssessmentResult,getCompletedScenarios, getActiveAssessment };
+const checkAssessmentOwnership = async (googleId, assessmentId) => {
+    const query = `
+        SELECT a.assessment_id
+        FROM assessments a
+        JOIN users u ON a.user_id = u.user_id
+        WHERE u.google_id = $1 AND a.assessment_id = $2;
+    `;
+    const result = await db.query(query, [googleId, assessmentId]);
+    return result.rows.length > 0;
+};
+
+export { 
+  createAssessment, 
+  getAssessmentById, 
+  completeAssessment, 
+  getUserAnswersWithCorrectness, 
+  updateAssessmentResult,
+  getCompletedScenarios, 
+  getActiveAssessment,
+  checkAssessmentOwnership
+};

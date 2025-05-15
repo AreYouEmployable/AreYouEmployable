@@ -277,3 +277,21 @@ export async function getOrCreateActiveAssessment(googleId) {
         client.release();
     }
 }
+
+
+/**
+ * Validates whether a given user (by Google ID) owns the specified assessment.
+ * Calls the checkAssessmentOwnership method to verify ownership.
+ *
+ * @param {string} googleId - The Google ID of the user.
+ * @param {number|string} assessmentId - The ID of the assessment to check.
+ * @returns {Promise<boolean>} True if the user owns the assessment, false otherwise.
+ */
+export async function validateAssessmentOwnership(googleId, assessmentId) {
+  console.log('Validating assessment ownership...');
+    const assessment = await assessmentRepository.checkAssessmentOwnership(googleId, assessmentId);
+    if (!assessment) {
+        return false;
+    }
+    return true;
+};
