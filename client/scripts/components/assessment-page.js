@@ -385,7 +385,7 @@ class AssessmentPage extends HTMLElement {
     }
     
     setTimeout(() => {
-        window.location.href = `/assessment-results?assessmentId=${this.assessmentId}`;
+        window.location.href = `/results?assessmentId=${this.assessmentId}`;
     }, 3000); 
   }
 }

@@ -1,36 +1,35 @@
 .card {
   background: #f9fafb;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 1.2rem;
+  padding: 1.6rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 0.6rem;
+  box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.05);
   font-family: sans-serif;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.6rem;
   font-weight: 600;
-  font-size: 14px;
   color: #1f2937;
 }
 
 .header-icon {
-  width: 20px;
-  height: 20px;
+  width: 2.0rem;
+  height: 2.0rem;
 }
 
 .score {
-  font-size: 20px;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #2563eb;
 }
 
-.score span {
-  font-size: 14px;
+.score {
+  font-size: 1.4rem;
   color: #6b7280;
-  margin-left: 4px;
+  margin-left: 0.4rem;
 }

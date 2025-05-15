@@ -18,7 +18,7 @@
     color: white;
     font-size: 0.75rem;
     font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
     background-color: #e2e8f0;
     position: relative;
     text-align: center;
@@ -42,7 +42,7 @@
   .progress-bar::-webkit-progress-value::after {
     content: attr(data-value);
     position: absolute;
-    right: 10px;
+    right: 1.0rem;
     color: white;
   }
   
@@ -58,7 +58,7 @@
     color: white;
     font-size: 0.75rem;
     font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.1);
     z-index: 1;
     pointer-events: none;
     padding-right: 0.5rem;
@@ -78,7 +78,7 @@
       box-shadow: 0 0 0 0 rgba(11, 121, 172, 0.4);
     }
     70% {
-      box-shadow: 0 0 0 6px rgba(11, 121, 172, 0);
+      box-shadow: 0 0 0 0.6rem rgba(11, 121, 172, 0);
     }
     100% {
       box-shadow: 0 0 0 0 rgba(11, 121, 172, 0);
