@@ -1,31 +1,35 @@
+import { createElementAndAppend } from '../utils.js';
+
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', '/styles/components/navigation-controls.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: '/styles/components/navigation-controls.css' }
+});
 
-const navElement = document.createElement('nav');
-navElement.classList.add('navigation-controls');
-navElement.setAttribute('aria-label', 'Scenario navigation');
+const navElement = createElementAndAppend(template.content, 'nav', {
+  props: { className: 'navigation-controls' },
+  attrs: { 'aria-label': 'Scenario navigation' }
+});
 
-const prevButton = document.createElement('button');
-prevButton.id = 'prev-btn';
-prevButton.classList.add('nav-button', 'prev-button');
-prevButton.disabled = true;
-prevButton.setAttribute('type', 'button');
-prevButton.textContent = 'Previous';
-navElement.appendChild(prevButton);
+createElementAndAppend(navElement, 'button', {
+  props: {
+    id: 'prev-btn',
+    className: 'nav-button prev-button',
+    disabled: true,
+    textContent: 'Previous'
+  },
+  attrs: { type: 'button' }
+});
 
-const nextButton = document.createElement('button');
-nextButton.id = 'next-btn';
-nextButton.classList.add('nav-button', 'next-button');
-nextButton.disabled = true;
-nextButton.setAttribute('type', 'button');
-nextButton.textContent = 'Next';
-navElement.appendChild(nextButton);
-
-template.content.appendChild(navElement);
+createElementAndAppend(navElement, 'button', {
+  props: {
+    id: 'next-btn',
+    className: 'nav-button next-button',
+    disabled: true,
+    textContent: 'Next'
+  },
+  attrs: { type: 'button' }
+});
 
 class NavigationControls extends HTMLElement {
   constructor() {
@@ -40,31 +44,39 @@ class NavigationControls extends HTMLElement {
   }
 
   connectedCallback() {
-    this.prevButton.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('navigate', {
-        detail: { direction: 'prev' },
-        bubbles: true,
-        composed: true
-      }));
-    });
+    if (this.prevButton) {
+      this.prevButton.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('navigate', {
+          detail: { direction: 'prev' },
+          bubbles: true,
+          composed: true
+        }));
+      });
+    }
 
-    this.nextButton.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('navigate', {
-        detail: { direction: 'next' },
-        bubbles: true,
-        composed: true
-      }));
-    });
+    if (this.nextButton) {
+      this.nextButton.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('navigate', {
+          detail: { direction: 'next' },
+          bubbles: true,
+          composed: true
+        }));
+      });
+    }
   }
 
   set canGoBack(value) {
     this._canGoBack = value;
-    this.prevButton.disabled = !value;
+    if (this.prevButton) {
+        this.prevButton.disabled = !value;
+    }
   }
 
   set canGoForward(value) {
     this._canGoForward = value;
-    this.nextButton.disabled = !value;
+    if (this.nextButton) {
+        this.nextButton.disabled = !value;
+    }
     this._updateNextButtonText();
   }
 
@@ -74,8 +86,10 @@ class NavigationControls extends HTMLElement {
   }
 
   _updateNextButtonText() {
-    this.nextButton.textContent = this._isLastScenario ? 'Finish Assessment' : 'Next';
-    this.nextButton.disabled = !this._canGoForward;
+    if (this.nextButton) {
+        this.nextButton.textContent = this._isLastScenario ? 'Finish Assessment' : 'Next';
+        this.nextButton.disabled = !this._canGoForward;
+    }
   }
 
   get canGoForward() {

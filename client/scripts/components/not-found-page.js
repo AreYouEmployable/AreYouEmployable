@@ -1,27 +1,25 @@
+import { createElementAndAppend } from '../utils.js';
+
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', '/styles/components/not-found-page.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: '/styles/components/not-found-page.css' }
+});
 
-const articleElement = document.createElement('article');
+const articleElement = createElementAndAppend(template.content, 'article');
 
-const h2Element = document.createElement('h2');
-h2Element.textContent = '404 Not Found';
-articleElement.appendChild(h2Element);
+createElementAndAppend(articleElement, 'h2', {
+  props: { textContent: '404 Not Found' }
+});
 
-const pElement = document.createElement('p');
-pElement.textContent = 'The page you are looking for does not exist.';
-articleElement.appendChild(pElement);
+createElementAndAppend(articleElement, 'p', {
+  props: { textContent: 'The page you are looking for does not exist.' }
+});
 
-const aElement = document.createElement('a');
-aElement.setAttribute('href', '/');
-aElement.setAttribute('data-link', '');
-aElement.textContent = 'Go Home';
-articleElement.appendChild(aElement);
-
-template.content.appendChild(articleElement);
+createElementAndAppend(articleElement, 'a', {
+  attrs: { href: '/', 'data-link': '' },
+  props: { textContent: 'Go Home' }
+});
 
 class NotFoundPage extends HTMLElement {
   constructor() {
@@ -31,4 +29,4 @@ class NotFoundPage extends HTMLElement {
   }
 }
 
-customElements.define('not-found-page', NotFoundPage); 
+customElements.define('not-found-page', NotFoundPage);

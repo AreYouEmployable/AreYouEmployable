@@ -1,18 +1,20 @@
+// dynamic-button.js
+
+import { createElementAndAppend } from '../utils.js';
+
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', '/styles/components/dynamic-button.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: '/styles/components/dynamic-button.css' }
+});
 
-const buttonElement = document.createElement('button');
-buttonElement.classList.add('btn');
+const buttonElement = createElementAndAppend(template.content, 'button', {
+  classList: ['btn']
+});
 
-const slotElement = document.createElement('slot');
-slotElement.textContent = 'Click Me';
-
-buttonElement.appendChild(slotElement);
-template.content.appendChild(buttonElement);
+createElementAndAppend(buttonElement, 'slot', {
+  props: { textContent: 'Click Me' }
+});
 
 class DynamicButton extends HTMLElement {
   constructor() {
@@ -33,7 +35,7 @@ class DynamicButton extends HTMLElement {
     if (text) {
       const slot = btn.querySelector('slot');
       if (slot) {
-        slot.textContent = text; 
+        slot.textContent = text;
       } else {
         btn.textContent = text;
       }

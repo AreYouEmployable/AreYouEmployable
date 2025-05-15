@@ -1,44 +1,44 @@
+// forbidden-page.js
+
+import { createElementAndAppend } from '../utils.js';
+
 const template = document.createElement('template');
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', '/styles/components/error-page.css');
-template.content.appendChild(stylesheetLink);
+createElementAndAppend(template.content, 'link', {
+  attrs: { rel: 'stylesheet', href: '/styles/components/error-page.css' }
+});
 
-const articleElement = document.createElement('article');
-articleElement.classList.add('error-container');
+const articleElement = createElementAndAppend(template.content, 'article', {
+  classList: ['error-container']
+});
 
-const summaryElement = document.createElement('summary');
-summaryElement.classList.add('error-content');
+const summaryElement = createElementAndAppend(articleElement, 'summary', {
+  classList: ['error-content']
+});
 
-const h1Element = document.createElement('h1');
-h1Element.classList.add('error-title');
-h1Element.textContent = 'Access Denied';
-summaryElement.appendChild(h1Element);
+createElementAndAppend(summaryElement, 'h1', {
+  props: { textContent: 'Access Denied' },
+  classList: ['error-title']
+});
 
-const pElement = document.createElement('p');
-pElement.classList.add('error-message');
-pElement.textContent = 'You do not have permission to access this resource.'; 
-summaryElement.appendChild(pElement);
+createElementAndAppend(summaryElement, 'p', {
+  props: { textContent: 'You do not have permission to access this resource.' },
+  classList: ['error-message']
+});
 
-const sectionActionsElement = document.createElement('section');
-sectionActionsElement.classList.add('error-actions');
+const sectionActionsElement = createElementAndAppend(summaryElement, 'section', {
+  classList: ['error-actions']
+});
 
-const goHomeButton = document.createElement('button');
-goHomeButton.id = 'goHomeBtn';
-goHomeButton.classList.add('primary-button');
-goHomeButton.textContent = 'Go to Home';
-sectionActionsElement.appendChild(goHomeButton);
+createElementAndAppend(sectionActionsElement, 'button', {
+  props: { id: 'goHomeBtn', textContent: 'Go to Home' },
+  classList: ['primary-button']
+});
 
-const signInButton = document.createElement('button');
-signInButton.id = 'signInBtn';
-signInButton.classList.add('secondary-button');
-signInButton.textContent = 'Sign In';
-sectionActionsElement.appendChild(signInButton);
-
-summaryElement.appendChild(sectionActionsElement);
-articleElement.appendChild(summaryElement);
-template.content.appendChild(articleElement);
+createElementAndAppend(sectionActionsElement, 'button', {
+  props: { id: 'signInBtn', textContent: 'Sign In' },
+  classList: ['secondary-button']
+});
 
 export class ForbiddenPage extends HTMLElement {
     constructor() {
@@ -47,7 +47,7 @@ export class ForbiddenPage extends HTMLElement {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
 
         this.goHomeBtn = this.shadowRoot.querySelector('#goHomeBtn');
-        this.signInBtn = this.shadowRoot.querySelector('#signInBtn'); 
+        this.signInBtn = this.shadowRoot.querySelector('#signInBtn');
         this.errorTitleElement = this.shadowRoot.querySelector('.error-title');
         this.errorMessageElement = this.shadowRoot.querySelector('.error-message');
     }
@@ -62,14 +62,12 @@ export class ForbiddenPage extends HTMLElement {
 
         if (this.goHomeBtn) {
             this.goHomeBtn.addEventListener('click', () => {
-                console.log('Go to Home clicked');
                 this.dispatchEvent(new CustomEvent('gohome', { bubbles: true, composed: true }));
             });
         }
 
         if (this.signInBtn) {
             this.signInBtn.addEventListener('click', () => {
-                console.log('Sign In clicked'); 
                 this.dispatchEvent(new CustomEvent('signin', { bubbles: true, composed: true }));
             });
         }

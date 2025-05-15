@@ -1,17 +1,16 @@
-const optionsListTemplate = document.createElement('template'); // Renamed to avoid conflict if used in same scope as other templates
+import { createElementAndAppend } from '../utils.js';
 
-const stylesheetLink = document.createElement('link');
-stylesheetLink.setAttribute('rel', 'stylesheet');
-stylesheetLink.setAttribute('href', 'styles/components/options-list.css');
-optionsListTemplate.content.appendChild(stylesheetLink);
+const optionsListTemplate = document.createElement('template');
 
-const sectionElement = document.createElement('section');
-sectionElement.classList.add('options-list');
+createElementAndAppend(optionsListTemplate.content, 'link', {
+  attrs: { rel: 'stylesheet', href: 'styles/components/options-list.css' }
+});
 
-const slotElement = document.createElement('slot');
-sectionElement.appendChild(slotElement);
+const sectionElement = createElementAndAppend(optionsListTemplate.content, 'section', {
+  classList: ['options-list']
+});
 
-optionsListTemplate.content.appendChild(sectionElement);
+createElementAndAppend(sectionElement, 'slot');
 
 class OptionsList extends HTMLElement {
   constructor() {
