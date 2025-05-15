@@ -1,13 +1,11 @@
+
 import "./progress-bar.js";
 
 const template = document.createElement("template");
 
 const stylesheetLink = document.createElement("link");
 stylesheetLink.setAttribute("rel", "stylesheet");
-stylesheetLink.setAttribute(
-  "href",
-  "/styles/components/results-progress-card.css"
-);
+stylesheetLink.setAttribute("href", "/styles/components/results-progress-card.css");
 template.content.appendChild(stylesheetLink);
 
 const articleElement = document.createElement("article");
@@ -63,32 +61,17 @@ class ResultsProgressCard extends HTMLElement {
     return ["current", "total", "category", "icon", "color", "score-color"];
   }
 
+  connectedCallback() {
+    this.update();
+  }
+
   attributeChangedCallback(name, oldValue, newValue) {
-    // Optionally handle each attribute individually
     if (oldValue !== newValue) {
-      this.updateAttributes();
-      // You could also update only what changed for better performance
+      this.update();
     }
   }
 
-  updateAttributes() {
-    this.current = parseInt(this.getAttribute("current") || "0");
-    this.total = parseInt(this.getAttribute("total") || "1");
-    this.category = this.getAttribute("category") || "Category";
-    this.icon = this.getAttribute("icon") || "";
-    this.color = this.getAttribute("color") || "#10b981";
-    this.scoreColor = this.getAttribute("score-color") || this.color;
-
-    // Update the UI or internal state accordingly
-    this.render();
-  }
-
-  render() {
-    // Implement your rendering logic using `this.current`, `this.total`, etc.
-  }
-
-  connectedCallback() {
-    this.render();
+  update() {
     const current = parseInt(this.getAttribute("current") || "0");
     const total = parseInt(this.getAttribute("total") || "1");
     const category = this.getAttribute("category") || "Category";
@@ -100,9 +83,7 @@ class ResultsProgressCard extends HTMLElement {
     const progress = this.shadowRoot.getElementById("progress");
     const score = this.shadowRoot.getElementById("score");
     const detail = this.shadowRoot.getElementById("score-detail");
-
     const headerIcon = this.shadowRoot.querySelector(".header-icon");
-    const header = this.shadowRoot.querySelector(".header");
 
     this.shadowRoot.querySelector(".category").textContent = category;
 
