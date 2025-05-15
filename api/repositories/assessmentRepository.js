@@ -93,10 +93,7 @@ const updateAssessmentResult = async (assessmentId, score, resultSummary) => {
     UPDATE assessments
     SET score = $1,
         result_summary = $2,
-        completed_at = NOW(),
-        assessment_status_id = (
-            SELECT assessment_status_id FROM assessment_status WHERE name = 'Completed'
-        )
+        assessment_status_id = 2
     WHERE assessment_id = $3
   `, [score, resultSummary, assessmentId]);
 };
