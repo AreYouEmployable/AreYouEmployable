@@ -104,6 +104,7 @@ const routes = [
   { path: '*', component: 'not-found-page', data: { title: '' } },
   { path: '/results', component: 'results-page', data: { title: 'Results' } },
   {path: '/assessment', component: 'assessment-page', data: { title: 'Assessment' } },
+  { path: '/history', component: 'assessment-history', data: { title: 'Assessment History' } },
   { path: '*', component: 'not-found-page', data: { title: '404 Not Found' } }
 ];
 
