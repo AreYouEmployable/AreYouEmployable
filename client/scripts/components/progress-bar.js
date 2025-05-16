@@ -1,33 +1,7 @@
 
 const barTemplate = document.createElement("template");
 barTemplate.innerHTML = `
-    <style>
-      progress {
-        appearance: none;
-        width: 100%;
-        height: 8px;
-        border: none;
-        border-radius: 4px;
-        background-color: #e5e7eb;
-        overflow: hidden;
-      }
-
-      progress::-webkit-progress-bar {
-        background-color: #e5e7eb;
-        border-radius: 4px;
-      }
-
-      progress::-webkit-progress-value {
-        background-color: #2563eb;
-        border-radius: 4px;
-        transition: width 0.3s ease;
-      }
-
-      progress::-moz-progress-bar {
-        background-color: #2563eb;
-        transition: width 0.3s ease;
-      }
-    </style>
+    <link rel="stylesheet" href="/styles/components/progress-bar.css">
     <progress id="bar" value="0" max="1"></progress>
   `;
 
