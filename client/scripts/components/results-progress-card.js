@@ -103,5 +103,6 @@ class ResultsProgressCard extends HTMLElement {
     detail.textContent = `(${current}/${total})`;
   }
 }
-
+if (!customElements.get("results-progress-card")) {
 customElements.define("results-progress-card", ResultsProgressCard);
+}
