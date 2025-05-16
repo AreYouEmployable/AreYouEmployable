@@ -1,244 +1,8 @@
-
-// import "./results-progress-card.js";
-// import "./results-summary-card.js";
-// import "./dynamic-button.js";
-// import "./progress-bar.js";
-// import { ApiService } from "../services/api.js";
-// import { AuthService } from "../services/auth.js";
-
-// const template = document.createElement("template");
-// template.innerHTML = `
-//   <link rel="stylesheet" href="/styles/components/results-page.css">
-//   <section class="loading" id="loading-message">Loading your results...</section>
-//   <section class="results-container">
-//     <h1>Your Assessment Results</h1>
-
-//     <results-summary-card id="rating-card"></results-summary-card>
-
-//     <section class="overall-score">
-//       <results-progress-card id="overall-score-card"></results-progress-card>
-//     </section>
-
-//     <h4 id="category-breakdown">Category Breakdown</h4>
-//     <section class="category-grid">
-//       <results-progress-card id="technical-card"></results-progress-card>
-//       <results-progress-card id="communication-card"></results-progress-card>
-//       <results-progress-card id="problem-solving-card"></results-progress-card>
-//       <results-progress-card id="soft-skills-card"></results-progress-card>
-//     </section>
-
-//     <section class="summary-section">
-//       <results-summary-card id="strengths-card"></results-summary-card>
-//       <results-summary-card id="improvements-card"></results-summary-card>
-//     </section>
-
-   
-//   </section>
-// `;
-// class ResultsPage extends HTMLElement {
-//   constructor() {
-//     super();
-//     this.attachShadow({ mode: "open" });
-//     this.shadowRoot.appendChild(template.content.cloneNode(true));
-//   }
-
-//   async connectedCallback() {
-//     try {
-//       const urlParams = new URLSearchParams(window.location.search);
-//       const assessmentId = urlParams.get("assessmentId");
-//       console.log("Assessment id:" + assessmentId);
-
-//       if (!assessmentId) {
-//         console.error(
-//           "AssessmentResults: Cannot load results: assessmentId is not set."
-//         );
-//         this.displayError("Assessment ID is missing. Cannot load results.");
-//         return;
-//       }
-
-//       // const response = await ApiService.get(
-//       //   `/api/assessments/${assessmentId}/results`
-//       // );
-
-//       // // console.log(response.data);
-//       // const assessmentResults = response.data;
-
-//       const mockResults = {
-//         employabilityRating: "Needs Improvement",
-//         feedback:
-//           "You have foundational software engineering knowledge but need to strengthen several key areas before being ready for professional roles.",
-//         totalScore: 14,
-//         maxPossibleScore: 15,
-//         categoryScores: {
-//           technical: { score: 4, maxScore: 6 },
-//           communication: { score: 2, maxScore: 3 },
-//           problemSolving: { score: 1, maxScore: 3 },
-//           softSkills: { score: 3, maxScore: 3 },
-//         },
-//         strengths: [
-//           "Reliable and consistent",
-//           "Strong collaboration",
-//           "Empathetic leadership",
-//         ],
-//         areasToImprove: ["Clear and constructive communication"],
-//       };
-
-
-//       // Update employability summary
-//       const ratingCard = this.shadowRoot.querySelector("#rating-card");
-
-//       function getScoreFeedbackRatings(score, maxScore) {
-//         const percentage = (score / maxScore) * 100;
-//         if (percentage >= 80) return "Highly Employable";
-//         if (percentage >= 60) return "Employable";
-//         if (percentage >= 40) return "Needs Improvement";
-//         return "Not Employable";
-//       }
-
-//       const colors = {
-//         "Highly Employable": {
-//           bg: "#d1fae5",
-//           title: "#065f46",
-//         },
-//         Employable: {
-//           bg: "#d1fae5",
-//           title: "#065f46",
-//         },
-//         "Needs Improvement": {
-//           bg: "#fef3c7",
-//           title: "#92400e",
-//         },
-//         "Not Employable": {
-//           bg: "#fee2e2",
-//           title: "#991b1b",
-//         },
-//       };
-
-//       const score = assessmentResults.totalScore;
-//       const maxScore = assessmentResults.maxPossibleScore;
-//       const rating = getScoreFeedbackRatings(score, maxScore);
-//       const ratingStyle = colors[rating] || {};
-
-//       ratingCard.setAttribute("title", rating);
-//       ratingCard.setAttribute("title-color", ratingStyle.title);
-//       ratingCard.setAttribute("background", ratingStyle.bg);
-//       ratingCard.setAttribute("items", assessmentResults.feedback);
-//       ratingCard.setAttribute("item-color", ratingStyle.title);
-//       ratingCard.setAttribute(
-//         "title-icon",
-//         rating.includes("Not Employable") ||
-//           rating.includes("Needs Improvement")
-//           ? "⚠️"
-//           : "✅"
-//       );
-
-//       // Populate Overall Score Progress Card
-//       const overallCard = this.shadowRoot.querySelector("#overall-score-card");
-//       overallCard.setAttribute("category", "Overall Score");
-//       overallCard.setAttribute("current", assessmentResults.totalScore);
-//       overallCard.setAttribute("total", assessmentResults.maxPossibleScore);
-//       overallCard.setAttribute(
-//         "color",
-//         this.getScoreColor(assessmentResults.totalScore, assessmentResults.maxPossibleScore)
-//       );
-
-//       // Populate Category Breakdown Progress Cards
-//       this.populateCategoryCard(
-//         "#technical-card",
-//         "Technical Skills",
-//         assessmentResults.categoryScores.technical
-//       );
-//       this.populateCategoryCard(
-//         "#communication-card",
-//         "Communication",
-//         assessmentResults.categoryScores.communication
-//       );
-//       this.populateCategoryCard(
-//         "#problem-solving-card",
-//         "Problem Solving",
-//         assessmentResults.categoryScores.problemSolving
-//       );
-//       this.populateCategoryCard(
-//         "#soft-skills-card",
-//         "Soft Skills",
-//         assessmentResults.categoryScores.softSkills
-//       );
-
-//       // Populate Strengths and Areas to Improve
-//       const strengthsCard = this.shadowRoot.querySelector("#strengths-card");
-//       strengthsCard.setAttribute("title", "Your Strengths");
-//       strengthsCard.setAttribute("title-color", "#065f46");
-//       strengthsCard.setAttribute("title-icon", "✅");
-//       strengthsCard.setAttribute("background", "#F0FDF4");
-//       strengthsCard.setAttribute("items", assessmentResults.strengths.join("|"));
-//       strengthsCard.setAttribute("item-icon", "✔️");
-
-//       const improvementsCard =
-//         this.shadowRoot.querySelector("#improvements-card");
-//       improvementsCard.setAttribute("title", "Areas to Improve");
-//       improvementsCard.setAttribute("title-color", "#92400E");
-//       improvementsCard.setAttribute("title-icon", "⚠️");
-//       improvementsCard.setAttribute("background", "#FFFBEB");
-//       improvementsCard.setAttribute(
-//         "items",
-//         assessmentResults.areasToImprove.join("|")
-//       );
-//       improvementsCard.setAttribute("item-icon", "⚠️");
-
-//       this.shadowRoot.getElementById("loading-message").classList.add("hidden");
-//       this.shadowRoot
-//         .getElementById("results-content")
-//         .classList.remove("hidden");
-//     } catch (error) {
-//       console.error("Failed to load assessment results:", error);
-//       this.shadowRoot.getElementById("loading-message").textContent =
-//         "Failed to load results. Please try again later.";
-//     }
-//   }
-
-//   populateCategoryCard(id, category, scores) {
-//     console.log(scores);
-//     const categoryIcons = {
-//       technicalskills: "🧠",
-//       communication: "💬",
-//       problemsolving: "🧩",
-//       softskills: "🤝",
-//     };
-
-//     // Normalize category key (remove spaces and lowercase)
-//     const key = category.replace(/\s+/g, "").toLowerCase();
-//     const icon = categoryIcons[key] || "❓";
-
-//     const card = this.shadowRoot.querySelector(id);
-//     card.setAttribute("category", category);
-//     card.setAttribute("current", scores.score);
-//     card.setAttribute("total", scores.maxScore);
-//     card.setAttribute("icon", icon);
-//     card.setAttribute(
-//       "color",
-//       this.getScoreColor(parseInt(scores.score), parseInt(scores.maxScore))
-//     );
-//   }
-
-//   getScoreColor(score, maxScore) {
-//     const percentage = (score / maxScore) * 100;
-//     if (percentage >= 80) return "#10b981"; // green
-//     if (percentage >= 60) return "#3b82f6"; // blue
-//     if (percentage >= 40) return "#f59e0b"; // amber
-//     return "#ef4444"; // red
-//   }
-// }
-
-// customElements.define("results-page", ResultsPage);
-
-
-
-
 import "./results-progress-card.js";
 import "./results-summary-card.js";
 import "./dynamic-button.js";
 import "./progress-bar.js";
-import { ApiService } from '../services/api.js';
+import { ApiService } from "../services/api.js";
 
 const template = document.createElement("template");
 
@@ -307,7 +71,6 @@ class ResultsPage extends HTMLElement {
   async connectedCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const assessmentId = urlParams.get("assessmentId");
-    console.log("Assessment id:" + assessmentId);
 
     if (!assessmentId) {
       console.error(
@@ -321,28 +84,8 @@ class ResultsPage extends HTMLElement {
       `/api/assessments/${assessmentId}/results`
     );
 
-    console.log(response.data);
     const assessmentResults = response.data;
 
-    const mockResults = {
-      employabilityRating: "Needs Improvement",
-      feedback:
-        "You have foundational software engineering knowledge but need to strengthen several key areas before being ready for professional roles.",
-      totalScore: 5,
-      maxPossibleScore: 15, // Assuming totalScore should not exceed maxPossibleScore for 100%
-      categoryScores: {
-        technical: { score: 4, maxScore: 6 },
-        communication: { score: 2, maxScore: 3 },
-        problemSolving: { score: 1, maxScore: 3 },
-        softSkills: { score: 3, maxScore: 3 },
-      },
-      strengths: [
-        "Reliable and consistent",
-        "Strong collaboration",
-        "Empathetic leadership",
-      ],
-      areasToImprove: ["Clear and constructive communication"],
-    };
     const ratingCardEl = this.shadowRoot.querySelector("#rating-card");
 
     function getScoreFeedbackRatings(score, maxScore) {
@@ -377,7 +120,6 @@ class ResultsPage extends HTMLElement {
     const rating = getScoreFeedbackRatings(score, maxScore);
     const ratingStyle = colors[rating] || { bg: "#E5E7EB", title: "#4B5563" }; // Default style
 
-  
     ratingCardEl.setAttribute("title", assessmentResults.employabilityRating);
     ratingCardEl.setAttribute("title-color", ratingStyle.title);
     ratingCardEl.setAttribute("background", ratingStyle.bg);
@@ -385,20 +127,28 @@ class ResultsPage extends HTMLElement {
     ratingCardEl.setAttribute("item-color", ratingStyle.title);
     ratingCardEl.setAttribute(
       "title-icon",
-      rating.includes("Not Employable") ||
-          rating.includes("Needs Improvement")
-          ? "⚠️"
-          : "✅"
+      rating.includes("Not Employable") || rating.includes("Needs Improvement")
+        ? "⚠️"
+        : "✅"
     );
 
     // Populate Overall Score Progress Card
     const overallCard = this.shadowRoot.querySelector("#overall-score-card");
     overallCard.setAttribute("category", "Overall Score");
-    overallCard.setAttribute("current", assessmentResults.totalScore.toString());
-    overallCard.setAttribute("total", assessmentResults.maxPossibleScore.toString());
+    overallCard.setAttribute(
+      "current",
+      assessmentResults.totalScore.toString()
+    );
+    overallCard.setAttribute(
+      "total",
+      assessmentResults.maxPossibleScore.toString()
+    );
     overallCard.setAttribute(
       "color",
-      this.getScoreColor(assessmentResults.totalScore, assessmentResults.maxPossibleScore)
+      this.getScoreColor(
+        assessmentResults.totalScore,
+        assessmentResults.maxPossibleScore
+      )
     );
 
     // Populate Category Breakdown Progress Cards
@@ -429,7 +179,10 @@ class ResultsPage extends HTMLElement {
     strengthsCardEl.setAttribute("title-color", "#065f46");
     strengthsCardEl.setAttribute("title-icon", "✅");
     strengthsCardEl.setAttribute("background", "#F0FDF4");
-    strengthsCardEl.setAttribute("items", assessmentResults.strengths.join("|"));
+    strengthsCardEl.setAttribute(
+      "items",
+      assessmentResults.strengths.join("|")
+    );
     strengthsCardEl.setAttribute("item-icon", "✔️");
 
     const improvementsCardEl =
@@ -444,37 +197,15 @@ class ResultsPage extends HTMLElement {
     );
     improvementsCardEl.setAttribute("item-icon", "⚠️");
 
-    // Add event listeners for buttons
-    this.shadowRoot.querySelectorAll("dynamic-button").forEach((button) => {
-      const eventName = button.getAttribute("on-click");
-      if (eventName === "retestClicked") {
-        button.addEventListener("retestClicked", () => {
-          // Handle retest logic, e.g., navigate to assessment page
-          console.log("Retest clicked");
-          // window.location.href = '/assessment';
-        });
-      } else if (eventName === "shareClicked") {
-        button.addEventListener("shareClicked", () => {
-          // Handle share logic
-          console.log("Share clicked");
-          // navigator.share({ title: 'My Assessment Results', text: 'Check out my employability assessment results!', url: window.location.href });
-        });
-      }
-    });
   }
 
   populateCategoryCard(id, category, scores) {
-    console.log(scores);
     const categoryIcons = {
       technicalskills: "🧠",
       communication: "💬",
       problemsolving: "🧩",
       softskills: "🤝",
     };
-    console.log(scores.score);
-
-
-    console.log(category);
 
     const key = category.replace(/\s+/g, "").toLowerCase();
     const icon = categoryIcons[key] || "❓";
