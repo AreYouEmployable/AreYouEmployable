@@ -38,26 +38,31 @@ class ProgressBar extends HTMLElement {
     bar.value = this.current;
     bar.max = this.total;
 
-    const style = this.shadowRoot.querySelector("style");
+
+    let style = this.shadowRoot.querySelector("style");
+     if (!style) {
+      style = document.createElement("style");
+      this.shadowRoot.appendChild(style);
+    }
     style.textContent = `
         progress {
           appearance: none;
           width: 100%;
-          height: 8px;
+          height: 0.8rem;
           border: none;
-          border-radius: 4px;
+          border-radius: 0.4rem;
           background-color: #e5e7eb;
           overflow: hidden;
         }
 
         progress::-webkit-progress-bar {
           background-color: #e5e7eb;
-          border-radius: 4px;
+          border-radius: 0.4rem;
         }
 
         progress::-webkit-progress-value {
           background-color: ${color};
-          border-radius: 4px;
+          border-radius: 0.4rem;
           transition: width 0.3s ease;
         }
 
@@ -68,5 +73,6 @@ class ProgressBar extends HTMLElement {
       `;
   }
 }
-
+if (!customElements.get("progress-bar")) {
 customElements.define("progress-bar", ProgressBar);
+}

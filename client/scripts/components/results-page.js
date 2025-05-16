@@ -234,5 +234,6 @@ class ResultsPage extends HTMLElement {
     return "#ef4444"; // red
   }
 }
-
+if (!customElements.get("results-page")) {
 customElements.define("results-page", ResultsPage);
+}

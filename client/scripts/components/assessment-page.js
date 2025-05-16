@@ -468,7 +468,7 @@ class AssessmentPage extends HTMLElement {
         const p2 = document.createElement('p');
         p2.className = 'mt-2';
         const link = document.createElement('a');
-        link.href = `/assessment-results?assessmentId=${this.assessmentId}`;
+        link.href = `/results?assessmentId=${this.assessmentId}`;
         link.className = 'text-blue-600 hover:underline';
         link.textContent = 'View Results Now';
         p2.appendChild(link);
