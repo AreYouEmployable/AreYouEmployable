@@ -16,7 +16,6 @@ homePageHeader.className = 'home-page__header';
 
 const h1Title = document.createElement('h1');
 h1Title.className = 'home-page__title';
-// Constructing the H1 title with DOM methods
 h1Title.appendChild(document.createTextNode('ARE '));
 const spanHighlight = document.createElement('span');
 spanHighlight.className = 'home-page__title-highlight';

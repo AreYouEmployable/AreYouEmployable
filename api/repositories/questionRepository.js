@@ -69,7 +69,7 @@ async function findByScenarioIds(dbClient, scenarioIds) {
  * @returns {Promise<Array<object>>} An array of question objects.
  */
 export async function findByScenarioId(dbClient, scenarioId) {
-    if (!scenarioId) { // Ensure scenarioId is valid
+    if (!scenarioId) { 
       return [];
     }
     const query = `

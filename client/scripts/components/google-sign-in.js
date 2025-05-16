@@ -32,7 +32,6 @@ class GoogleSignIn extends HTMLElement {
     async render() {
         if (!this.signInContainer) return;
 
-        // Clear previous content using DOM manipulation
         while (this.signInContainer.firstChild) {
             this.signInContainer.removeChild(this.signInContainer.firstChild);
         }
@@ -82,14 +81,8 @@ class GoogleSignIn extends HTMLElement {
             }
         } catch (error) {
             console.error('Error rendering GoogleSignIn:', error);
-            // Display error message using DOM manipulation
             const errorTextNode = document.createTextNode('Error loading sign-in button.');
             this.signInContainer.appendChild(errorTextNode);
-            // Or, for more structure/styling:
-            // const errorParagraph = document.createElement('p');
-            // errorParagraph.textContent = 'Error loading sign-in button.';
-            // errorParagraph.className = 'error-message'; // Add a class for styling
-            // this.signInContainer.appendChild(errorParagraph);
         }
     }
 

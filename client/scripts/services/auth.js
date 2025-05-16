@@ -18,7 +18,6 @@ export class AuthService {
         const redirectUri = `${config.API_URL}/api/auth/google/callback`;
         const scope = 'openid email profile';
         
-        // Generate a random state for CSRF protection
         const state = crypto.randomUUID();
         localStorage.setItem('oauth_state', state);
         
@@ -40,7 +39,6 @@ export class AuthService {
         const error = params.get('error');
         const state = params.get('state');
 
-        // Verify state to prevent CSRF attacks
         const savedState = localStorage.getItem('oauth_state');
         localStorage.removeItem('oauth_state');
 

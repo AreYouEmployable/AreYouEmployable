@@ -24,7 +24,6 @@ class Router {
   displayErrorInAppMain(titleText, messageText = '') {
     const appMain = document.querySelector('app-main');
     if (appMain) {
-      // Clear previous content using DOM manipulation
       while (appMain.firstChild) {
         appMain.removeChild(appMain.firstChild);
       }
@@ -55,7 +54,6 @@ class Router {
         console.warn(`Router: No specific route or wildcard route found for "${path}". Defaulting to home '/'.`);
       } else {
         console.error(`Router: CRITICAL - No route found for path "${path}", and no wildcard '*' or home '/' route is configured.`);
-        // This now calls the updated displayErrorInAppMain
         this.displayErrorInAppMain('Error: Application routing is not configured correctly.', 'Please define a home ("/") or wildcard ("*") route.');
         return;
       }
@@ -67,7 +65,6 @@ class Router {
         targetRoute = forbiddenRoute;
       } else {
         console.error("Router: Forbidden route accessed but no '/forbidden' path is configured.");
-        // This also calls the updated displayErrorInAppMain
         this.displayErrorInAppMain('Error: Access Forbidden', 'And no forbidden page is configured.');
         return;
       }
@@ -89,15 +86,6 @@ class Router {
   loadComponent(componentName, data = {}) {
     const appMain = document.querySelector('app-main');
     if (appMain) {
-      // If app-main itself needs clearing before attributes are set,
-      // and it doesn't handle its own content replacement based on attribute changes,
-      // you might clear it here too. For now, assuming app-main re-renders based on attributes.
-      // Example:
-      // if (componentName !== 'error-page' && componentName !== 'forbidden-page') { // Avoid re-clearing if an error was just shown
-      //   while (appMain.firstChild) {
-      //     appMain.removeChild(appMain.firstChild);
-      //   }
-      // }
       appMain.setAttribute('data-component', componentName);
       appMain.setAttribute('data-props', JSON.stringify(data));
     } else {

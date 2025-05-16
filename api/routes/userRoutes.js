@@ -3,7 +3,6 @@ import getUsers from '../controllers/userController.js';
 import { verifyGoogleIdToken } from '../middlewares/authMiddleware.js'; 
 const router = express.Router();
 
-// Add auth middleware and controller
 
 /**
  * @swagger
