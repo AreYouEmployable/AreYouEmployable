@@ -118,7 +118,7 @@ class ResultsPage extends HTMLElement {
     const score = assessmentResults.totalScore;
     const maxScore = assessmentResults.maxPossibleScore;
     const rating = getScoreFeedbackRatings(score, maxScore);
-    const ratingStyle = colors[rating] || { bg: "#E5E7EB", title: "#4B5563" }; // Default style
+    const ratingStyle = colors[rating] || { bg: "#E5E7EB", title: "#4B5563" }; 
 
     ratingCardEl.setAttribute("title", assessmentResults.employabilityRating);
     ratingCardEl.setAttribute("title-color", ratingStyle.title);
@@ -132,7 +132,6 @@ class ResultsPage extends HTMLElement {
         : "✅"
     );
 
-    // Populate Overall Score Progress Card
     const overallCard = this.shadowRoot.querySelector("#overall-score-card");
     overallCard.setAttribute("category", "Overall Score");
     overallCard.setAttribute(
@@ -151,7 +150,6 @@ class ResultsPage extends HTMLElement {
       )
     );
 
-    // Populate Category Breakdown Progress Cards
     this.populateCategoryCard(
       "#technical-card",
       "Technical Skills",
@@ -173,7 +171,6 @@ class ResultsPage extends HTMLElement {
       assessmentResults.categoryScores.softskills
     );
 
-    // Populate Strengths and Areas to Improve
     const strengthsCardEl = this.shadowRoot.querySelector("#strengths-card");
     strengthsCardEl.setAttribute("title", "Your Strengths");
     strengthsCardEl.setAttribute("title-color", "#065f46");
@@ -226,12 +223,12 @@ class ResultsPage extends HTMLElement {
   }
 
   getScoreColor(score, maxScore) {
-    if (maxScore === 0) return "#9ca3af"; // gray for no score/maxScore
+    if (maxScore === 0) return "#9ca3af"; 
     const percentage = (score / maxScore) * 100;
-    if (percentage >= 80) return "#10b981"; // green
-    if (percentage >= 60) return "#3b82f6"; // blue
-    if (percentage >= 40) return "#f59e0b"; // amber
-    return "#ef4444"; // red
+    if (percentage >= 80) return "#10b981"; 
+    if (percentage >= 60) return "#3b82f6"; 
+    if (percentage >= 40) return "#f59e0b"; 
+    return "#ef4444"; 
   }
 }
 if (!customElements.get("results-page")) {

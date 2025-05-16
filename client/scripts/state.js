@@ -22,7 +22,6 @@ class Store {
     }
   }
   
-  // Initial state
   const initialState = {
     user: null,
     posts: [],

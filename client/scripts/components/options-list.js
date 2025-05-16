@@ -1,4 +1,4 @@
-const optionsListTemplate = document.createElement('template'); // Renamed to avoid conflict if used in same scope as other templates
+const optionsListTemplate = document.createElement('template'); 
 
 const stylesheetLink = document.createElement('link');
 stylesheetLink.setAttribute('rel', 'stylesheet');

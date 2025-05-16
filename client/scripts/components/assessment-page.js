@@ -254,14 +254,14 @@ class AssessmentPage extends HTMLElement {
       this.scenarioQuestionsContainer.appendChild(p);
       this.submittedCurrentScenario = true;
     } else {
-      this.currentScenarioData.questions.forEach((question) => { // Removed unused questionIndex
-        const questionElement = document.createElement('section'); // Changed div to section for semantic grouping
+      this.currentScenarioData.questions.forEach((question) => { 
+        const questionElement = document.createElement('section'); 
         questionElement.className = 'question-item mb-4 p-4 border border-gray-200 rounded-lg shadow-sm';
 
         const questionHeader = document.createElement('question-header');
         questionHeader.setAttribute('title', question.question_text);
 
-        const optionsList = document.createElement('section'); // Changed div to section
+        const optionsList = document.createElement('section'); 
         optionsList.className = 'options-list mt-2';
 
         question.options.forEach((option) => {
@@ -480,8 +480,7 @@ class AssessmentPage extends HTMLElement {
     }
 
     try {
-        // Assuming the API endpoint is to finalize or mark completion
-        await ApiService.post(`/api/assessment/submit/${this.assessmentId}`); // Or a more appropriate endpoint like /finalize
+        await ApiService.post(`/api/assessment/submit/${this.assessmentId}`);
     } catch (finalizationError) {
       console.error("AssessmentPage: Error during final assessment finalization call:", finalizationError);
     }

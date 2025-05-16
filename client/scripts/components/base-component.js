@@ -6,7 +6,6 @@ export class BaseComponent extends HTMLElement {
     this._props = {};
   }
 
-  // Lifecycle methods
   connectedCallback() {
     this.render();
     this.afterRender();
@@ -16,7 +15,6 @@ export class BaseComponent extends HTMLElement {
     this.cleanup();
   }
 
-  // State management
   setState(newState) {
     this._state = { ...this._state, ...newState };
     this.render();
@@ -26,7 +24,6 @@ export class BaseComponent extends HTMLElement {
     return this._state;
   }
 
-  // Props management
   setProps(props) {
     this._props = { ...this._props, ...props };
     this.render();
@@ -36,7 +33,6 @@ export class BaseComponent extends HTMLElement {
     return this._props;
   }
 
-  // Template and rendering
   getTemplate() {
     throw new Error('getTemplate() must be implemented by subclass');
   }
@@ -47,16 +43,12 @@ export class BaseComponent extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
-  // Hooks
   afterRender() {
-    // Override in subclass if needed
   }
 
   cleanup() {
-    // Override in subclass if needed
   }
 
-  // Utility methods
   dispatchCustomEvent(name, detail = {}) {
     this.dispatchEvent(new CustomEvent(name, {
       detail,
