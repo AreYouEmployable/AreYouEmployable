@@ -115,8 +115,6 @@ class Router {
 
 const routes = [
   { path: '/', component: 'home-page', data: { title: 'Welcome Home' } },
-  { path: '/about', component: 'about-page', data: { title: 'About Us' } },
-  { path: '/contact', component: 'contact-page', data: { title: 'Contact Us' } },
   { path: '/assessment', component: 'assessment-page', data: { title: 'Assessment' }, protected: true },
   { path: '/forbidden', component: 'forbidden-page', data: { title: '' } },
   { path: '*', component: 'not-found-page', data: { title: '' } },
