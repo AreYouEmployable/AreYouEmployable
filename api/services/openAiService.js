@@ -46,7 +46,7 @@ export async function generateAssessmentResultSummary(assessmentId) {
         return resultSummary;
     } catch (error) {
         console.error("Error generating assessment result summary:", error);
-        // Fallbacks based on score
+    
         const score = total > 0 ? correct / total : 0;
         if (score <= 0.4) {
             return "The user showed limited understanding of core software engineering concepts.";

@@ -55,7 +55,6 @@ export const getScenarioInfo = async (assessmentId, scenarioId) => {
     return result.rows[0];
 };
 
-// scenarioRepository.js
 
 /**
  * Fetches a specified number of random scenarios from the database.
